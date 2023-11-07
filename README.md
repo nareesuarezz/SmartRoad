@@ -10,7 +10,9 @@ Apart from incorporating a cyclist alert which notifies the car driver when his 
 These are the database entities that we are using to store all the information for this application to work.
 
 **Vehicles** : This entity has an Unique ID **(UID)**, and the type of vehicle that it is **(Vehicle)**
+
 **Tracks** : This entity has an ID of the track **(ID)**, the location of the track **(Location)**, the status of the vehicle that it tracked **(Status)**, the speed of the vehicle **(Speed)**, a JSON of extra information like an encounter with a bike **(Extra)** and also the Vehicle UID **(Vehicle_UID)**
+
 **User** : This entity has and ID of the user **(ID)**, an username **(Username)** and a password **(Password)**
 
 In our database, we assume that a user (in this case the user is an administrator since a common user does not require to login and is anonymous) can manage many tracks and a track can be managed by several administrators. Also, a vehicle can send many tracks and a track only belongs to one vehicle.
