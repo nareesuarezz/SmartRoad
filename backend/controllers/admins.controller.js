@@ -63,42 +63,56 @@ exports.findOne = (req, res) => {
 };
 
 // Update an Admin by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
   const id = req.params.id;
   const updateAdmin = {
     Username: req.body.Username,
-    Password: req.body.Password
-  }
+    Password: req.body.Password,
+  };
 
-  if (req.file) {
-    updateAdmin.filename = req.file.filename;
-  }
+  try {
+    const admin = await Admins.findByPk(id);
 
-  console.log(updateAdmin)
-  Admins.findByPk(id)
-    .then(admin => {
-      if (admin) {
-        // Actualizar la base de datos primero
-        return admin.update(updateAdmin);
-      } else {
-        res.send({
-          message: `Cannot update Admin with id=${id}. Maybe Admin was not found or req.body is empty!`
-        });
+    if (!admin) {
+      return res.status(404).send({
+        message: `Cannot update Admin with id=${id}. Maybe Admin was not found or req.body is empty!`,
+      });
+    }
+
+    const previousImagePath = path.join(__dirname, '../public/images', admin.filename);
+
+    // Elimina la imagen anterior independientemente de si se proporciona una nueva imagen
+    fs.unlink(previousImagePath, (err) => {
+      if (err) {
+        console.error('Error al eliminar la imagen anterior:', err);
       }
-    })
-    .then(updatedAdmin => {
-      // Enviar la respuesta después de la actualización de la base de datos
-      res.send({
-        message: `Admin was updated successfully.`,
-        updatedAdmin: updatedAdmin
-      });
-    })
-    .catch(err => {
-      res.status(500).send({
-        message: "Error updating Admin with id=" + id
-      });
     });
+
+    if (req.file) {
+      updateAdmin.filename = req.file.filename;
+    } else {
+      // Si no se proporciona una nueva imagen, establece el nombre del archivo en una cadena vacía
+      updateAdmin.filename = "";
+    }
+
+    const updatedAdmin = await admin.update(updateAdmin);
+
+    console.log('Admin actualizado en la base de datos:', updatedAdmin);
+
+    res.send({
+      message: `Admin was updated successfully.`,
+      updatedAdmin: updatedAdmin,
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: `Error updating Admin with id=${id}: ${err.message}`,
+    });
+  }
 };
+
+
+
+
 
 
 
@@ -114,22 +128,18 @@ exports.delete = (req, res) => {
         });
       }
 
-      // Obtén la ruta del directorio del controlador
-      const controllerDir = path.dirname(__filename);
-
-      // Construye la ruta relativa al archivo de imagen
-      const imagePath = path.join(controllerDir, '../public/images', admin.filename);
-
-      // Elimina el archivo de imagen
-      fs.unlink(imagePath, (err) => {
-        if (err) {
-          console.error('Error al eliminar la imagen:', err);
-        }
-      });
-
-      // Delete the admin record in the database
       admin.destroy()
         .then(() => {
+          const controllerDir = path.dirname(__filename);
+
+          const imagePath = path.join(controllerDir, '../public/images', admin.filename);
+
+          fs.unlink(imagePath, (err) => {
+            if (err) {
+              console.error('Error al eliminar la imagen:', err);
+            }
+          });
+
           res.send({
             message: 'Admin was deleted successfully.'
           });
@@ -151,26 +161,16 @@ exports.deleteAll = (req, res) => {
   Admins.findAll()
     .then(admins => {
       admins.forEach(admin => {
-        // Obtén la ruta del directorio del controlador
         const controllerDir = path.dirname(__filename);
-
-        // Construye la ruta relativa al archivo de imagen
         const imagePath = path.join(controllerDir, '../public/images', admin.filename);
 
-        // Elimina el archivo de imagen
         fs.unlink(imagePath, (err) => {
           if (err) {
             console.error('Error al eliminar la imagen:', err);
           }
         });
-
-        admin.destroy()
-          .catch(err => {
-            console.error(`Error deleting Admin with id=${admin.UID}: ${err.message}`);
-          });
       });
 
-      // Delete all admin records in the database
       return Admins.destroy({
         where: {},
         truncate: false
@@ -185,3 +185,4 @@ exports.deleteAll = (req, res) => {
       });
     });
 };
+

@@ -1,0 +1,61 @@
+@keyframes slideInFromRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .image {
+    text-align: center;
+    margin-top: 15em;
+    animation: slideInFromRight 1s ease-out;
+  }
+  
+  .image.animation-complete {
+    animation: none; 
+  }
+  
+  .image img {
+    width: 80%;
+    max-width: 200px;
+    display: block;
+    margin: 0 auto;
+  }
+  
+  @keyframes fadeInFromRight {
+    0% {
+      transform: translateX(100%);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  .slogan {
+    text-align: center;
+    opacity: 0; 
+    animation: fadeInFromRight 1s ease-out 0.5s forwards; 
+  }
+  
+  .animation-complete .slogan {
+    opacity: 1; 
+  }
+  
+  .slogan h1 {
+    font-size: 1.5em;
+  }
+  
+  .credits {
+    text-align: center;
+    font-size: 0.8em;
+    position: absolute;
+    bottom: 10px;
+    width: 100%;
+  }
+  
