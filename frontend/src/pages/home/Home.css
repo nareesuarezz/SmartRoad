@@ -1,0 +1,61 @@
+.title {
+
+    text-align: center;
+    margin-top: 7em;
+    margin-bottom: 2em;
+  }
+  
+  .question {
+    text-align: center;
+    margin-top: 0.5em;
+  }
+  
+  .vehicle-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    margin-top: 4em;
+  }
+  
+  .vehicle-box {
+    background-color: #aedff7; 
+    width: 130px;
+    height: 130px;
+    text-align: center;
+  }
+  
+.bicycle {
+    margin-bottom: 3em;
+}
+
+.car {
+    margin-bottom: 3em;
+}
+
+  .vehicle-box img {
+    margin-top: 15px;
+    width: 100px; 
+  }
+  
+  .bicycle-box {
+    border-radius: 8px; 
+  }
+  
+  .car-box {
+    background-color: #c6f7ae;
+    border-radius: 8px; 
+  }
+  
+  .admin{
+    margin-top: 3em;
+    text-align: center;
+    font-size: 13px;
+    color: grey;
+  }
+
+  .log{
+    margin-top: -1em;
+    text-decoration: underline;
+  }
+ 
+  
