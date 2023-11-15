@@ -1,0 +1,46 @@
+.warn {
+    text-align: center;
+    margin: 10vh;
+}
+
+.logged {
+    text-align: center;
+    margin-top: 0.5em;
+}
+
+.car-title {
+    text-align: center;
+    margin-top: 7em;
+    margin-bottom: 2em;
+}
+
+.car-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    margin-top: 15vh;}
+
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.7);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+    
+    .modal {
+        background: white;
+        padding: 5px;
+        border-radius: 5px;
+        text-align: center;
+    }
+    
+    .arrow{
+        margin-top: 2vh;
+        margin-left: 2vw;
+        font-size: 30px;
+    }

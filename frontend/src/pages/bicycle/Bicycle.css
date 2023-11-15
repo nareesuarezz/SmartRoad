@@ -1,0 +1,21 @@
+.warn {
+    text-align: center;
+    margin: 10vh;
+}
+
+.logged {
+    text-align: center;
+    margin-top: 0.5em;
+}
+
+.bike-title {
+    text-align: center;
+    margin-top: 7em;
+    margin-bottom: 2em;
+}
+
+.bicycle-container {
+    display: flex;
+    flex-direction: column; 
+    align-items: center; 
+    margin-top: 15vh;}
