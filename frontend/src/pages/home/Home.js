@@ -52,6 +52,10 @@ function Home() {
         getLocation();
     }
 
+    const goLogin = () => {
+        window.location.href = "/login";
+    }
+
     return (
         <>
             <div className="title">
@@ -73,7 +77,7 @@ function Home() {
             </div>
             <div className='admin'>
                 <p>¿Eres un administrador?</p>
-                <p className='log'>Inicia sesión aquí</p>
+                <p className='log' onClick={goLogin}>Inicia sesión aquí</p>
             </div>
         </>
     );
