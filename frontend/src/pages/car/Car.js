@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import logoCar from '../../img/car.png';
 import './Car.css';
-import bikeWarningSound from '../../sounds/sound.mp3';
+import bikeWarningSound from '../../sounds/sound3.mp3';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
 

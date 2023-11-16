@@ -72,23 +72,27 @@ exports.update = (req, res) => {
 
     Tracks.findByPk(id)
         .then(track => {
-            if (track) {
-                res.send({
-                    message: `Track was updated successfully.`
-                });
-                return track.update(updateTrack);
-            } else {
-                res.send({
-                    message: `Cannot update Track with id=${id}. Maybe Track was not found or req.body is empty!`
+            if (!track) {
+                return res.status(404).send({
+                    message: `Cannot update Track with id=${id}. Track not found!`
                 });
             }
+
+            return track.update(updateTrack);
+        })
+        .then(updatedTrack => {
+            res.send({
+                message: `Track with id=${id} was updated successfully.`,
+                updatedTrack: updatedTrack
+            });
         })
         .catch(err => {
             res.status(500).send({
-                message: "Error updating Track with id=" + id
+                message: `Error updating Track with id=${id}: ${err.message}`
             });
         });
 };
+
 
 // Delete a Track with the specified id in the request
 exports.delete = (req, res) => {

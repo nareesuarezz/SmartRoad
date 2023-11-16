@@ -1,0 +1,96 @@
+.container {
+  padding: 20px;
+  max-width: 100%;
+}
+
+.button-primary {
+  margin-top: 20px;
+}
+
+.table {
+  width: 100%;
+  margin-top: 20px;
+  overflow-x: auto;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  word-break: break-all; /* Añadido para romper palabras largas */
+}
+
+.table th {
+  background-color: #f2f2f2;
+  font-size: 10px;
+}
+
+.button-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.button-actions button {
+  width: 100%;
+  padding: 10px;
+  cursor: pointer;
+}
+
+.button-actions .button-edit {
+  background-color: #2196F3;
+  color: #fff;
+  border: none;
+}
+
+.button-actions .button-delete {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+}
+
+/* Media Query para PC (más de 1023px) */
+@media only screen and (min-width: 1024px) {
+  .container {
+    max-width: 800px;
+  }
+
+  .button-actions {
+    flex-direction: row;
+  }
+
+  .button-actions button {
+    width: auto;
+    margin-right: 10px;
+  }
+}
+
+.table th, .table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+  word-break: break-all;
+  /* Ajusta el ancho de la columna "Speed" para todas las pantallas */
+  width: 120px;
+}
+
+/* Media Query para tablet (768px - 1023px) */
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
+  .container {
+    max-width: 600px;
+  }
+  
+  /* Anula el ancho específico para tablet */
+  .table th.speed, .table td.speed {
+    width: auto;
+  }
+}
+
+/* Media Query para móviles (menos de 768px) */
+@media only screen and (max-width: 767px) {
+  /* Anula el ancho específico para móviles */
+  .table th.speed, .table td.speed {
+    width: auto;
+  }
+}
