@@ -41,7 +41,7 @@ const VehicleAdd = ({ getVehicles }) => {
     <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
     <form onSubmit={handleSubmit}>
       <label>
-          Status:
+          Vehicle:
           <select name="Status" value={formData.Status} onChange={handleChange}>
             <option value="">Seleccionar</option>
             <option value="stopped">Bike</option>

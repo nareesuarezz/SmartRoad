@@ -92,7 +92,11 @@ const TrackEdit = ({ getTracks }) => {
                 </label>
                 <label>
                     Status:
-                    <input type="text" name="Status" value={formData.Status} onChange={handleChange} />
+                    <select name="Status" value={formData.Status} onChange={handleChange}>
+                        <option value="">Select</option>
+                        <option value="stopped">Stopped</option>
+                        <option value="moving">Moving</option>
+                    </select>
                 </label>
                 <label>
                     Speed:
