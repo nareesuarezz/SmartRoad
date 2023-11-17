@@ -9,6 +9,13 @@ import Login from './pages/login/Login';
 import TrackList from './pages/tracks/trackList';
 import TrackAdd from './pages/tracks/trackAdd';
 import TrackEdit from './pages/tracks/trackEdit';
+import VehicleList from './pages/vehicles/vehiclesList';
+import VehicleAdd from './pages/vehicles/vehiclesAdd';
+import VehicleEdit from './pages/vehicles/vehiclesEdit';
+import AdminList from './pages/admins/adminList';
+import AdminAdd from './pages/admins/adminAdd';
+import AdminEdit from './pages/admins/adminEdit';
+import LogList from './pages/logs/logList';
 
 function App() {
   return (
@@ -23,7 +30,14 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/track-list" element={<TrackList />} />
           <Route path="/track-add" element={<TrackAdd />} />
-          <Route path="/edit/:id" element={<TrackEdit />} />
+          <Route path="/track-edit/:id" element={<TrackEdit />} />
+          <Route path="/vehicle-list" element={<VehicleList />} />
+          <Route path="/vehicle-add" element={<VehicleAdd />} />
+          <Route path="/vehicle-edit/:id" element={<VehicleEdit />} />
+          <Route path="/admin-list" element={<AdminList />} />
+          <Route path="/admin-add" element={<AdminAdd />} />
+          <Route path="/admin-edit/:id" element={<AdminEdit />} />
+          <Route path="/log-list" element={<LogList />} />
         </Routes>
       </BrowserRouter>
     </>

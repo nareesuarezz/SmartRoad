@@ -4,6 +4,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import './trackList.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import Header from '../../components/header/header';
 
 const TrackList = () => {
   const [tracks, setTracks] = useState([]);
@@ -36,8 +37,9 @@ const TrackList = () => {
 
   return (
     <div>
+      <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <Link to="/track-add" className="button is-primary mt-2">
+      <Link to="/track-add" className="add">
         Add New Track
       </Link>
 
@@ -56,19 +58,19 @@ const TrackList = () => {
         <tbody>
           {tracks.map((track, index) => (
             <tr key={track.ID}>
-              <td>{index + 1}</td>
+              <td>{track.ID}</td>
               <td>{track.Location.coordinates.join(', ')}</td>
               <td>{track.Status}</td>
               <td>{track.Speed}</td>
               <td>{JSON.stringify(track.Extra)}</td>
               <td>{track.Vehicle_UID}</td>
               <td>
-                <Link to={`/edit/${track.ID}`} className="button is-small is-info">
+                <Link to={`/track-edit/${track.ID}`} className="edit">
                   Edit
                 </Link>
-                <button onClick={() => deleteTrack(track.ID)} className="button is-small is-danger">
+                <Link to="#" onClick={() => deleteTrack(track.ID)} className="delete">
                   Delete
-                </button>
+                </Link>
               </td>
             </tr>
           ))}

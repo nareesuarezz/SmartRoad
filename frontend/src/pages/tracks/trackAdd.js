@@ -33,7 +33,15 @@ const TrackAdd = ({ getTracks }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Combina la latitud y la longitud en el formato esperado por el backend
+    if (!formData.Latitude || !formData.Longitude || !formData.Status || !formData.Speed || !formData.Extra || !formData.Vehicle_UID) {
+      const missingFields = Object.entries(formData)
+        .filter(([key, value]) => !value)
+        .map(([key]) => key);
+
+      alert(`Por favor, complete los siguientes campos: ${missingFields.join(', ')}`);
+      return;
+    }
+
     const location = {
       type: 'Point',
       coordinates: [parseFloat(formData.Longitude), parseFloat(formData.Latitude)],

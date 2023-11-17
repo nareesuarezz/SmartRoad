@@ -7,6 +7,10 @@
   margin-top: 20px;
 }
 
+.arrow {
+  margin-bottom: 5vh;
+}
+
 .table {
   width: 100%;
   margin-top: 20px;
@@ -14,11 +18,12 @@
   border-collapse: collapse;
 }
 
-.table th, .table td {
+.table th,
+.table td {
   border: 1px solid #ddd;
   padding: 8px;
   text-align: left;
-  word-break: break-all; /* Añadido para romper palabras largas */
+  word-break: break-all;
 }
 
 .table th {
@@ -38,22 +43,59 @@
   cursor: pointer;
 }
 
-.button-actions .button-edit {
-  background-color: #2196F3;
+.button-actions .button-edit,
+.button-actions .button-delete,
+.add,
+.edit,
+.delete {
   color: #fff;
+  padding: 5px 10px;
+  text-decoration: none;
+  border-radius: 4px;
+  cursor: pointer;
+  display: inline-block;
+}
+
+.button-actions .button-edit {
+  background-color: #2196f3;
   border: none;
 }
 
 .button-actions .button-delete {
   background-color: #f44336;
-  color: #fff;
   border: none;
 }
 
-/* Media Query para PC (más de 1023px) */
-@media only screen and (min-width: 1024px) {
+.add {
+  background-color: #f8ab2f;
+  margin-left: 10px;
+}
+
+.add:hover {
+  background-color: #fa7c38;
+}
+
+.edit {
+  background-color: #3c9de7;
+  margin-right: 20px;
+}
+
+.edit:hover {
+  background-color: #462bc0;
+}
+
+.delete {
+  background-color: #cf2310;
+  margin-top: 10px;
+}
+
+.delete:hover {
+  background-color: #7b0e02;
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1023px) {
   .container {
-    max-width: 800px;
+    max-width: 600px;
   }
 
   .button-actions {
@@ -66,31 +108,20 @@
   }
 }
 
-.table th, .table td {
-  border: 1px solid #ddd;
-  padding: 8px;
-  text-align: left;
-  word-break: break-all;
-  /* Ajusta el ancho de la columna "Speed" para todas las pantallas */
-  width: 120px;
-}
-
-/* Media Query para tablet (768px - 1023px) */
-@media only screen and (min-width: 768px) and (max-width: 1023px) {
+@media only screen and (min-width: 1024px) {
   .container {
-    max-width: 600px;
+    max-width: 800px;
   }
-  
-  /* Anula el ancho específico para tablet */
-  .table th.speed, .table td.speed {
-    width: auto;
+
+  .table th,
+  .table td {
+    width: 120px;
   }
 }
 
-/* Media Query para móviles (menos de 768px) */
 @media only screen and (max-width: 767px) {
-  /* Anula el ancho específico para móviles */
-  .table th.speed, .table td.speed {
+  .table th.speed,
+  .table td.speed {
     width: auto;
   }
 }

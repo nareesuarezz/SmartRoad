@@ -5,7 +5,7 @@ import './Home.css';
 
 function Home() {
     const handleClick = (vehicle) => {
-        debugger;
+        // debugger;
         const x = document.getElementById("demo");
 
         function getLocation() {

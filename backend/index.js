@@ -4,8 +4,8 @@ const path = require('path');
 
 const app = express();
 
-// Public directory
 app.use(express.static(path.join(__dirname, 'public')));
+app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 
 var corsOptions = {
   origin: "*"
@@ -14,12 +14,10 @@ var corsOptions = {
 app.use(cors(corsOptions));
 
 app.use(express.json());
-
 app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
 
-// Sync all models with force: true (caution: this will drop and recreate tables)
 db.sequelize.sync({ force: true }).then(() => {
   console.log("Database tables dropped and re-synced.");
 });
