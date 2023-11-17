@@ -29,11 +29,11 @@ const TrackAdd = ({ getTracks }) => {
   const goBack = () => {
     window.location.href = "/track-list";
   }
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.Latitude || !formData.Longitude || !formData.Status || !formData.Speed || !formData.Extra || !formData.Vehicle_UID) {
+    if (!formData.Latitude || !formData.Longitude || !formData.Status || !formData.Speed || !formData.Vehicle_UID) {
       const missingFields = Object.entries(formData)
         .filter(([key, value]) => !value)
         .map(([key]) => key);
@@ -60,34 +60,38 @@ const TrackAdd = ({ getTracks }) => {
 
   return (
     <>
-    <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-    <form onSubmit={handleSubmit}>
-      <label>
-        Latitude:
-        <input type="text" name="Latitude" value={formData.Latitude} onChange={(e) => handleLocationChange('Latitude', e.target.value)} />
-      </label>
-      <label>
-        Longitude:
-        <input type="text" name="Longitude" value={formData.Longitude} onChange={(e) => handleLocationChange('Longitude', e.target.value)} />
-      </label>
-      <label>
-        Status:
-        <input type="text" name="Status" value={formData.Status} onChange={handleChange} />
-      </label>
-      <label>
-        Speed:
-        <input type="text" name="Speed" value={formData.Speed} onChange={handleChange} />
-      </label>
-      <label>
-        Extra:
-        <input type="text" name="Extra" value={formData.Extra} onChange={handleChange} />
-      </label>
-      <label>
-        Vehicle UID:
-        <input type="text" name="Vehicle_UID" value={formData.Vehicle_UID} onChange={handleChange} />
-      </label>
-      <button type="submit">Add Track</button>
-    </form>
+      <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Latitude:
+          <input type="text" name="Latitude" value={formData.Latitude} onChange={(e) => handleLocationChange('Latitude', e.target.value)} />
+        </label>
+        <label>
+          Longitude:
+          <input type="text" name="Longitude" value={formData.Longitude} onChange={(e) => handleLocationChange('Longitude', e.target.value)} />
+        </label>
+        <label>
+          Status:
+          <select name="Status" value={formData.Status} onChange={handleChange}>
+            <option value="">Select</option>
+            <option value="stopped">Stopped</option>
+            <option value="moving">Moving</option>
+          </select>
+        </label>
+        <label>
+          Speed:
+          <input type="text" name="Speed" value={formData.Speed} onChange={handleChange} />
+        </label>
+        <label>
+          Extra:
+          <input type="text" name="Extra" value={formData.Extra} onChange={handleChange} />
+        </label>
+        <label>
+          Vehicle UID:
+          <input type="text" name="Vehicle_UID" value={formData.Vehicle_UID} onChange={handleChange} />
+        </label>
+        <button type="submit">Add Track</button>
+      </form>
     </>
   );
 };

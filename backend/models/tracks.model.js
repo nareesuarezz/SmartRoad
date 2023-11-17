@@ -10,7 +10,7 @@ module.exports = (sequelize, Sequelize) => {
       allowNull: false,
     },
     Status: {
-      type: Sequelize.ENUM('stopped', 'moving')
+      type: Sequelize.ENUM('Stopped', 'Moving')
     },
     Speed: {
       type: Sequelize.DECIMAL
