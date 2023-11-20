@@ -21,10 +21,6 @@ const VehicleAdd = ({ getVehicles }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.Vehicle) {
-      alert('Por favor, inserta un vehiculo.');
-      return;
-    }
 
     try {
       await axios.post('http://localhost:8080/api/vehicles', {
@@ -42,13 +38,13 @@ const VehicleAdd = ({ getVehicles }) => {
     <form onSubmit={handleSubmit}>
       <label>
           Vehicle:
-          <select name="Status" value={formData.Status} onChange={handleChange}>
-            <option value="">Seleccionar</option>
-            <option value="stopped">Bike</option>
-            <option value="moving">Car</option>
+          <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
+            <option value="">Select</option>
+            <option value="Car">Car</option>
+            <option value="Bike">Bike</option>
           </select>
         </label>
-      <button type="submit">Add Vehicle</button>
+      <button type="submit" className="submit">Add Vehicle</button>
     </form>
     </>
   );

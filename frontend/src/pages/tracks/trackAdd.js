@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import './trackAdd.css'
 
 const TrackAdd = ({ getTracks }) => {
   const [formData, setFormData] = useState({

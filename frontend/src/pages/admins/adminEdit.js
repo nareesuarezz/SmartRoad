@@ -1,3 +1,5 @@
+// AdminEdit.js
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -10,7 +12,6 @@ const AdminEdit = ({ getAdmins }) => {
     const [formData, setFormData] = useState({
         Username: '',
         Password: '',
-        // Agrega una propiedad para la imagen
         Image: null,
     });
 
@@ -87,7 +88,11 @@ const AdminEdit = ({ getAdmins }) => {
                 <label>
                     Image:
                     <input type="file" name="Image" onChange={handleChange} accept="image/*" />
-                    {previewImage && <img src={previewImage} alt="Preview" width="100" />}
+                    {previewImage && (
+                        <div className="image-preview">
+                            <img src={previewImage} alt="Preview" />
+                        </div>
+                    )}
                 </label>
                 <button type="submit">Edit Admin</button>
             </form>

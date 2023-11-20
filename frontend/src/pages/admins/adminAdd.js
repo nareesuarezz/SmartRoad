@@ -1,3 +1,5 @@
+// AdminAdd.js
+
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -13,7 +15,7 @@ const AdminAdd = ({ getAdmins }) => {
 
   const goBack = () => {
     window.location.href = "/admin-list";
-  }
+  };
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
@@ -56,7 +58,6 @@ const AdminAdd = ({ getAdmins }) => {
       formDataForUpload.append('Password', formData.Password);
       formDataForUpload.append('filename', formData.Image);
 
-      // Realizar la solicitud solo si los datos son válidos
       await axios.post('http://localhost:8080/api/admins', formDataForUpload);
       goBack();
     } catch (error) {
@@ -79,7 +80,11 @@ const AdminAdd = ({ getAdmins }) => {
         <label>
           Image:
           <input type="file" name="Image" onChange={handleChange} accept="image/*" />
-          {previewImage && <img src={previewImage} alt="Preview" width="100" />}
+          {previewImage && (
+            <div className="image-preview">
+              <img src={previewImage} alt="Preview" />
+            </div>
+          )}
         </label>
         <button type="submit">Add Admin</button>
       </form>
