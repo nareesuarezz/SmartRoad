@@ -1,9 +1,9 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
-require ('dotenv').config ();
+require('dotenv').config();
 const bodyParser = require('body-parser');
-
+const jwt = require('jsonwebtoken'); // Asegúrate de importar jwt
 
 const app = express();
 
@@ -25,38 +25,51 @@ db.sequelize.sync({ force: true }).then(() => {
   console.log("Database tables dropped and re-synced.");
 });
 
-//In all future routes, this helps to know if the request is authenticated or not.
+// In all future routes, this helps to know if the request is authenticated or not.
 app.use(function (req, res, next) {
   // check header or url parameters or post parameters for token
   var token = req.headers['authorization'];
-  if (!token) return next(); //if no token, continue
 
-  if(req.headers.authorization.indexOf('Basic ') === 0){
+  // Imprime el encabezado de autorización
+  console.log('Authorization Header:', token);
+
+  if (token && token.indexOf('Basic ') === 0) {
     // verify auth basic credentials
-    const base64Credentials =  req.headers.authorization.split(' ')[1];
+    const base64Credentials = req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [username, password] = credentials.split(':');
 
+    // Imprime las credenciales decodificadas
+    console.log('Decoded Credentials:', username, password);
+
     req.body.Username = username;
     req.body.Password = password;
+    req.bodyb = {};
+    req.bodyb.Username = username;
+    req.bodyb.Password = password;
 
     return next();
   }
 
-  token = token.replace('Bearer ', '');
-  // .env should contain a line like JWT_SECRET=V3RY#1MP0RT@NT$3CR3T#
-  jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
-    if (err) {
-      return res.status(401).json({
-        error: true,
-        message: "Invalid user."
-      });
-    } else {
-      req.user = user; //set the user to req so other routes can use it
-      req.token = token;
-      next();
-    }
-  });
+  if (token) {
+    token = token.replace('Bearer ', '');
+    // .env should contain a line like JWT_SECRET=V3RY#1MP0RT@NT$3CR3T#
+    jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
+      if (err) {
+        return res.status(401).json({
+          error: true,
+          message: "Invalid user."
+        });
+      } else {
+        req.user = user; // set the user to req so other routes can use it
+        req.token = token;
+        next();
+      }
+    });
+  } else {
+    // Handle the case where no authorization header is present
+    next();
+  }
 });
 
 // Require routes for each model

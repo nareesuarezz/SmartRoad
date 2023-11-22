@@ -45,9 +45,9 @@ const AdminEdit = ({ getAdmins }) => {
         if (e.target.name === 'Image') {
             setFormData({
                 ...formData,
-                Image: e.target.files[0],
+                Image: e.target.files[0],  
             });
-
+    
             setPreviewImage(URL.createObjectURL(e.target.files[0]));
         } else {
             setFormData({
@@ -56,22 +56,27 @@ const AdminEdit = ({ getAdmins }) => {
             });
         }
     };
+    
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-
+      
         try {
-            const formDataForUpload = new FormData();
-            formDataForUpload.append('Username', formData.Username);
-            formDataForUpload.append('Password', formData.Password);
+          const formDataForUpload = new FormData();
+          formDataForUpload.append('Username', formData.Username);
+          formDataForUpload.append('Password', formData.Password);
+          
+          if (formData.Image) {
             formDataForUpload.append('filename', formData.Image);
-
-            await axios.put(`http://localhost:8080/api/admins/${id}`, formDataForUpload);
-            goBack();
-        } catch (error) {
-            console.error(`Error updating admin with id=${id}:`, error);
         }
-    };
+      
+          await axios.put(`http://localhost:8080/api/admins/${id}`, formDataForUpload);
+          goBack();
+        } catch (error) {
+          console.error(`Error updating admin with id=${id}:`, error);
+        }
+      };
+      
 
     return (
         <>
