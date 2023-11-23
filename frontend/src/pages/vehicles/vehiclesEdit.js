@@ -56,7 +56,7 @@ const VehicleEdit = ({ getVehicles }) => {
                 <label>
                     Vehicle:
                     <select name="Status" value={formData.Status} onChange={handleChange}>
-                        <option value="">Seleccionar</option>
+                        <option value="">Select</option>
                         <option value="stopped">Bike</option>
                         <option value="moving">Car</option>
                     </select>

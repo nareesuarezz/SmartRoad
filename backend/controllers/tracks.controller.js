@@ -1,31 +1,48 @@
 const db = require("../models");
 const Tracks = db.Track;
+const Logs = db.Log;
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Track
 exports.create = (req, res) => {
+    const adminId = req.user.UID;
+    
     // Create a Track
     const track = {
         Location: req.body.Location,
         Status: req.body.Status,
         Speed: req.body.Speed,
         Extra: req.body.Extra,
-        Vehicle_UID: req.body.Vehicle_UID
+        Vehicle_UID: req.body.Vehicle_UID,
+        Admin_UID: adminId, 
     };
 
     // Save Track in the database
-    Tracks.create(track)
+    db.Track.create(track)
         .then(data => {
-            res.send(data);
+            const trackId = data.ID;
+            console.log("Admin ID:", adminId);
+            console.log("Track ID:", trackId);
+
+            // Ahora crea un nuevo registro en Logs con el ID del Track y del Admin
+            const logEntry = {
+                Track_ID: trackId,
+                Admin_UID: adminId,
+            };
+
+            return Logs.create(logEntry);
+        })
+        .then(() => {
+            res.status(201).send({ message: "Track created successfully." });
         })
         .catch(err => {
+            console.error(err);
             res.status(500).send({
                 message: err.message || "Some error occurred while creating the track."
             });
         });
 };
 
-// Retrieve all Tracks from the database.
+
 exports.findAll = (req, res) => {
     Tracks.findAll()
         .then(data => {
@@ -38,7 +55,6 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Find a single Track with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
 

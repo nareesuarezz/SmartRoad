@@ -8,7 +8,7 @@ function generateToken(admin) {
   if (!admin) return null;
  
   var u = {
-    UID: admin.id,
+    UID: admin.UID,
     Username: admin.Username,
     Password: admin.Password,
     filename: admin.filename
@@ -25,7 +25,7 @@ function getCleanUser(admin) {
   if (!admin) return null;
  
   return {
-    UID: admin.id,
+    UID: admin.UID,
     Username: admin.Username,
     Password: admin.Password,
     filename: admin.filename

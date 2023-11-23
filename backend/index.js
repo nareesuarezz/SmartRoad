@@ -29,7 +29,7 @@ db.sequelize.sync({ force: true }).then(async () => {
 
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('prueba', 10);
-    await db.Admin.create({ Username: 'prueba', Password: hashedPassword });
+    await db.Admin.create({ Username: 'prueba', Password: hashedPassword, filename: ""});
 
     console.log('Admin predeterminado creado con éxito.');
   }

@@ -61,9 +61,9 @@ const Login = () => {
                   checked={rememberMe}
                   onChange={() => setRememberMe(!rememberMe)}
                 />
-                <label htmlFor="rememberMe">Recuérdame</label>
+                <label htmlFor="rememberMe">Remember me</label>
               </div>
-              <a href="#">¿Olvidaste tu contraseña?</a>
+              <a href="#">Did you forget your password?</a>
             </div>
             {error && <div className="error-message">{error}</div>}
             <button type="button" onClick={goTracks}>

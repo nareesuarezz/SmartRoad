@@ -62,22 +62,22 @@ function Home() {
                 <h1>SmartRoad</h1>
             </div>
             <div className="question">
-                <h2>¿Qué estás conduciendo?</h2>
+                <h2>What are you driving?</h2>
             </div>
 
             <div className="vehicle-container">
                 <div className="vehicle-box bicycle-box" onClick={() => handleClick('bicycle')}>
                     <img src={logoBicycle} alt="Logo de bicicleta" />
                 </div>
-                <p className='bicycle'>Bicicleta</p>
+                <p className='bicycle'>Bicycle</p>
                 <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
                     <img src={logoCar} alt="Logo de coche" />
                 </div>
-                <p className='car'>Coche</p>
+                <p className='car'>Car</p>
             </div>
             <div className='admin'>
-                <p>¿Eres un administrador?</p>
-                <p className='log' onClick={goLogin}>Inicia sesión aquí</p>
+                <p>Are you an admin?</p>
+                <p className='log' onClick={goLogin}>Log in here</p>
             </div>
         </>
     );

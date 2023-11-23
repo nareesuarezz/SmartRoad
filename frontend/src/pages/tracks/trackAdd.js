@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import './trackAdd.css'
+import './trackAdd.css';
+import AuthService from '../../services/authService';
 
 const TrackAdd = ({ getTracks }) => {
   const [formData, setFormData] = useState({
@@ -12,6 +13,9 @@ const TrackAdd = ({ getTracks }) => {
     Extra: '',
     Vehicle_UID: '',
   });
+
+  // Agrega el estado para almacenar el ID del admin
+  const [adminId, setAdminId] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -29,10 +33,19 @@ const TrackAdd = ({ getTracks }) => {
 
   const goBack = () => {
     window.location.href = "/track-list";
-  }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // Recupera el token del almacenamiento local
+    const authToken = AuthService.getAuthToken();
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+      }
+    };
 
     if (!formData.Latitude || !formData.Longitude || !formData.Status || !formData.Speed || !formData.Vehicle_UID) {
       const missingFields = Object.entries(formData)
@@ -52,12 +65,28 @@ const TrackAdd = ({ getTracks }) => {
       await axios.post('http://localhost:8080/api/tracks', {
         ...formData,
         Location: location,
-      });
+        Admin_UID: adminId,
+      }, config);
       goBack();
     } catch (error) {
       console.error('Error adding track:', error);
     }
   };
+
+  useEffect(() => {
+    // Obtén el ID del admin cuando el componente se monta
+    const fetchAdminId = async () => {
+      try {
+        const authToken = AuthService.getAuthToken();
+        const decodedToken = AuthService.decodeAuthToken(authToken);
+        setAdminId(decodedToken.UID);
+      } catch (error) {
+        console.error('Error fetching admin ID:', error);
+      }
+    };
+
+    fetchAdminId();
+  }, []);
 
   return (
     <>
@@ -81,7 +110,7 @@ const TrackAdd = ({ getTracks }) => {
         </label>
         <label>
           Speed:
-          <input type="text" name="Speed" value={formData.Speed} onChange={handleChange} />
+          <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} />
         </label>
         <label>
           Extra:
