@@ -1,16 +1,25 @@
-
 import React, { useState } from 'react';
 import './Login.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import AuthService from '../../services/authService'; 
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
+  const [error, setError] = useState('');
 
+  const goTracks = async () => {
+    try {
+      const response = await AuthService.signIn(username, password);
 
-  const goTracks = () => {
-    window.location.href = "/track-list";
+      console.log('Respuesta del backend:', response);
+
+      window.location.href = "/track-list";
+    } catch (error) {
+      console.error('Error de inicio de sesión:', error);
+      setError('Usuario o contraseña incorrectos');
+    }
   }
 
   const goBack = () => {
@@ -56,6 +65,7 @@ const Login = () => {
               </div>
               <a href="#">¿Olvidaste tu contraseña?</a>
             </div>
+            {error && <div className="error-message">{error}</div>}
             <button type="button" onClick={goTracks}>
               Login
             </button>

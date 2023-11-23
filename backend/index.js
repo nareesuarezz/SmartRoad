@@ -1,9 +1,10 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
+const bcrypt = require('bcryptjs')
 require('dotenv').config();
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken'); // Asegúrate de importar jwt
+const jwt = require('jsonwebtoken'); 
 
 const app = express();
 
@@ -21,8 +22,17 @@ app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
 
-db.sequelize.sync({ force: true }).then(() => {
+db.sequelize.sync({ force: true }).then(async () => {
   console.log("Database tables dropped and re-synced.");
+
+  const existingAdmin = await db.Admin.findOne({ where: { Username: 'prueba' } });
+
+  if (!existingAdmin) {
+    const hashedPassword = await bcrypt.hash('prueba', 10);
+    await db.Admin.create({ Username: 'prueba', Password: hashedPassword });
+
+    console.log('Admin predeterminado creado con éxito.');
+  }
 });
 
 // In all future routes, this helps to know if the request is authenticated or not.

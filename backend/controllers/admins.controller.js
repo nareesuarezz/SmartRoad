@@ -112,7 +112,10 @@ exports.update = async (req, res) => {
 
     // Update admin fields
     admin.Username = req.body.Username;
-    admin.Password = req.body.Password;
+
+    if (req.body.Password) {
+      admin.Password = bcrypt.hashSync(req.body.Password);
+    }
 
     // Check if a new image file is provided
     if (req.file) {
@@ -143,6 +146,7 @@ exports.update = async (req, res) => {
     });
   }
 };
+
 
 
 
