@@ -1,111 +1,138 @@
 /* Login.css */
 
 .container-wrapper {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
+
+.container {
+  max-width: 100%;
+  padding: 40px; /* Aumentar el padding */
+  border-radius: 12px; /* Aumentar el radio de borde */
+  background-color: #e6e4e4;
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 30vh;
+}
+
+.heading {
+  text-align: center;
+  margin-bottom: 20px;
+  font-size: 6vw;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 20px; /* Aumentar el margen inferior */
+}
+
+.label-input {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px; /* Aumentar el margen inferior */
+}
+
+.label-input input {
+  margin-right: 12px; /* Aumentar el espacio entre la etiqueta y el input */
+}
+
+label {
+  margin-bottom: 8px; /* Aumentar el margen inferior */
+}
+
+input {
+  border-radius: 40px;
+  border: 2px solid #ccc; /* Aumentar el grosor del borde */
+  width: 100%;
+  padding: 15px; /* Aumentar el padding */
+}
+
+.forgot-password {
+  display: flex;
+  justify-content: flex-end;
+  font-size: 14px; /* Aumentar el tamaño de fuente */
+}
+
+button {
+  padding: 15px;
+  background-color: #4caf50;
+  color: #fff;
+  border: none;
+  border-radius: 40px;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 2em;
+  border: 2px solid #4caf50;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.button:hover {
+  background-color: #45a049;
+}
+
+.password-input {
+  position: relative;
+}
+
+.eye-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+
+/* Media Queries */
+
+@media only screen and (min-width: 600px) {
   .container {
-    max-width: 100%;
-    padding: 20px;
-    border-radius: 8px;
-    background-color: #e6e4e4;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 5em;
+    padding: 60px; /* Aumentar el padding */
+    margin-bottom: 10em; /* Aumentar el margen inferior */
   }
-  
+
   .heading {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 6vw;
+    font-size: 4vw; /* Ajustar el tamaño de fuente */
   }
-  
-  form {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-  }
-  
-  .input-group {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 15px;
-  }
-  
-  .label-input {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-  }
-  
-  .label-input input {
-    margin-right: 8px;
-  }
-  
-  label {
-    margin-bottom: 5px;
-  }
-  
-  input {
-    border-radius: 40px;
-    border: 1px solid #ccc;
-    width: 95%;
-    padding: 10px;
-  }
-  
-  .forgot-password {
-    display: flex;
-    justify-content: flex-end;
-    font-size: 12px;
-  }
-  
+
+  .input-group,
+  .label-input,
+  label,
+  input,
+  .forgot-password,
   button {
-    padding: 10px;
-    background-color: #4caf50;
-    color: #fff;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    width: 100%;
+    font-size: 16px; /* Aumentar el tamaño de fuente */
   }
-  
-  /* Media Queries */
-  
-  @media only screen and (min-width: 600px) {
-    .container {
-      padding: 40px;
-      margin-bottom: 8em;
-    }
-  
-    .heading {
-      font-size: 3vw;
-    }
+}
+
+@media only screen and (min-width: 768px) {
+  .container {
+    max-width: 800px;
+    margin-bottom: 8em;
   }
-  
-  @media only screen and (min-width: 768px) {
-    .container {
-      max-width: 600px; /* Ancho máximo para tabletas */
-      margin-bottom: 6em;
-    }
-  
-    .heading {
-      font-size: 2.5vw;
-    }
+
+  .heading {
+    font-size: 3.5vw; /* Ajustar el tamaño de fuente */
   }
-  
-  @media only screen and (min-width: 1024px) {
-    .container {
-      max-width: 800px; /* Ancho máximo para PC */
-      margin-bottom: 4em;
-    }
-  
-    .heading {
-      font-size: 2vw;
-    }
+}
+
+@media only screen and (min-width: 1024px) {
+  .container {
+    max-width: 1000px; /* Ajustar el ancho máximo */
+    margin-bottom: 6em;
   }
-  
+
+  .heading {
+    font-size: 3vw;
+  }
+}

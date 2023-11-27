@@ -29,11 +29,20 @@ db.sequelize.sync({ force: true }).then(async () => {
 
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('prueba', 10);
-    await db.Admin.create({ Username: 'prueba', Password: hashedPassword, filename: ""});
+
+    const createdAdmin = await db.Admin.create({
+      Username: 'prueba',
+      Password: hashedPassword,
+      filename: 'user.jpg' 
+    });
 
     console.log('Admin predeterminado creado con éxito.');
+
+    // Imprimir los detalles del administrador creado
+    console.log('Admin Details:', createdAdmin.toJSON());
   }
 });
+
 
 // In all future routes, this helps to know if the request is authenticated or not.
 app.use(function (req, res, next) {

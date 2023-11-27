@@ -6,7 +6,6 @@ module.exports = app => {
     // Create a new Car
     // DECOMMENT:
     router.post("/", vehicles.create);
-    // router.post("/", bicycles.create);
   
     // Retrieve all Cars
     router.get("/", vehicles.findAll);

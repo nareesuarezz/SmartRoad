@@ -23,7 +23,6 @@ exports.create = (req, res) => {
             console.log("Admin ID:", adminId);
             console.log("Track ID:", trackId);
 
-            // Ahora crea un nuevo registro en Logs con el ID del Track y del Admin
             const logEntry = {
                 Track_ID: trackId,
                 Admin_UID: adminId,

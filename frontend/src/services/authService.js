@@ -19,6 +19,10 @@ const AuthService = {
   getAuthToken: () => {
     return localStorage.getItem('authToken');
   },
+  isAuthenticated: () => {
+    const authToken = localStorage.getItem('authToken');
+    return authToken !== null;
+  },
 };
 
 export default AuthService;

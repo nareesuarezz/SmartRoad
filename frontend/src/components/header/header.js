@@ -1,7 +1,13 @@
+import React from 'react';
 import { Link } from 'react-router-dom';
-import './header.css'; 
+import './header.css';
+import AuthService from '../../services/authService'; 
+import ProfilePicture from '../profilePicture/profilePicture';
+
 
 function Header() {
+  const isAuthenticated = AuthService.isAuthenticated();
+
   return (
     <div className="header-container">
       <nav>
@@ -18,8 +24,14 @@ function Header() {
           <li className="nav-item">
             <Link to="/log-list" className="nav-link">Logs</Link>
           </li>
+          {isAuthenticated && (
+            <li className="nav-item">
+              <ProfilePicture/>
+            </li>
+          )}
         </ul>
       </nav>
+   
     </div>
   );
 }

@@ -252,3 +252,16 @@ exports.findAdminByUsernameAndPassword = (req, res) => {
       });
     });
 };
+
+// Obtener información del admin logeado
+exports.getLoggedInAdmin = (req, res) => {
+  const adminId = req.admin.UID;
+
+  Admin.findByPk(adminId)
+    .then(admin => {
+      res.json({ admin });
+    })
+    .catch(error => {
+      res.status(500).json({ message: 'Error al obtener información del admin logeado.' });
+    });
+};
