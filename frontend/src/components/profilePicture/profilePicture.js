@@ -1,4 +1,3 @@
-// ProfilePicture.js
 import React from 'react';
 import './profilePicture.css'
 import { Link } from 'react-router-dom';

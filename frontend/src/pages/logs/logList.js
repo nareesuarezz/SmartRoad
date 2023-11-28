@@ -34,6 +34,7 @@ const LogList = () => {
             <th>ID</th>
             <th>Track ID</th>
             <th>Admin ID</th>
+            <th>Action</th>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +43,7 @@ const LogList = () => {
               <td>{log.Log_ID}</td>
               <td>{log.Track_ID}</td>
               <td>{log.Admin_UID}</td>
+              <td>{log.Action}</td>
               <td>
               </td>
             </tr>

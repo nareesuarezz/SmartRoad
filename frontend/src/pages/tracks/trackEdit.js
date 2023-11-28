@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import AuthService from '../../services/authService';
 
 const TrackEdit = ({ getTracks }) => {
     const navigate = useNavigate();
@@ -16,11 +17,28 @@ const TrackEdit = ({ getTracks }) => {
         Vehicle_UID: '',
     });
 
+    const [adminId, setAdminId] = useState(null);
+
     const goBack = () => {
         navigate('/track-list');
     };
 
     useEffect(() => {
+
+        // Obtén el ID del admin cuando el componente se monta
+        const fetchAdminId = async () => {
+            try {
+                const authToken = AuthService.getAuthToken();
+                const decodedToken = AuthService.decodeAuthToken(authToken);
+                setAdminId(decodedToken.UID);
+            } catch (error) {
+                console.error('Error fetching admin ID:', error);
+            }
+        };
+
+        fetchAdminId();
+
+
         const fetchTrackData = async () => {
             try {
                 const response = await axios.get(`http://localhost:8080/api/tracks/${id}`);
@@ -59,24 +77,47 @@ const TrackEdit = ({ getTracks }) => {
         });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+// 
 
-        const location = {
-            type: 'Point',
-            coordinates: [parseFloat(formData.Longitude), parseFloat(formData.Latitude)],
-        };
+const handleSubmit = async (e) => {
+    e.preventDefault();
 
-        try {
-            await axios.put(`http://localhost:8080/api/tracks/${id}`, {
-                ...formData,
-                Location: location,
-            });
-            goBack();
-        } catch (error) {
-            console.error(`Error editing track with id=${id}:`, error);
-        }
+    // Recupera el token del almacenamiento local
+    const authToken = AuthService.getAuthToken();
+
+    const config = {
+      headers: {
+        'Authorization': `Bearer ${authToken}`,
+      }
     };
+
+    if (!formData.Latitude || !formData.Longitude || !formData.Status || !formData.Speed || !formData.Vehicle_UID) {
+      const missingFields = Object.entries(formData)
+        .filter(([key, value]) => !value)
+        .map(([key]) => key);
+
+      alert(`Por favor, complete los siguientes campos: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    const location = {
+      type: 'Point',
+      coordinates: [parseFloat(formData.Longitude), parseFloat(formData.Latitude)],
+    };
+
+    try {
+        await axios.put(`http://localhost:8080/api/tracks/${id}`, {
+        ...formData,
+        Location: location,
+        Admin_UID: adminId,
+      }, config);
+      goBack();
+    } catch (error) {
+      console.error('Error updating track:', error);
+    }
+  };
+
+
 
     return (
         <>

@@ -38,15 +38,12 @@ db.sequelize.sync({ force: true }).then(async () => {
 
     console.log('Admin predeterminado creado con éxito.');
 
-    // Imprimir los detalles del administrador creado
     console.log('Admin Details:', createdAdmin.toJSON());
   }
 });
 
 
-// In all future routes, this helps to know if the request is authenticated or not.
 app.use(function (req, res, next) {
-  // check header or url parameters or post parameters for token
   var token = req.headers['authorization'];
 
   // Imprime el encabezado de autorización
@@ -80,22 +77,22 @@ app.use(function (req, res, next) {
           message: "Invalid user."
         });
       } else {
-        req.user = user; // set the user to req so other routes can use it
+        req.user = user; 
         req.token = token;
         next();
       }
     });
   } else {
-    // Handle the case where no authorization header is present
     next();
   }
 });
 
-// Require routes for each model
+
 require("./routes/logs.routes")(app);
 require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
+require("./routes/subscription.routes")(app);
 
 const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {

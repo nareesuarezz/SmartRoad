@@ -23,6 +23,7 @@ const AuthService = {
     const authToken = localStorage.getItem('authToken');
     return authToken !== null;
   },
+  
 };
 
 export default AuthService;

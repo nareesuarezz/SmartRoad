@@ -1,5 +1,3 @@
-// AdminAdd.js
-
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -75,7 +73,7 @@ const AdminAdd = ({ getAdmins }) => {
         </label>
         <label>
           Password:
-          <input type="text" name="Password" value={formData.Password} onChange={handleChange} />
+          <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
         </label>
         <label>
           Image:

@@ -14,7 +14,6 @@ const TrackAdd = ({ getTracks }) => {
     Vehicle_UID: '',
   });
 
-  // Agrega el estado para almacenar el ID del admin
   const [adminId, setAdminId] = useState(null);
 
   const handleChange = (e) => {

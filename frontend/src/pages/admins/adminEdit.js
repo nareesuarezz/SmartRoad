@@ -1,4 +1,3 @@
-// AdminEdit.js
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -10,12 +9,12 @@ const AdminEdit = ({ getAdmins }) => {
 
   const [formData, setFormData] = useState({
     Username: '',
-    Password: '',
+    Password: '',  
     Image: null,
   });
 
   const [previewImage, setPreviewImage] = useState('');
-  const [adminInfo, setAdminInfo] = useState(null); // Agrega un estado para adminInfo
+  const [adminInfo, setAdminInfo] = useState(null); 
 
   const goBack = () => {
     navigate('/admin-list');
@@ -29,11 +28,12 @@ const AdminEdit = ({ getAdmins }) => {
 
         setFormData({
           Username: adminData.Username,
-          Password: adminData.Password,
+          Password: '',  // Deja la contraseña como vacía
+          Image: null,
         });
 
         setPreviewImage(`http://localhost:8080/uploads/${adminData.filename}`);
-        setAdminInfo(adminData); // Actualiza el estado de adminInfo
+        setAdminInfo(adminData); 
       } catch (error) {
         console.error('Error fetching admin data:', error);
       }
@@ -76,6 +76,10 @@ const AdminEdit = ({ getAdmins }) => {
       // Actualiza la información de adminInfo después de la carga exitosa
       const updatedAdminData = await axios.get(`http://localhost:8080/api/admins/${id}`);
       setAdminInfo(updatedAdminData.data);
+      const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
+      if ((adminInfo.UID + "") == id) {
+        localStorage.setItem('adminInfo', JSON.stringify(updatedAdminData.data));
+      }
 
       // Redirigir después de la actualización
       goBack();
@@ -94,7 +98,7 @@ const AdminEdit = ({ getAdmins }) => {
         </label>
         <label>
           Password:
-          <input type="text" name="Password" value={formData.Password} onChange={handleChange} />
+          <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
         </label>
         <label>
           Image:

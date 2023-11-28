@@ -5,35 +5,65 @@ import { Link } from 'react-router-dom';
 import './trackList.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
+import AuthService from '../../services/authService'; // Asegúrate de importar AuthService
 
 const TrackList = () => {
   const [tracks, setTracks] = useState([]);
+  const [adminId, setAdminId] = useState(null); 
 
   useEffect(() => {
     getTracks();
+    fetchAdminId(); 
   }, []);
 
   const getTracks = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/tracks');
+      const authToken = AuthService.getAuthToken();
+      const response = await axios.get('http://localhost:8080/api/tracks', {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
       setTracks(response.data);
     } catch (error) {
       console.error('Error fetching tracks:', error);
     }
   };
 
-  const deleteTrack = async (id) => {
-    try {
-      await axios.delete(`http://localhost:8080/api/tracks/${id}`);
-      getTracks();
-    } catch (error) {
-      console.error(`Error deleting track with id=${id}:`, error);
-    }
-  };
+ const deleteTrack = async (id) => {
+  try {
+    const trackToDelete = await axios.get(`http://localhost:8080/api/tracks/${id}`);
+
+    await axios.post('http://localhost:8080/api/log', {
+      action: 'DELETE',
+      trackId: id,
+      adminId,
+      trackData: trackToDelete.data,  
+    });
+
+    await axios.delete(`http://localhost:8080/api/tracks/${id}`);
+
+    getTracks();
+  } catch (error) {
+    console.error(`Error deleting track with id=${id}:`, error);
+  }
+};
+
+  
 
   const goBack = () => {
     window.location.href = "/login";
-  }
+  };
+
+  const fetchAdminId = async () => {
+    try {
+      const authToken = AuthService.getAuthToken();
+      const decodedToken = AuthService.decodeAuthToken(authToken);
+      setAdminId(decodedToken.UID);
+    } catch (error) {
+      console.error('Error fetching admin ID:', error);
+    }
+  };
 
   return (
     <div>

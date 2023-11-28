@@ -72,6 +72,7 @@ exports.findAll = (req, res) => {
 
   Admin.findAll()
     .then(data => {
+      console.log('kkkkkk',data)
       res.send(data);
     })
     .catch(err => {
@@ -86,7 +87,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Admin.findByPk(id)
+  Admin.findByPk(id,{attributes: {exclude: ['Password']}} )
     .then(data => {
       res.send(data);
     })
@@ -97,7 +98,6 @@ exports.findOne = (req, res) => {
     });
 };
 
-// Update an Admin by the id in the request
 exports.update = async (req, res) => {
   const id = req.params.id;
 
