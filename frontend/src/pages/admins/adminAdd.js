@@ -34,7 +34,7 @@ const AdminAdd = ({ getAdmins }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!formData.Username || !formData.Password || !formData.Image) {
+    if (!formData.Username || !formData.Password) {
       const missingFields = [];
       if (!formData.Username) {
         missingFields.push('Username');

@@ -20,6 +20,10 @@ const VehicleEdit = ({ getVehicles }) => {
             try {
                 const response = await axios.get(`http://localhost:8080/api/vehicles/${id}`);
                 const vehicleData = response.data;
+
+                setFormData({
+                    Vehicle: vehicleData.Vehicle
+                });
             } catch (error) {
                 console.error('Error fetching vehicle data:', error);
             }
@@ -55,10 +59,10 @@ const VehicleEdit = ({ getVehicles }) => {
             <form onSubmit={handleSubmit}>
                 <label>
                     Vehicle:
-                    <select name="Status" value={formData.Status} onChange={handleChange}>
+                    <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
                         <option value="">Select</option>
-                        <option value="stopped">Bike</option>
-                        <option value="moving">Car</option>
+                        <option value="Bike">Bike</option>
+                        <option value="Car">Car</option>
                     </select>
                 </label>
                 <button type="submit">Edit Vehicle</button>

@@ -28,7 +28,7 @@ const AdminEdit = ({ getAdmins }) => {
 
         setFormData({
           Username: adminData.Username,
-          Password: '',  // Deja la contraseña como vacía
+          Password: '',  
           Image: null,
         });
 

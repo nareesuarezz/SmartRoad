@@ -37,7 +37,6 @@ const TrackAdd = ({ getTracks }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Recupera el token del almacenamiento local
     const authToken = AuthService.getAuthToken();
 
     const config = {
@@ -46,12 +45,22 @@ const TrackAdd = ({ getTracks }) => {
       }
     };
 
-    if (!formData.Latitude || !formData.Longitude || !formData.Status || !formData.Speed || !formData.Vehicle_UID) {
+    if (!formData.Latitude || !formData.Longitude || !formData.Status || (!formData.Speed && formData.Status !== 'stopped') || !formData.Vehicle_UID) {
       const missingFields = Object.entries(formData)
         .filter(([key, value]) => !value)
         .map(([key]) => key);
 
-      alert(`Por favor, complete los siguientes campos: ${missingFields.join(', ')}`);
+      alert(`Please complete the following fields: ${missingFields.join(', ')}`);
+      return;
+    }
+
+    if (formData.Status === 'moving' && formData.Speed === '0') {
+      alert("Error: You can't put 0 speed on a moving vehicle.");
+      return;
+    }
+
+    if (formData.Status === 'Select') {
+      alert('Error: Select a type of status for the vehicle.');
       return;
     }
 
@@ -65,26 +74,16 @@ const TrackAdd = ({ getTracks }) => {
         ...formData,
         Location: location,
         Admin_UID: adminId,
+        Speed: formData.Status === 'stopped' ? 0 : formData.Speed,
       }, config);
       goBack();
     } catch (error) {
       console.error('Error adding track:', error);
     }
-  };
+  }
 
   useEffect(() => {
-    // Obtén el ID del admin cuando el componente se monta
-    const fetchAdminId = async () => {
-      try {
-        const authToken = AuthService.getAuthToken();
-        const decodedToken = AuthService.decodeAuthToken(authToken);
-        setAdminId(decodedToken.UID);
-      } catch (error) {
-        console.error('Error fetching admin ID:', error);
-      }
-    };
-
-    fetchAdminId();
+   
   }, []);
 
   return (
@@ -102,14 +101,14 @@ const TrackAdd = ({ getTracks }) => {
         <label>
           Status:
           <select name="Status" value={formData.Status} onChange={handleChange}>
-            <option value="">Select</option>
+            <option value="select">Select</option>
             <option value="stopped">Stopped</option>
             <option value="moving">Moving</option>
           </select>
         </label>
         <label>
           Speed:
-          <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} />
+          <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} disabled={formData.Status === 'stopped'} />
         </label>
         <label>
           Extra:

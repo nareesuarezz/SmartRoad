@@ -129,11 +129,9 @@ exports.update = async (req, res) => {
         });
       }
 
-      // Update the filename in the database
       admin.filename = req.file.filename;
     }
 
-    // Save the updated admin
     await admin.save();
 
     return res.status(200).send({

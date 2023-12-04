@@ -17,8 +17,6 @@ const createLogEntry = async (action, trackId, adminId) => {
 };
 
 exports.create = async (req, res) => {
-    const adminId = req.user.UID;
-
     try {
         const track = {
             Location: req.body.Location,
@@ -26,12 +24,9 @@ exports.create = async (req, res) => {
             Speed: req.body.Speed,
             Extra: req.body.Extra,
             Vehicle_UID: req.body.Vehicle_UID,
-            Admin_UID: adminId,
         };
 
         const createdTrack = await Tracks.create(track);
-
-        await createLogEntry('CREATE', createdTrack.ID, adminId);
 
         res.status(201).send({ message: "Track created successfully." });
     } catch (error) {
@@ -96,7 +91,7 @@ exports.update = async (req, res) => {
             });
         }
 
-        
+
 
         if (!adminId) {
             console.error(`Admin ID is undefined. Request user: ${JSON.stringify(req.user)}`);
@@ -123,22 +118,18 @@ exports.update = async (req, res) => {
 
 // Delete a Track with the specified id in the request
 exports.delete = async (req, res) => {
-    const adminId = req.user.UID;
     const id = req.params.id;
 
     try {
-        const track = await Tracks.findByPk(id);
+        const trackToDelete = await Tracks.findByPk(id);
 
-        if (!track) {
+        if (!trackToDelete) {
             return res.status(404).send({
                 message: `Track with id=${id} not found.`
             });
         }
 
-       
-        await createLogEntry('DELETE', id, adminId);
-
-        await track.destroy();
+        await trackToDelete.destroy();
 
         res.send({
             message: 'Track was deleted successfully.'
@@ -157,8 +148,6 @@ exports.deleteAll = async (req, res) => {
 
         tracks.forEach(async (track) => {
             await track.destroy();
-            
-            await createLogEntry('DELETE', track.ID, req.user.UID);
         });
 
         await Tracks.destroy({

@@ -56,5 +56,70 @@ exports.findOne = (req, res) => {
             });
         });
 };
+// Update a Log by the ID in the request
+exports.update = (req, res) => {
+    const id = req.params.id;
+  
+    Logs.update(req.body, {
+      where: { Log_ID: id }
+    })
+      .then(num => {
+        if (num == 1) {
+          res.send({
+            message: "Log was updated successfully."
+          });
+        } else {
+          res.send({
+            message: `Cannot update Log with id=${id}. Maybe Log was not found or req.body is empty!`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Error updating Log with id=" + id
+        });
+      });
+  };
+  
+  // Delete a Log with the specified ID in the request
+  exports.delete = (req, res) => {
+    const id = req.params.id;
+  
+    Logs.destroy({
+      where: { Log_ID: id }
+    })
+      .then(num => {
+        if (num == 1) {
+          res.send({
+            message: "Log was deleted successfully."
+          });
+        } else {
+          res.send({
+            message: `Cannot delete Log with id=${id}. Maybe Log was not found!`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete Log with id=" + id
+        });
+      });
+  };
+  
+  // Delete all Logs from the database
+  exports.deleteAll = (req, res) => {
+    Logs.destroy({
+      where: {},
+      truncate: false
+    })
+      .then(nums => {
+        res.send({ message: `${nums} Logs were deleted successfully.` });
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: err.message || "Some error occurred while removing all logs."
+        });
+      });
+  };
 
 

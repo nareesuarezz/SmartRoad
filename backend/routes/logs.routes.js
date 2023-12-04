@@ -13,6 +13,15 @@ module.exports = app => {
   
     // Retrieve a single Car with id
     router.get("/:id", logs.findOne);
+
+    // Update a Car with id
+      router.put("/:id", logs.update);
+    
+      // Delete a Car with id
+      router.delete("/:id",logs.delete);
+    
+      // Delete all Cars
+      router.delete("/", logs.deleteAll);
   
     app.use("/api/logs", router);
   }
