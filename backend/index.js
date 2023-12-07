@@ -46,9 +46,7 @@ db.sequelize.sync({ force: true }).then(async () => {
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
-  // Imprime el encabezado de autorización
-  console.log('Authorization Header:', token);
-
+  
   if (token && token.indexOf('Basic ') === 0) {
     // verify auth basic credentials
     const base64Credentials = req.headers.authorization.split(' ')[1];

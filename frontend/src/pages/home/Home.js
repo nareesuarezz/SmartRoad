@@ -1,60 +1,80 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logoBicycle from '../../img/bike.png';
 import logoCar from '../../img/car.png';
 import './Home.css';
+import { regSw, subscribe } from '../../services/subscriptionService';
 
 function Home() {
-    const handleClick = (vehicle) => {
-        // debugger;
-        const x = document.getElementById("demo");
+    const [subscription, setSubscription] = useState(null);
 
-        function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-            (position) => showPosition(position, vehicle),
-            showError,
-            { enableHighAccuracy: true }
-        );
-    } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
-    }
-}
+    const handleClick = async (vehicle) => {
+        try {
+            await askForNotificationPermission();
+            const position = await askForLocationPermission();
 
+            if (position && Notification.permission === 'granted') {
+                const newSubscription = await createSubscription(vehicle);
+                setSubscription(newSubscription);
 
-        function showPosition(position, vehicle) {
-            x.innerHTML = "Latitude: " + position.coords.latitude +
-                "<br>Longitude: " + position.coords.longitude;
-
-            if (vehicle === 'bicycle') {
-                window.location.href = "/bicycle";
-            } else if (vehicle === 'car') {
-                window.location.href = "/car";
+                redirectToVehiclePage(vehicle);
             }
+        } catch (error) {
+            console.error('Error al solicitar permisos:', error);
+        }
+    };
+
+    const askForLocationPermission = () => {
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => resolve(position),
+                (error) => reject(error),
+                { enableHighAccuracy: true }
+            );
+        });
+    };
+
+    const askForNotificationPermission = async () => {
+        console.log('Estado actual de los permisos de notificaciones:', Notification.permission);
+
+        if (Notification.permission === 'granted') {
+            return;
         }
 
-        function showError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    x.innerHTML = "User denied the request for Geolocation.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    x.innerHTML = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    x.innerHTML = "The request to get user location timed out.";
-                    break;
-                case error.UNKNOWN_ERROR:
-                    x.innerHTML = "An unknown error occurred.";
-                    break;
-            }
-        }
+        const permission = await Notification.requestPermission();
 
-        getLocation();
-    }
+        if (permission === 'granted') {
+            console.log('Permisos de notificaciones concedidos');
+            return;
+        } else {
+            throw new Error('Permiso de notificaciones denegado');
+        }
+    };
+
+    const createSubscription = async (subscriptionName) => {
+        try {
+            const serviceWorkerReg = await regSw();
+            const publicKey = process.env.REACT_APP_PUBLIC_KEY;
+            
+            await subscribe(serviceWorkerReg, subscriptionName, publicKey);
+    
+
+        } catch (error) {
+            console.error('Error al crear la suscripción:', error);
+            throw error;
+        }
+    };
+
+    const redirectToVehiclePage = (vehicle) => {
+        if (vehicle === 'bicycle') {
+            window.location.href = "/bicycle";
+        } else if (vehicle === 'car') {
+            window.location.href = "/car";
+        }
+    };
 
     const goLogin = () => {
         window.location.href = "/login";
-    }
+    };
 
     return (
         <>

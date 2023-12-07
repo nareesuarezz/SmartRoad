@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import './App.css';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import Loading from './pages/loading/Loading';
@@ -18,6 +18,20 @@ import AdminEdit from './pages/admins/adminEdit';
 import LogList from './pages/logs/logList';
 
 function App() {
+
+  useEffect(() => {
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then(function (registration) {
+          console.log('Service Worker registrado con éxito:', registration);
+        })
+        .catch(function (error) {
+          console.error('Error al registrar el Service Worker:', error);
+        });
+    }
+  }, []);
+
   return (
     <>
       <div id='demo'></div>
