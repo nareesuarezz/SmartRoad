@@ -71,7 +71,7 @@
           keys: JSON.parse(s.dataValues.keys)
         };
   
-        const title = `Just for ${subscriptionName}`;
+        const title = `Notification for ${subscriptionName}`;
         await sendNotification(subscriptionRecipient, title, notificationMessage);
       }
   
@@ -127,47 +127,64 @@
   exports.update = (req, res) => {
   }
 
-  exports.deleteByEndpoint = (req, res) => {
-
-    Subscription.findOne({
-      where: {
-        endpoint: req.body.endpoint
-      }
-    }).then((subscriptionToDelete) => {
+  exports.deleteByEndpoint = async (req, res) => {
+    try {
+      const endpointToDelete = req.body.endpoint;
+  
+      // Buscar la suscripción a eliminar
+      const subscriptionToDelete = await Subscription.findOne({
+        where: {
+          endpoint: endpointToDelete
+        }
+      });
+  
+      // Si la suscripción no existe, devolver un error 404
       if (!subscriptionToDelete) {
-        res.send("endpoint not found");
-        return
+        return res.status(404).send("Endpoint not found");
       }
-
-      Subscription.destroy({
+  
+      // Eliminar la suscripción
+      await Subscription.destroy({
         where: {
           id: subscriptionToDelete.id
         }
-      }).then(() => {
-        Subscription.findAll().then((subscriptionsInDB) => {
-          for (let s of subscriptionsInDB) {
-            const subscriptionRecipient = {
-              endpoint: s.dataValues.endpoint,
-              expirationTime: s.dataValues.expirationTime,
-              keys: JSON.parse(s.dataValues.keys)
-            }
-            const title = `Subscription to ${subscriptionToDelete.subscriptionName} deleted`;
-            const description = "";
-            sendNotification(subscriptionRecipient, title, description);
-          }
-        }).catch(err => {
-          res.status(500).send({
-            message: err.message || "some error happened"
-          })
-        });
-        res.status(200).send("subscription deleted");
-      }).catch(err => {
-        res.status(500).send({
-          message: err.message || "some error happened"
-        })
       });
-    })
-  }
+  
+      // Notificar sobre la eliminación de la suscripción
+      const subscriptionRecipient = {
+        endpoint: subscriptionToDelete.endpoint,
+        expirationTime: subscriptionToDelete.expirationTime,
+        keys: JSON.parse(subscriptionToDelete.keys)
+      };
+      const title = `Subscription to ${subscriptionToDelete.subscriptionName} deleted`;
+      const description = "";
+      sendNotification(subscriptionRecipient, title, description);
+  
+      // Obtener las suscripciones restantes después de la eliminación
+      const remainingSubscriptions = await Subscription.findAll();
+  
+      // Enviar una notificación para cada suscripción restante
+      for (let s of remainingSubscriptions) {
+        const remainingSubscriptionRecipient = {
+          endpoint: s.dataValues.endpoint,
+          expirationTime: s.dataValues.expirationTime,
+          keys: JSON.parse(s.dataValues.keys)
+        };
+        const remainingTitle = `Subscription to ${subscriptionToDelete.subscriptionName} deleted`;
+        sendNotification(remainingSubscriptionRecipient, remainingTitle, description);
+      }
+  
+      // Responder con éxito
+      res.status(200).send("Subscription deleted");
+    } catch (err) {
+      // Manejar errores
+      res.status(500).send({
+        message: err.message || "Some error happened"
+      });
+    }
+  };
+  
+  
 
   const sendNotification = async (subscriptionRecipient, title, description) => {
     console.log('Sending notification:', subscriptionRecipient, title, description);  

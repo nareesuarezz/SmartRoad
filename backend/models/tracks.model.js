@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true
     },
     Location: {
-      type: Sequelize.DataTypes.GEOMETRY('POINT'),
+      type: Sequelize.GEOMETRY('POINT'),
       allowNull: false,
     },
     Status: {
