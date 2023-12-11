@@ -73,7 +73,6 @@ const AdminEdit = ({ getAdmins }) => {
 
       await axios.put(`http://localhost:8080/api/admins/${id}`, formDataForUpload);
 
-      // Actualiza la información de adminInfo después de la carga exitosa
       const updatedAdminData = await axios.get(`http://localhost:8080/api/admins/${id}`);
       setAdminInfo(updatedAdminData.data);
       const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
@@ -81,7 +80,6 @@ const AdminEdit = ({ getAdmins }) => {
         localStorage.setItem('adminInfo', JSON.stringify(updatedAdminData.data));
       }
 
-      // Redirigir después de la actualización
       goBack();
     } catch (error) {
       console.error(`Error updating admin with id=${id}:`, error);

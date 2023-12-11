@@ -10,7 +10,6 @@ describe('Admin routes', () => {
         .post('/api/admins')
         .attach('filename', './public/images/user.jpg')
         .field('Username', 'testadmin')
-        .field('Password', '') 
         .expect(httpStatus.INTERNAL_SERVER_ERROR);
     });
   });

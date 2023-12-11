@@ -1,9 +1,7 @@
 const db = require("../models");
 const Vehicles = db.Vehicle;
 
-// Create and Save a new 
 exports.create = (req, res) => {
-    // Create a Vehicle
     const vehicle = {
         Vehicle: req.body.Vehicle
     };
@@ -19,7 +17,6 @@ exports.create = (req, res) => {
         });
 };
 
-// Retrieve all Vehicles from the database.
 exports.findAll = (req, res) => {
     Vehicles.findAll()
         .then(data => {
@@ -32,7 +29,6 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Find a single Vehicle with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
@@ -53,7 +49,6 @@ exports.findOne = (req, res) => {
         });
 };
 
-// Update a Vehicle by the id in the request
 exports.update = (req, res) => {
     const id = req.params.id;
     const updateVehicle = {
@@ -80,7 +75,6 @@ exports.update = (req, res) => {
         });
 };
 
-// Delete a Vehicle with the specified id in the request
 exports.delete = (req, res) => {
     const id = req.params.id;
 
@@ -92,7 +86,6 @@ exports.delete = (req, res) => {
                 });
             }
 
-            // Delete the vehicle record in the database
             vehicle.destroy()
                 .then(() => {
                     res.send({
@@ -116,14 +109,12 @@ exports.deleteAll = (req, res) => {
     Vehicles.findAll()
         .then(vehicles => {
             vehicles.forEach(vehicle => {
-                // Delete the vehicle record in the database
                 vehicle.destroy()
                     .catch(err => {
                         console.error(`Error deleting Vehicle with id=${vehicle.id}: ${err.message}`);
                     });
             });
 
-            // Delete all vehicle records in the database
             return Vehicles.destroy({
                 where: {},
                 truncate: false

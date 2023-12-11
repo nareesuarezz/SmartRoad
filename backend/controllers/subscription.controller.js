@@ -131,26 +131,22 @@
     try {
       const endpointToDelete = req.body.endpoint;
   
-      // Buscar la suscripción a eliminar
       const subscriptionToDelete = await Subscription.findOne({
         where: {
           endpoint: endpointToDelete
         }
       });
   
-      // Si la suscripción no existe, devolver un error 404
       if (!subscriptionToDelete) {
         return res.status(404).send("Endpoint not found");
       }
   
-      // Eliminar la suscripción
       await Subscription.destroy({
         where: {
           id: subscriptionToDelete.id
         }
       });
   
-      // Notificar sobre la eliminación de la suscripción
       const subscriptionRecipient = {
         endpoint: subscriptionToDelete.endpoint,
         expirationTime: subscriptionToDelete.expirationTime,
@@ -160,10 +156,8 @@
       const description = "";
       sendNotification(subscriptionRecipient, title, description);
   
-      // Obtener las suscripciones restantes después de la eliminación
       const remainingSubscriptions = await Subscription.findAll();
   
-      // Enviar una notificación para cada suscripción restante
       for (let s of remainingSubscriptions) {
         const remainingSubscriptionRecipient = {
           endpoint: s.dataValues.endpoint,
@@ -174,10 +168,8 @@
         sendNotification(remainingSubscriptionRecipient, remainingTitle, description);
       }
   
-      // Responder con éxito
       res.status(200).send("Subscription deleted");
     } catch (err) {
-      // Manejar errores
       res.status(500).send({
         message: err.message || "Some error happened"
       });
@@ -202,7 +194,7 @@
         JSON.stringify({
           title,
           description,
-          image: 'https://cdn2.vectorstock.com/i/thumb-large/94/66/emoji-smile-icon-symbol-smiley-face-vector-26119466.jpg',
+          image: 'https://cdn-icons-png.flaticon.com/512/752/752755.png',
         }),
         options
       );

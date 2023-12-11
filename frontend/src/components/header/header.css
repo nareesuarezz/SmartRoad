@@ -1,6 +1,5 @@
-/* Estilos para móviles (estilo base) */
 .header-container {
-  padding: 15px; /* Ajusta el padding para móviles */
+  padding: 15px;
   background-color: #333;
 }
 
@@ -9,12 +8,12 @@
   padding: 0;
   margin: 0;
   display: flex;
-  flex-wrap: wrap; /* Permite que los elementos se envuelvan en varias líneas en pantallas pequeñas */
+  flex-wrap: wrap; 
 }
 
 .nav-item {
   margin-top: 20px;
-  margin-right: 2vh; /* Ajusta el margen para móviles */
+  margin-right: 2vh; 
   margin-left: 2vh;
 }
 
@@ -28,25 +27,24 @@
   color: lightgray;
 }
 
-/* Media queries para tablet y PC */
 @media (min-width: 768px) {
   .header-container {
-      padding: 20px; /* Ajusta el padding para tablet y PC */
+      padding: 20px; 
   }
 
   .nav-item {
-      margin-right: 15px; /* Ajusta el margen para tablet y PC */
+      margin-right: 15px; 
       margin-left: 15px;
   }
 }
 
 @media (min-width: 1024px) {
   .header-container {
-      padding: 30px; /* Ajusta el padding para pantallas más grandes */
+      padding: 30px; 
   }
 
   .nav-item {
-      margin-right: 30px; /* Ajusta el margen para pantallas más grandes */
+      margin-right: 30px; 
       margin-left: 30px;
   }
 }

@@ -55,7 +55,7 @@ function Car() {
             try {
                 const serviceWorkerReg = await regSw();
                 const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
-    
+
                 if (existingSubscription) {
                     console.log('Suscripción ya existe:', existingSubscription);
                     setSubscription(existingSubscription);
@@ -67,30 +67,34 @@ function Car() {
                 console.error('Error al obtener suscripción:', error);
             }
         };
-    
+
         handleMount();
     }, []);
-    
+
     useEffect(() => {
-        // Cleanup effect
         return () => {
             const handleUnmount = async () => {
                 try {
+                    const serviceWorkerReg = await regSw();
                     if (subscription) {
                         console.log('Unsubscribing from:', subscription.endpoint);
                         await axios.post(`${API}/deleteByEndpoint`, { endpoint: subscription.endpoint });
-                        await subscription.unsubscribe();
-                        console.log('Unsubscription successful');
-                        setSubscription(null); 
+                        const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
+                        if (existingSubscription) {
+                            await existingSubscription.unsubscribe();
+                            console.log('Unsubscription successful');
+                        }
+                        setSubscription(null);
                     }
                 } catch (error) {
                     console.error('Error during unsubscription:', error);
                 }
             };
-    
+
             handleUnmount();
         };
     }, [subscription]);
+
     return (
         <>
             <div className='arrow' onClick={() => goBack()}>

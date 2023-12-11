@@ -19,8 +19,8 @@ function urlBase64ToUint8Array(base64String) {
 
 const publicKey = process.env.REACT_APP_PUBLIC_KEY;
 const key = urlBase64ToUint8Array(publicKey);
-console.log(key.length);  // Debería imprimir 65
-console.log(key[0]);  // Debería imprimir 4
+console.log(key.length);  
+console.log(key[0]);  
 
 
 
@@ -35,11 +35,11 @@ async function subscribe(serviceWorkerReg, subscriptionName) {
           await existingSubscription.unsubscribe();
       }
 
-      const applicationServerKey = urlBase64ToUint8Array(publicKey); // Cambiado el nombre de la variable
+      const applicationServerKey = urlBase64ToUint8Array(publicKey); 
 
       const subscription = await serviceWorkerReg.pushManager.subscribe({
           userVisibleOnly: true,
-          applicationServerKey: applicationServerKey, // Usar la nueva variable
+          applicationServerKey: applicationServerKey, 
       });
 
       await axios.post(`${API}/subscribe`, { subscriptionName, subscription });

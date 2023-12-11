@@ -6,13 +6,10 @@ const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
 
-// Create and Save a new Admin
 exports.create = (req, res, next) => {
-  // Imprime la información del archivo
   console.log('File:', req.file);
 
 
-  // Imprime el cuerpo de la solicitud
   console.log('Body:', req.body);
   req.body.Username ||= req.bodyb.Username;
   req.body.Password ||= req.bodyb.Password;
@@ -24,7 +21,6 @@ exports.create = (req, res, next) => {
     return;
   }
 
-  // Create an Admin
   let admin = {
     Username: req.body.Username,
     Password: req.body.Password,
@@ -43,13 +39,10 @@ exports.create = (req, res, next) => {
 
       admin.Password = bcrypt.hashSync(req.body.Password);
 
-      // Admin not found. Save new Admin in the database
       Admin.create(admin)
         .then(data => {
           const token = utils.generateToken(data);
-          // get basic Admin details
           const userObj = utils.getCleanUser(data);
-          // return the token along with Admin details
           return res.json({ admin: userObj, access_token: token });
         })
         .catch(err => {
@@ -83,7 +76,6 @@ exports.findAll = (req, res) => {
     });
 };
 
-// Find a single Admin with an id
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
@@ -110,16 +102,13 @@ exports.update = async (req, res) => {
       });
     }
 
-    // Update admin fields
     admin.Username = req.body.Username;
 
     if (req.body.Password) {
       admin.Password = bcrypt.hashSync(req.body.Password);
     }
 
-    // Check if a new image file is provided
     if (req.file) {
-      // Delete the existing image file if it exists
       if (admin.filename) {
         const imagePath = path.join(__dirname, '../public/images/', admin.filename);
         fs.unlink(imagePath, (err) => {
@@ -146,9 +135,6 @@ exports.update = async (req, res) => {
 };
 
 
-
-
-// // Delete a Admin with the specified id in the request
 exports.delete = (req, res) => {
   const id = req.params.id;
 
@@ -234,7 +220,6 @@ exports.deleteAll = (req, res) => {
 
 
 
-// Find Admin by username and password
 exports.findAdminByUsernameAndPassword = (req, res) => {
   const user = req.body.Username;
   const pwd = req.body.Password;
@@ -251,7 +236,6 @@ exports.findAdminByUsernameAndPassword = (req, res) => {
     });
 };
 
-// Obtener información del admin logeado
 exports.getLoggedInAdmin = (req, res) => {
   const adminId = req.admin.UID;
 
