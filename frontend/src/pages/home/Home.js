@@ -50,10 +50,8 @@ function Home() {
 
   const createVehicleAndTrack = async (vehicle, coords) => {
     try {
-      // Crear vehículo en el backend
       const createdVehicle = await createVehicle(vehicle);
 
-      // Crear track en el backend usando el ID del vehículo creado
       const createdTrack = await createTrack(createdVehicle.UID, coords);
 
       console.log('Vehicle and track created successfully:', createdVehicle, createdTrack);

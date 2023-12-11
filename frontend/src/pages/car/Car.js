@@ -100,16 +100,16 @@ function Car() {
                 <h1>SmartRoad</h1>
             </div>
             <div className='logged'>
-                <h2>Has iniciado sesión como...</h2>
+                <h2>You are now logged as a...</h2>
             </div>
 
             <div className='car-container'>
                 <div className='vehicle-box car-box'>
                     <img src={logoCar} alt='Logo de Coche' />
                 </div>
-                <p className='car'>Coche</p>
+                <p className='car'>Car</p>
 
-                <h3 className='warn'>Ahora recibirás advertencias en caso de que haya una bicicleta cerca de ti.</h3>
+                <h3 className='warn'>Now you will be warned in case that a bike passes near you.</h3>
             </div>
 
             {showModal && (
