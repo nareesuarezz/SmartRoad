@@ -1,14 +1,13 @@
 const db = require("../models");
 const Vehicles = db.Vehicle;
 
-// Create and Save a new Vehicle
+// Create and Save a new 
 exports.create = (req, res) => {
     // Create a Vehicle
     const vehicle = {
         Vehicle: req.body.Vehicle
     };
 
-    // Save Vehicle in the database
     Vehicles.create(vehicle)
         .then(data => {
             res.send(data);

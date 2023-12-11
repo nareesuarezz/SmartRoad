@@ -7,7 +7,8 @@ exports.create = (req, res) => {
     const log = {
         Log_ID: req.body.Log_ID,
         Admin_UID: req.body.Admin_UID,
-        Track_ID: req.body.Track_ID
+        Track_ID: req.body.Track_ID,
+        Action: req.body.Action
     };
 
     // Save Log in the database
@@ -55,93 +56,70 @@ exports.findOne = (req, res) => {
             });
         });
 };
-
-// Update a Log by the id in the request
+// Update a Log by the ID in the request
 exports.update = (req, res) => {
     const id = req.params.id;
-    const updateLog = {
-        Log_ID: req.body.Log_ID,
-        Admin_UID: req.body.Admin_UID,
-        Track_ID: req.body.Track_ID
-    };
-
-    Logs.findByPk(id)
-        .then(log => {
-            if (log) {
-                res.send({
-                    message: `Log was updated successfully.`
-                });
-                return log.update(updateLog);
-            } else {
-                res.send({
-                    message: `Cannot update Log with id=${id}. Maybe Log was not found or req.body is empty!`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error updating Log with id=" + id
-            });
+  
+    Logs.update(req.body, {
+      where: { Log_ID: id }
+    })
+      .then(num => {
+        if (num == 1) {
+          res.send({
+            message: "Log was updated successfully."
+          });
+        } else {
+          res.send({
+            message: `Cannot update Log with id=${id}. Maybe Log was not found or req.body is empty!`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Error updating Log with id=" + id
         });
-};
-
-// Delete a Log with the specified id in the request
-exports.delete = (req, res) => {
+      });
+  };
+  
+  // Delete a Log with the specified ID in the request
+  exports.delete = (req, res) => {
     const id = req.params.id;
-
-    Logs.findByPk(id)
-        .then(log => {
-            if (!log) {
-                return res.status(404).send({
-                    message: `Log with id=${id} not found.`
-                });
-            }
-
-            // Delete the log record in the database
-            log.destroy()
-                .then(() => {
-                    res.send({
-                        message: 'Log was deleted successfully.'
-                    });
-                })
-                .catch(err => {
-                    res.status(500).send({
-                        message: `Error deleting Log with id=${id}: ${err.message}`
-                    });
-                });
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Error retrieving Log with id=${id}: ${err.message}`
-            });
+  
+    Logs.destroy({
+      where: { Log_ID: id }
+    })
+      .then(num => {
+        if (num == 1) {
+          res.send({
+            message: "Log was deleted successfully."
+          });
+        } else {
+          res.send({
+            message: `Cannot delete Log with id=${id}. Maybe Log was not found!`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete Log with id=" + id
         });
-};
-
-exports.deleteAll = (req, res) => {
-    Logs.findAll()
-        .then(logs => {
-            logs.forEach(log => {
-                // Delete the log record in the database
-                log.destroy()
-                    .catch(err => {
-                        console.error(`Error deleting Log with id=${log.id}: ${err.message}`);
-                    });
-            });
-
-            // Delete all log records in the database
-            return Logs.destroy({
-                where: {},
-                truncate: false
-            });
-        })
-        .then(nums => {
-            res.send({
-                message: `${nums} Logs were deleted successfully!`
-            });
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Some error occurred while removing all Logs: ${err.message}`
-            });
+      });
+  };
+  
+  // Delete all Logs from the database
+  exports.deleteAll = (req, res) => {
+    Logs.destroy({
+      where: {},
+      truncate: false
+    })
+      .then(nums => {
+        res.send({ message: `${nums} Logs were deleted successfully.` });
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: err.message || "Some error occurred while removing all logs."
         });
-};
+      });
+  };
+
+

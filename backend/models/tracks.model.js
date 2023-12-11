@@ -6,11 +6,11 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true
     },
     Location: {
-      type: Sequelize.DataTypes.GEOMETRY('POINT'),
+      type: Sequelize.GEOMETRY('POINT'),
       allowNull: false,
     },
     Status: {
-      type: Sequelize.ENUM('stopped', 'moving')
+      type: Sequelize.ENUM('Stopped', 'Moving')
     },
     Speed: {
       type: Sequelize.DECIMAL

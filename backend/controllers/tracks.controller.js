@@ -1,31 +1,42 @@
 const db = require("../models");
 const Tracks = db.Track;
+const Logs = db.Log;
 const Op = db.Sequelize.Op;
 
-// Create and Save a new Track
-exports.create = (req, res) => {
-    // Create a Track
-    const track = {
-        Location: req.body.Location,
-        Status: req.body.Status,
-        Speed: req.body.Speed,
-        Extra: req.body.Extra,
-        Vehicle_UID: req.body.Vehicle_UID
-    };
-
-    // Save Track in the database
-    Tracks.create(track)
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while creating the track."
-            });
-        });
+const createLogEntry = async (action, trackId, adminId) => {
+    try {
+        const logEntry = {
+            Track_ID: trackId,
+            Admin_UID: adminId,
+            Action: action,
+        };
+        await Logs.create(logEntry);
+    } catch (error) {
+        console.error(`Error creating log entry: ${error.message}`);
+    }
 };
 
-// Retrieve all Tracks from the database.
+exports.create = async (req, res) => {
+    try {
+        const track = {
+            Location: req.body.Location,
+            Status: req.body.Status,
+            Speed: req.body.Speed,
+            Extra: req.body.Extra,
+            Vehicle_UID: req.body.Vehicle_UID,
+        };
+
+        const createdTrack = await Tracks.create(track);
+
+        res.status(201).send({ message: "Track created successfully." });
+    } catch (error) {
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Some error occurred while creating the track.",
+        });
+    }
+};
+
 exports.findAll = (req, res) => {
     Tracks.findAll()
         .then(data => {
@@ -38,7 +49,6 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Find a single Track with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
@@ -60,93 +70,97 @@ exports.findOne = (req, res) => {
 };
 
 // Update a Track by the id in the request
-exports.update = (req, res) => {
+exports.update = async (req, res) => {
+    const adminId = req.user.UID;
     const id = req.params.id;
-    const updateTrack = {
-        Location: req.body.Location,
-        Status: req.body.Status,
-        Speed: req.body.Speed,
-        Extra: req.body.Extra,
-        Vehicle_UID: req.body.Vehicle_UID
-    };
 
-    Tracks.findByPk(id)
-        .then(track => {
-            if (track) {
-                res.send({
-                    message: `Track was updated successfully.`
-                });
-                return track.update(updateTrack);
-            } else {
-                res.send({
-                    message: `Cannot update Track with id=${id}. Maybe Track was not found or req.body is empty!`
-                });
-            }
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: "Error updating Track with id=" + id
+    try {
+        const updateTrack = {
+            Location: req.body.Location,
+            Status: req.body.Status,
+            Speed: req.body.Speed,
+            Extra: req.body.Extra,
+            Vehicle_UID: req.body.Vehicle_UID
+        };
+
+        const track = await Tracks.findByPk(id);
+
+        if (!track) {
+            return res.status(404).send({
+                message: `Cannot update Track with id=${id}. Track not found!`
             });
+        }
+
+
+
+        if (!adminId) {
+            console.error(`Admin ID is undefined. Request user: ${JSON.stringify(req.user)}`);
+            return res.status(500).send({
+                message: `Error updating Track with id=${id}: Admin ID is undefined.`
+            });
+        }
+
+        const updatedTrack = await track.update(updateTrack);
+        await createLogEntry('UPDATE', updatedTrack.ID, adminId);
+
+        res.send({
+            message: `Track with id=${id} was updated successfully.`,
+            updatedTrack: updatedTrack
         });
+    } catch (err) {
+        console.error(`Error updating Track with id=${id}: ${err.message}`);
+        res.status(500).send({
+            message: `Error updating Track with id=${id}: ${err.message}`
+        });
+    }
 };
+
 
 // Delete a Track with the specified id in the request
-exports.delete = (req, res) => {
+exports.delete = async (req, res) => {
     const id = req.params.id;
 
-    Tracks.findByPk(id)
-        .then(track => {
-            if (!track) {
-                return res.status(404).send({
-                    message: `Track with id=${id} not found.`
-                });
-            }
+    try {
+        const trackToDelete = await Tracks.findByPk(id);
 
-            // Delete the track record in the database
-            track.destroy()
-                .then(() => {
-                    res.send({
-                        message: 'Track was deleted successfully.'
-                    });
-                })
-                .catch(err => {
-                    res.status(500).send({
-                        message: `Error deleting Track with id=${id}: ${err.message}`
-                    });
-                });
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Error retrieving Track with id=${id}: ${err.message}`
+        if (!trackToDelete) {
+            return res.status(404).send({
+                message: `Track with id=${id} not found.`
             });
+        }
+
+        await trackToDelete.destroy();
+
+        res.send({
+            message: 'Track was deleted successfully.'
         });
+    } catch (err) {
+        res.status(500).send({
+            message: `Error deleting Track with id=${id}: ${err.message}`
+        });
+    }
 };
 
-exports.deleteAll = (req, res) => {
-    Tracks.findAll()
-        .then(tracks => {
-            tracks.forEach(track => {
-                // Delete the track record in the database
-                track.destroy()
-                    .catch(err => {
-                        console.error(`Error deleting Track with id=${track.id}: ${err.message}`);
-                    });
-            });
 
-            // Delete all track records in the database
-            return Tracks.destroy({
-                where: {},
-                truncate: false
-            });
-        })
-        .then(nums => {
-            res.send({
-                message: `${nums} Tracks were deleted successfully!`
-            });
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: `Some error occurred while removing all Tracks: ${err.message}`
-            });
+exports.deleteAll = async (req, res) => {
+    try {
+        const tracks = await Tracks.findAll();
+
+        tracks.forEach(async (track) => {
+            await track.destroy();
         });
+
+        await Tracks.destroy({
+            where: {},
+            truncate: false
+        });
+
+        res.send({
+            message: `${tracks.length} Tracks were deleted successfully!`
+        });
+    } catch (err) {
+        res.status(500).send({
+            message: `Some error occurred while removing all Tracks: ${err.message}`
+        });
+    }
 };

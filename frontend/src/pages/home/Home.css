@@ -1,13 +1,16 @@
 .title {
 
     text-align: center;
-    margin-top: 7em;
-    margin-bottom: 2em;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    font-size: 1.1em;
+
   }
   
   .question {
     text-align: center;
     margin-top: 0.5em;
+    font-size: 1.2em;
   }
   
   .vehicle-container {
@@ -19,22 +22,25 @@
   
   .vehicle-box {
     background-color: #aedff7; 
-    width: 130px;
-    height: 130px;
+    width: 170px;
+    height: 170px;
     text-align: center;
   }
   
 .bicycle {
     margin-bottom: 3em;
+    font-size: 1.5em;
+
 }
 
 .car {
     margin-bottom: 3em;
+    font-size: 1.5em;
 }
 
   .vehicle-box img {
-    margin-top: 15px;
-    width: 100px; 
+    margin-top: 25px;
+    width: 130px; 
   }
   
   .bicycle-box {
@@ -47,15 +53,16 @@
   }
   
   .admin{
-    margin-top: 3em;
+    margin-top: 1.7em;
     text-align: center;
-    font-size: 13px;
+    font-size: 20px;
     color: grey;
   }
 
   .log{
-    margin-top: -1em;
+    margin-top: -1.2em;
     text-decoration: underline;
+    cursor: pointer;
   }
  
   

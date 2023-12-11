@@ -5,6 +5,9 @@ module.exports = (sequelize, Sequelize) => {
       autoIncrement: true,
       primaryKey: true
     },
+    Action: {
+      type: Sequelize.STRING,
+    }
   });
 
   Logs.associate = models => {

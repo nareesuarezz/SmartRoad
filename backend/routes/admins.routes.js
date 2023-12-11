@@ -1,20 +1,27 @@
+// admins.routes.js
 module.exports = app => {
-    const admins = require("../controllers/admins.controller");
-    var upload = require('../multer/upload');
+  const admins = require("../controllers/admins.controller");
+  const auth = require("../controllers/auth");
 
-    var router = require("express").Router();
-  
-    router.post("/", upload.single('filename'), admins.create);
-  
-    router.get("/", admins.findAll);
-  
-    router.get("/:id", admins.findOne);
-  
-    router.put("/:id", upload.single('filename'), admins.update);
-  
-    router.delete("/:id", admins.delete);
-  
-    router.delete("/", admins.deleteAll);
-  
-    app.use("/api/admins", router);
-  }
+  const isAuthenticated = auth.isAuthenticated;
+
+  const upload = require('../multer/upload');
+
+  var router = require("express").Router();
+
+  router.post("/", upload, admins.create);
+
+  router.get("/", admins.findAll);
+
+  router.get("/:id", admins.findOne);
+
+  router.put("/:id", upload, admins.update);
+
+  router.delete("/:id", admins.delete);
+
+  router.delete("/", admins.deleteAll);
+
+  router.post("/signin", auth.signin);
+
+  app.use("/api/admins", router);
+};
