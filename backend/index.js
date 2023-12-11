@@ -5,8 +5,15 @@ const bcrypt = require('bcryptjs')
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken'); 
+const { Sequelize } = require('sequelize');
+const dbConfig = require("./config/db.config");
 
 const app = express();
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+  host: dbConfig.HOST,
+  dialect: dbConfig.dialect,
+  pool: dbConfig.pool
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
@@ -42,18 +49,14 @@ db.sequelize.sync({ force: true }).then(async () => {
   }
 });
 
-
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
-  
   if (token && token.indexOf('Basic ') === 0) {
-    // verify auth basic credentials
     const base64Credentials = req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [username, password] = credentials.split(':');
 
-    // Imprime las credenciales decodificadas
     console.log('Decoded Credentials:', username, password);
 
     req.body.Username = username;
@@ -84,7 +87,6 @@ app.use(function (req, res, next) {
   }
 });
 
-
 require("./routes/logs.routes")(app);
 require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
@@ -95,3 +97,5 @@ const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = app;
