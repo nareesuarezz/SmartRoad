@@ -3,6 +3,8 @@ import logoBicycle from '../../img/bike.png';
 import logoCar from '../../img/car.png';
 import './Home.css';
 import axios from 'axios';
+import { regSw, subscribe } from '../../services/subscriptionService';
+
 
 function Home() {
   const [subscription, setSubscription] = useState(null);
@@ -11,15 +13,22 @@ function Home() {
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-
+  
       if (position && Notification.permission === 'granted') {
         await createVehicleAndTrack(vehicle, position.coords);
+        
+        if (vehicle === 'car') {
+          const serviceWorkerReg = await regSw();
+          await subscribe(serviceWorkerReg, 'car');
+        }
+        
         window.location.href = `/${vehicle}`;
       }
     } catch (error) {
       console.error('Error al solicitar permisos:', error);
     }
   };
+  
 
   const askForLocationPermission = () => {
     return new Promise((resolve, reject) => {
@@ -77,9 +86,9 @@ function Home() {
 
   const createTrack = async (vehicleId, coords) => {
     const location = {
-        type: 'Point',
-        coordinates: [parseFloat(coords.latitude), parseFloat(coords.longitude)],
-      };
+      type: 'Point',
+      coordinates: [parseFloat(coords.latitude), parseFloat(coords.longitude)],
+    };
     try {
       const response = await axios.post(`http://localhost:8080/api/tracks`, {
         Location: location,

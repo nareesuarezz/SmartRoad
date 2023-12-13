@@ -69,7 +69,6 @@ exports.findOne = (req, res) => {
         });
 };
 
-// Update a Track by the id in the request
 exports.update = async (req, res) => {
     const adminId = req.user.UID;
     const id = req.params.id;
@@ -116,7 +115,6 @@ exports.update = async (req, res) => {
 };
 
 
-// Delete a Track with the specified id in the request
 exports.delete = async (req, res) => {
     const id = req.params.id;
 

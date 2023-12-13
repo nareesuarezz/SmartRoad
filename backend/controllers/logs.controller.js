@@ -1,9 +1,7 @@
 const db = require("../models");
 const Logs = db.Log;
 
-// Create and Save a new Log
 exports.create = (req, res) => {
-    // Create a Log
     const log = {
         Log_ID: req.body.Log_ID,
         Admin_UID: req.body.Admin_UID,
@@ -11,7 +9,6 @@ exports.create = (req, res) => {
         Action: req.body.Action
     };
 
-    // Save Log in the database
     Logs.create(log)
         .then(data => {
             res.send(data);
@@ -23,7 +20,6 @@ exports.create = (req, res) => {
         });
 };
 
-// Retrieve all Logs from the database.
 exports.findAll = (req, res) => {
     Logs.findAll()
         .then(data => {
@@ -36,7 +32,6 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Find a single Log with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
@@ -56,7 +51,7 @@ exports.findOne = (req, res) => {
             });
         });
 };
-// Update a Log by the ID in the request
+
 exports.update = (req, res) => {
     const id = req.params.id;
   
@@ -81,7 +76,6 @@ exports.update = (req, res) => {
       });
   };
   
-  // Delete a Log with the specified ID in the request
   exports.delete = (req, res) => {
     const id = req.params.id;
   
@@ -106,7 +100,6 @@ exports.update = (req, res) => {
       });
   };
   
-  // Delete all Logs from the database
   exports.deleteAll = (req, res) => {
     Logs.destroy({
       where: {},

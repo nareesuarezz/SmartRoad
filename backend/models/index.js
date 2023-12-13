@@ -19,7 +19,6 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
-// Importar y asociar todos los modelos
 db.Vehicle = require("./vehicles.model.js")(sequelize, Sequelize);
 db.Track = require("./tracks.model.js")(sequelize, Sequelize);
 db.Admin = require("./admins.model.js")(sequelize, Sequelize);

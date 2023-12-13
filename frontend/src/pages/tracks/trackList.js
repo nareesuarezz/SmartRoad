@@ -38,8 +38,6 @@ const TrackList = () => {
   const fetchAdminId = async () => {
     try {
       const authToken = AuthService.getAuthToken();
-      // const decodedToken = AuthService.decodeAuthToken(authToken);
-      // setAdminId(decodedToken.UID);
     } catch (error) {
       console.error('Error fetching admin ID:', error);
     }

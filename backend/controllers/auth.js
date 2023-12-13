@@ -7,7 +7,6 @@ const utils = require('../utils');
 exports.signin = async (req, res) => {
   const { Username, Password } = req.body;
 
-  // Verificar si el usuario y la contraseña están presentes
   if (!Username || !Password) {
     return res.status(400).json({
       error: true,
@@ -16,7 +15,6 @@ exports.signin = async (req, res) => {
   }
 
   try {
-    // Buscar el admin por su nombre de usuario
     const admin = await Admin.findOne({ where: { Username } });
 
     if (!admin) {
@@ -26,7 +24,6 @@ exports.signin = async (req, res) => {
       });
     }
 
-    // Comparar las contraseñas
     const passwordMatch = bcrypt.compareSync(Password, admin.Password);
 
     if (!passwordMatch) {
@@ -36,12 +33,9 @@ exports.signin = async (req, res) => {
       });
     }
 
-    // Generar el token
     const token = utils.generateToken(admin);
-    // Obtener detalles básicos del admin
     const adminDetails = utils.getCleanUser(admin);
 
-    // Enviar el token y detalles del admin en la respuesta
     res.json({ admin: adminDetails, access_token: token });
   } catch (error) {
     console.error("Error during sign-in:", error);
@@ -53,7 +47,6 @@ exports.signin = async (req, res) => {
 };
 
 exports.isAuthenticated = (req, res, next) => {
-  // Obtener el token del encabezado de la solicitud
   const token = req.headers.authorization;
 
   if (!token) {
@@ -63,7 +56,6 @@ exports.isAuthenticated = (req, res, next) => {
     });
   }
 
-  // Verificar el token utilizando la clave secreta
   jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
     if (err) {
       return res.status(401).json({
@@ -73,7 +65,6 @@ exports.isAuthenticated = (req, res, next) => {
     }
 
     try {
-      // Buscar el admin en la base de datos
       const admin = await Admin.findByPk(decoded.adminId);
 
       if (!admin) {
@@ -83,7 +74,6 @@ exports.isAuthenticated = (req, res, next) => {
         });
       }
 
-      // Añadir la información del admin a la solicitud
       req.admin = { UID: decoded.adminId };
       next();
     } catch (error) {
