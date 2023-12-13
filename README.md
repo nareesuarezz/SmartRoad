@@ -4,6 +4,7 @@ SmartRoad is a project whose purpose is to keep the driver informed of everythin
 
 Apart from incorporating a cyclist alert which notifies the car driver when his path coincides with that of a cyclist, notifying him of the approximate time of the encounter with the cyclist.
 
+**The company of the project is ITC (Instituto Técnológico de Canarias)**
 
 ## Database, its entities and relationships:
 
@@ -40,6 +41,9 @@ According to the previous Entities and Relationships that I explained before, he
 
 **Relational**
 ![Relaional Diagram](frontend/public/images/Relational.jpeg)
+
+
+### Describe the operation of the system and technical specifications for the server application and the mobile and web APPs
 
 
 
