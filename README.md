@@ -35,6 +35,7 @@ According to the previous Entities and Relationships that I explained before, he
 ![UML Diagram](frontend/public/images/Uml.jpeg)
 
 **Class**
+
 ![Class Diagram](frontend/public/images/class.jpg)
 
 **Relational**
