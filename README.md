@@ -22,6 +22,7 @@ In our database, we assume that an admin (in this case the is an administrator s
 
 I made this Use Case Diagram to have an idea of all the things that our app can do:
 
+![Use Case Diagram](frontend/public/images/Use Case Diagram1.jpg)
 
 ```
 Da un ejemplo
