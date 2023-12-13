@@ -28,16 +28,16 @@ I made this Use Case Diagram to have an idea of all the things that our app can 
 
 According to the previous Entities and Relationships that I explained before, here are the E/R, UML, Class and Relational Diagrams:
 
-##E/R
+**E/R**
 ![E/R Diagram](frontend/public/images/Er.jpeg)
 
-##UML
+**UML**
 ![UML Diagram](frontend/public/images/Uml.jpeg)
 
-##Class
+**Class**
 ![Class Diagram](frontend/public/images/class.jpg)
 
-##Relational
+**Relational**
 ![Relaional Diagram](frontend/public/images/Relational.jpeg)
 
 
