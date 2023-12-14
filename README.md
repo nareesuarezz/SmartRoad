@@ -59,8 +59,28 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
 
 ### Manuals of installation
 The steps for installing this app are the following:
+
+## Step one: Cloning the repository
 ```sh
+git clone https://github.com/nareesuarezz/SmartRoad/
+```
+## Step two: Installing the dependencies of both backend and frontend
+```sh
+cd SmartRoad/backend
 npm install
+
+cd SmartRoad/frontend
+npm install
+```
+
+## Step three: Running both backend and frontend
+```sh
+cd SmartRoad/backend
+npm start
+
+cd SmartRoad/frontend
+npm start
+```
 
 ### User Manual
 
