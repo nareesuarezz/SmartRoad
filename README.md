@@ -129,7 +129,7 @@ Here in the pdf you have the user manual of the app
 
 ## Technology Comparison:
 
-### Native Apps:
+## Native Apps:
 ### Advantages:
 -Access to device-specific features for enhanced performance.
 -Optimal user experience tailored to the platform.
@@ -138,7 +138,7 @@ Here in the pdf you have the user manual of the app
 -Requires separate development for different platforms.
 -Longer development time and higher costs.
 
-### Hybrid Apps:
+## Hybrid Apps:
 ### Advantages:
 -Cross-platform development, reducing development time and costs.
 -Access to device features through plugins.
@@ -147,7 +147,7 @@ Here in the pdf you have the user manual of the app
 -May not match the performance of native apps.
 -Limited access to some native features.
 
-### Web Apps:
+## Web Apps:
 ### Advantages:
 -Cross-platform compatibility without the need for separate development.
 -Easier maintenance and updates.
@@ -156,7 +156,7 @@ Here in the pdf you have the user manual of the app
 -Limited access to device-specific features.
 -Potentially lower performance compared to native apps.
 
-### Progressive Web Apps (PWA):
+## Progressive Web Apps (PWA):
 ### Advantages:
 -Offline capabilities and responsive design.
 -No need for installation through app stores.
