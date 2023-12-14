@@ -73,6 +73,35 @@ My initial design of the application was thinking of a menu with 2 simple button
 
 https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0%3A1&mode=design&t=jRCTMx0RnjMFJu7F-1
 
+## Usability and Accesibility
+
+### Usability Aspects:
+1. Navigation:
+
+    _Justification:_ Intuitive navigation is crucial for user satisfaction. The interface offers clear buttons and pathways for users to select their role or access admin features.
+
+2. Consistency:
+
+    _Justification:_ Consistent design elements and placement create a familiar user experience. Buttons and layouts maintain uniformity throughout the application.
+
+3. Readability:
+
+    _Justification:_ Legible fonts, appropriate font sizes, and a well-chosen color scheme enhance readability, catering to users with visual impairments or reading difficulties.
+
+
+## Accessibility Aspects:
+1. Alt Text for Images:
+
+    _Justification:_ Including alt text ensures that users with visual impairments can understand the content of images using screen readers.
+
+2. Keyboard Navigation:
+
+    _Justification:_ Supporting keyboard navigation is crucial for users who rely on keyboard input or assistive technologies.
+
+3. Color Contrast:
+
+    _Justification:_ A carefully chosen color scheme and contrast ratios improve visibility for users with visual impairments.
+
 ## Manuals of installation
 The steps for installing this app are the following:
 
