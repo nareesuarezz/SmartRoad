@@ -129,19 +129,41 @@ Here in the pdf you have the user manual of the app
 
 ## Technology Comparison:
 
-### Backend (Server):
--Node.js vs. Django (Python): Node.js is suitable for real-time and event-driven applications, while Django is a robust framework for rapid web application development.
+### Native Apps:
+### Advantages:
+-Access to device-specific features for enhanced performance.
+-Optimal user experience tailored to the platform.
 
--Express.js vs. Flask (Python): Both are minimalistic and flexible frameworks. Express.js is commonly used with Node.js, while Flask is popular in the Python ecosystem.
+### Disadvantages:
+-Requires separate development for different platforms.
+-Longer development time and higher costs.
 
--Sequelize vs. TypeORM: Both are ORMs for SQL databases in Node.js. Sequelize is more mature and widely used, while TypeORM is known for its TypeScript integration and object-oriented approach.
+### Hybrid Apps:
+### Advantages:
+-Cross-platform development, reducing development time and costs.
+-Access to device features through plugins.
 
--MySQL vs. MongoDB: MySQL is a relational database, while MongoDB is a NoSQL database. The choice between them depends on the specific needs of your application.
+### Disadvantages:
+-May not match the performance of native apps.
+-Limited access to some native features.
 
-### Frontend (Web Client):
--React vs. Angular vs. Vue: React is a library, while Angular and Vue are full-fledged frameworks. React is known for its flexibility and simplicity.
+### Web Apps:
+### Advantages:
+-Cross-platform compatibility without the need for separate development.
+-Easier maintenance and updates.
 
--Axios vs. Fetch: Both are used for making HTTP requests in the browser. Axios is easier to use and has more features than Fetch.
+### Disadvantages:
+-Limited access to device-specific features.
+-Potentially lower performance compared to native apps.
+
+### Progressive Web Apps (PWA):
+### Advantages:
+-Offline capabilities and responsive design.
+-No need for installation through app stores.
+
+### Disadvantages:
+-Limited access to some native features.
+-May not provide the same level of user engagement as native apps.
 
 ## Planification
 
