@@ -122,17 +122,20 @@ function Home() {
       <div className="vehicle-container">
         <div className="vehicle-box bicycle-box" onClick={() => handleClick('bicycle')}>
           <img src={logoBicycle} alt="Logo de bicicleta" />
+          <p className='bicycle'>Bicycle</p>
         </div>
-        <p className='bicycle'>Bicycle</p>
+        
         <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
           <img src={logoCar} alt="Logo de coche" />
+          <p className='car'>Car</p>
         </div>
-        <p className='car'>Car</p>
+       
       </div>
       <div className='admin'>
         <p>Are you an admin?</p>
         <p className='log' onClick={goLogin}>Log in here</p>
       </div>
+      <a className='help' href='/html/Introduction.html'>Need help?</a>
     </>
   );
 }
