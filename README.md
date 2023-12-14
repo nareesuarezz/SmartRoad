@@ -71,10 +71,6 @@ My initial design of the application was thinking of a menu with 2 simple button
 
 https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0%3A1&mode=design&t=jRCTMx0RnjMFJu7F-1
 
-## Usability and Accesibility
-
-## Add the list with descriptions and a demonstrative image of our app, in which the usability aspects of each aspect are applied.
-
 ## Manuals of installation
 The steps for installing this app are the following:
 
@@ -104,15 +100,39 @@ npm start
 Here in the pdf you have the user manual of the app
 ![PDF](frontend/public/images/SmartRoad.pdf)
 
-## Technology stack
+## Technology Stack:
+### Backend (Server):
+-Node.js: JavaScript runtime for server-side execution.
+-Express.js: Node.js framework for building web applications and APIs.
+-Sequelize: ORM (Object-Relational Mapping) for managing SQL databases, specifically for MySQL.
+-MySQL: Relational database for storing system information.
+-JSON Web Tokens (JWT): For authentication and token generation.
 
-## Technology comparison
+### Frontend (Web Client):
+-React: JavaScript library for building user interfaces.
+-Axios: HTTP client for making requests to the server.
+
+### Development and Version Control Tools:
+-Git: Version control system.
+-GitHub: Collaboration platform using Git.
+-npm: Package management system for Node.js.
+
+### Technology Comparison:
+## Backend (Server):
+-Node.js vs. Django (Python): Node.js is suitable for real-time and event-driven applications, while Django is a robust framework for rapid web application development.
+-Express.js vs. Flask (Python): Both are minimalistic and flexible frameworks. Express.js is commonly used with Node.js, while Flask is popular in the Python ecosystem.
+-Sequelize vs. TypeORM: Both are ORMs for SQL databases in Node.js. Sequelize is more mature and widely used, while TypeORM is known for its TypeScript integration and object-oriented approach.
+-MySQL vs. MongoDB: MySQL is a relational database, while MongoDB is a NoSQL database. The choice between them depends on the specific needs of your application.
+
+### Frontend (Web Client):
+-React vs. Angular vs. Vue: React is a library, while Angular and Vue are full-fledged frameworks. React is known for its flexibility and simplicity.
+-Axios vs. Fetch: Both are used for making HTTP requests in the browser. Axios is easier to use and has more features than Fetch.
 
 ## Planification
 
+For the planification, I started doing a repository on GitHub, and I made a develop branch, and I made local branches for specifical issues that I was finding and putting them into my project 
 ## Conclusion, opinions, reflections
 
-###
 
 
 
