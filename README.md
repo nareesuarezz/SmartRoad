@@ -19,13 +19,13 @@ These are the database entities that we are using to store all the information f
 **Logs** : This entity has and ID of the log **(Log_ID)**, an id of the admin that made an action on a track **(Admin_UID)**
 In our database, we assume that an admin (in this case the is an administrator since a common user does not require to login and is anonymous) can manage many tracks and a track can be managed by several administrators. Also, a vehicle can send many tracks and a track only belongs to one vehicle.
 
-### Use Case Diagram
+## Use Case Diagram
 
 I made this Use Case Diagram to have an idea of all the things that our app can do:
 
 ![Use Case Diagram](frontend/public/images/Use1.jpg)
 
-### E/R, UML, Class and Relational Diagrams
+## E/R, UML, Class and Relational Diagrams
 
 According to the previous Entities and Relationships that I explained before, here are the E/R, UML, Class and Relational Diagrams:
 
@@ -36,35 +36,39 @@ According to the previous Entities and Relationships that I explained before, he
 ![UML Diagram](frontend/public/images/Uml.jpeg)
 
 **Class**
-
 ![Class Diagram](frontend/public/images/class.jpg)
 
 **Relational**
 ![Relaional Diagram](frontend/public/images/Relational.jpeg
 
 
-### Describe the operation of the system and technical specifications for the server application and the mobile and web APPs
+## Describe the operation of the system and technical specifications for the server application and the mobile and web APPs
+
+## Interface
+
+The interface of the app it's really simple, for the user, two buttons where you decide who you are, and the it send you notifications in case that you are a car driver user, also you have an admin view with some tables where you can manage the data. Below, you have some screenshots of the interface of the app:
+
+### User interface:
 
 
-
-### Initial Design
+## Initial Design
 
 My initial design of the application was thinking of a menu with 2 simple buttons, one with a bicycle where you register as a cyclist, and another with a car where you register as a car driver, apart from another more hidden button than the car and bike buttons where you can log in as administrator and access all the data in the database, and I used this idea to the end. My idea is reflected in the following link:
 
 https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0%3A1&mode=design&t=jRCTMx0RnjMFJu7F-1
 
-### Usability and Accesibility
+## Usability and Accesibility
 
-### Add the list with descriptions and a demonstrative image of our app, in which the usability aspects of each aspect are applied.
+## Add the list with descriptions and a demonstrative image of our app, in which the usability aspects of each aspect are applied.
 
-### Manuals of installation
+## Manuals of installation
 The steps for installing this app are the following:
 
-## Step one: Cloning the repository
+### Step one: Cloning the repository
 ```sh
 git clone https://github.com/nareesuarezz/SmartRoad/
 ```
-## Step two: Installing the dependencies of both backend and frontend
+### Step two: Installing the dependencies of both backend and frontend
 ```sh
 cd SmartRoad/backend
 npm install
@@ -73,7 +77,7 @@ cd SmartRoad/frontend
 npm install
 ```
 
-## Step three: Running both backend and frontend
+### Step three: Running both backend and frontend
 ```sh
 cd SmartRoad/backend
 npm start
@@ -82,18 +86,18 @@ cd SmartRoad/frontend
 npm start
 ```
 
-### User Manual
+## User Manual
 
-### Technology stack
+## Technology stack
 
-### Technology comparison
+## Technology comparison
 
-### Planification
+## Planification
 
-### Conclusion, opinions, reflections
-
-###
+## Conclusion, opinions, reflections
 
 ###
+
+
 
 
