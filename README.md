@@ -79,23 +79,30 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
 1. Navigation:
 
     _Justification:_ Intuitive navigation is crucial for user satisfaction. The interface offers clear buttons and pathways for users to select their role or access admin features.
-   _Example:_ The home page is the best example of this aspect, we have 2 buttons that indicates clearly where are them redirecting to ![290362180-b0ed9750-0d60-4cc6-a954-07e72c7acf04](https://github.com/nareesuarezz/SmartRoad/assets/131177598/54ad482b-8f4d-4ea7-9650-64ebad5b3075)
-   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/41d3bad5-1172-4a52-acd9-e2c1b6fee525)
+   
+   _Example:_ The home page is the best example of this aspect, we have 2 buttons that indicates clearly where are them redirecting to
+
+   ![290362180-b0ed9750-0d60-4cc6-a954-07e72c7acf04](https://github.com/nareesuarezz/SmartRoad/assets/131177598/54ad482b-8f4d-4ea7-9650-64ebad5b3075)
 
 
-
-3. Consistency:
+2. Consistency:
 
     _Justification:_ Consistent design elements and placement create a familiar user experience. Buttons and layouts maintain uniformity throughout the application.
+   
    _Example:_ When selecting the car driver button, the interface continues to maintain the same general layout and offers a consistent experience with the home page.
+   
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/810921d3-2ec5-45e3-b7fd-28c7bc4ee4fa)
+   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/7ec111b7-d9c4-444a-b0a9-38c628bdaeff)
+
     
    
 
-4. Readability:
+3. Readability:
 
     _Justification:_ Legible fonts, appropriate font sizes, and a well-chosen color scheme enhance readability, catering to users with visual impairments or reading difficulties.
-   _Example:_ The car or bike page is a perfect example for this aspect, we have a really clear text telling you what is it function and what is going to make the app:
+   
+   _Example:_ The car or bike page is a perfect example for this aspect, we have a really clear text telling you what is it function and what is going to make the app
+   
    ![290362307-931ec42f-f85d-4903-8cb6-01339b27a259](https://github.com/nareesuarezz/SmartRoad/assets/131177598/a4dd3d9e-fdad-454f-8d69-1bbbce11332b)
 
 
@@ -104,14 +111,18 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
 1. Keyboard Navigation:
 
     _Justification:_ Supporting keyboard navigation is crucial for users who rely on keyboard input or assistive technologies.
+   
    _Example:_ An example of this aspect is in the forms of the admin view, you can navigate through the fields with the keyboard
+   
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/ddab5941-3439-4344-af38-77a83d41f5fa)
 
 
-2. Color Contrast:
+3. Color Contrast:
 
     _Justification:_ A carefully chosen color scheme and contrast ratios improve visibility for users with visual impairments.
+   
    _Example:_ The admin view is a good example of this aspect, since it has a contrast between all the features
+   
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/2a584642-f412-4f9c-9850-2d96b05ec1cd)
 
 
