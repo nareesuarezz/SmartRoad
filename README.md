@@ -80,12 +80,17 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
 
     _Justification:_ Intuitive navigation is crucial for user satisfaction. The interface offers clear buttons and pathways for users to select their role or access admin features.
    _Example:_ The home page is the best example of this aspect, we have 2 buttons that indicates clearly where are them redirecting to ![290362180-b0ed9750-0d60-4cc6-a954-07e72c7acf04](https://github.com/nareesuarezz/SmartRoad/assets/131177598/54ad482b-8f4d-4ea7-9650-64ebad5b3075)
+   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/41d3bad5-1172-4a52-acd9-e2c1b6fee525)
 
 
-2. Consistency:
+
+3. Consistency:
 
     _Justification:_ Consistent design elements and placement create a familiar user experience. Buttons and layouts maintain uniformity throughout the application.
-   _Example:_ 
+   _Example:_ When selecting the car driver button, the interface continues to maintain the same general layout and offers a consistent experience with the home page.
+   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/810921d3-2ec5-45e3-b7fd-28c7bc4ee4fa)
+    
+   
 
 4. Readability:
 
@@ -107,7 +112,8 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
 
     _Justification:_ A carefully chosen color scheme and contrast ratios improve visibility for users with visual impairments.
    _Example:_ The admin view is a good example of this aspect, since it has a contrast between all the features
-   
+   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/2a584642-f412-4f9c-9850-2d96b05ec1cd)
+
 
 ## Manuals of installation
 The steps for installing this app are the following:
