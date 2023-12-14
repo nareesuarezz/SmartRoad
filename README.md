@@ -39,7 +39,7 @@ According to the previous Entities and Relationships that I explained before, he
 ![Class Diagram](frontend/public/images/class.jpg)
 
 **Relational**
-![Relaional Diagram](frontend/public/images/Relational.jpeg
+![Relaional Diagram](frontend/public/images/Relational.jpeg)
 
 
 ## Describe the operation of the system and technical specifications for the server application and the mobile and web APPs
@@ -49,7 +49,21 @@ According to the previous Entities and Relationships that I explained before, he
 The interface of the app it's really simple, for the user, two buttons where you decide who you are, and the it send you notifications in case that you are a car driver user, also you have an admin view with some tables where you can manage the data. Below, you have some screenshots of the interface of the app:
 
 ### User interface:
+This is the home page:
+![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/b0ed9750-0d60-4cc6-a954-07e72c7acf04)
 
+If you log as a car it appears this interface:
+![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/931ec42f-f85d-4903-8cb6-01339b27a259)
+
+And if you log as a bike it appears this interface:
+![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/c27904d9-aef0-4aa3-b377-d4cb369f4914)
+
+### Admin interface:
+When you try to enter as an admin, it will apear a login page as the following:
+![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/e941ab32-a5cc-4986-9030-3b57b2cd987b)
+
+Then if you enter succesfully, you will have access to every table of the database (only the track table as an example is shown)
+![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/6856b48a-823b-49d2-9c86-eb845d9ea061)
 
 ## Initial Design
 
