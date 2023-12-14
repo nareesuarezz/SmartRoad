@@ -40,11 +40,40 @@ According to the previous Entities and Relationships that I explained before, he
 ![Class Diagram](frontend/public/images/class.jpg)
 
 **Relational**
-![Relaional Diagram](frontend/public/images/Relational.jpeg)
+![Relaional Diagram](frontend/public/images/Relational.jpeg
 
 
 ### Describe the operation of the system and technical specifications for the server application and the mobile and web APPs
 
 
+
+### Initial Design
+
+My initial design of the application was thinking of a menu with 2 simple buttons, one with a bicycle where you register as a cyclist, and another with a car where you register as a car driver, apart from another more hidden button than the car and bike buttons where you can log in as administrator and access all the data in the database, and I used this idea to the end. My idea is reflected in the following link:
+
+https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0%3A1&mode=design&t=jRCTMx0RnjMFJu7F-1
+
+### Usability and Accesibility
+
+### Add the list with descriptions and a demonstrative image of our app, in which the usability aspects of each aspect are applied.
+
+### Manuals of installation
+The steps for installing this app are the following:
+```sh
+npm install
+
+### User Manual
+
+### Technology stack
+
+### Technology comparison
+
+### Planification
+
+### Conclusion, opinions, reflections
+
+###
+
+###
 
 
