@@ -101,6 +101,8 @@ npm start
 ```
 
 ## User Manual
+Here in the pdf you have the user manual of the app
+![PDF](frontend/public/images/SmartRoad.pdf)
 
 ## Technology stack
 
