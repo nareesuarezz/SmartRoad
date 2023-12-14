@@ -106,30 +106,41 @@ Here in the pdf you have the user manual of the app
 
 ### Backend (Server):
 -Node.js: JavaScript runtime for server-side execution.
+
 -Express.js: Node.js framework for building web applications and APIs.
+
 -Sequelize: ORM (Object-Relational Mapping) for managing SQL databases, specifically for MySQL.
+
 -MySQL: Relational database for storing system information.
+
 -JSON Web Tokens (JWT): For authentication and token generation.
 
 ### Frontend (Web Client):
 -React: JavaScript library for building user interfaces.
+
 -Axios: HTTP client for making requests to the server.
 
 ### Development and Version Control Tools:
 -Git: Version control system.
+
 -GitHub: Collaboration platform using Git.
+
 -npm: Package management system for Node.js.
 
 ## Technology Comparison:
 
 ### Backend (Server):
 -Node.js vs. Django (Python): Node.js is suitable for real-time and event-driven applications, while Django is a robust framework for rapid web application development.
+
 -Express.js vs. Flask (Python): Both are minimalistic and flexible frameworks. Express.js is commonly used with Node.js, while Flask is popular in the Python ecosystem.
+
 -Sequelize vs. TypeORM: Both are ORMs for SQL databases in Node.js. Sequelize is more mature and widely used, while TypeORM is known for its TypeScript integration and object-oriented approach.
+
 -MySQL vs. MongoDB: MySQL is a relational database, while MongoDB is a NoSQL database. The choice between them depends on the specific needs of your application.
 
 ### Frontend (Web Client):
 -React vs. Angular vs. Vue: React is a library, while Angular and Vue are full-fledged frameworks. React is known for its flexibility and simplicity.
+
 -Axios vs. Fetch: Both are used for making HTTP requests in the browser. Axios is easier to use and has more features than Fetch.
 
 ## Planification
