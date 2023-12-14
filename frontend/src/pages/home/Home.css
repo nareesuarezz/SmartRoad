@@ -71,6 +71,7 @@
   color: blue;
   margin-top: 1em;
   text-decoration: none;
+  margin-bottom: 3vh;
 }
 
 @media (min-width: 600px) {
