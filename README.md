@@ -1,8 +1,8 @@
 # SmartRoad:
 
-SmartRoad is a project whose purpose is to keep the driver informed of everything that happens around him, constantly saving data on the elements of the road (passive, such as traffic signs, changing, such as traffic lights, and active, such as the vehicles themselves. ).
+SmartRoad is a project whose purpose is to keep the driver informed of everything that happens around him, constantly saving data on the elements of the road (passive, such as traffic signs, changing, such as traffic lights, and active, such as the vehicles themselves.).
 
-Apart from incorporating a cyclist alert which notifies the car driver when his path coincides with that of a cyclist, notifying him of the approximate time of the encounter with the cyclist.
+Apart from incorporating a cyclist alert which notifies the car driver when his path matches with that of a cyclist, notifying him of the approximate time of the encounter with the cyclist.
 
 **The company of the project is ITC (Instituto Técnológico de Canarias)**
 
@@ -43,6 +43,8 @@ According to the previous Entities and Relationships that I explained before, he
 
 
 ## Describe the operation of the system and technical specifications for the server application and the mobile and web APPs
+
+The SmartRoad system operates by constantly collecting and storing data related to road elements, such as vehicles. It provides real-time information to drivers and incorporates a cyclist alert system to notify car drivers when their path intersects with a cyclist, along with an estimate of the encounter time.
 
 ## Interface
 
@@ -101,6 +103,7 @@ Here in the pdf you have the user manual of the app
 ![PDF](frontend/public/images/SmartRoad.pdf)
 
 ## Technology Stack:
+
 ### Backend (Server):
 -Node.js: JavaScript runtime for server-side execution.
 -Express.js: Node.js framework for building web applications and APIs.
@@ -117,8 +120,9 @@ Here in the pdf you have the user manual of the app
 -GitHub: Collaboration platform using Git.
 -npm: Package management system for Node.js.
 
-### Technology Comparison:
-## Backend (Server):
+## Technology Comparison:
+
+### Backend (Server):
 -Node.js vs. Django (Python): Node.js is suitable for real-time and event-driven applications, while Django is a robust framework for rapid web application development.
 -Express.js vs. Flask (Python): Both are minimalistic and flexible frameworks. Express.js is commonly used with Node.js, while Flask is popular in the Python ecosystem.
 -Sequelize vs. TypeORM: Both are ORMs for SQL databases in Node.js. Sequelize is more mature and widely used, while TypeORM is known for its TypeScript integration and object-oriented approach.
@@ -130,9 +134,11 @@ Here in the pdf you have the user manual of the app
 
 ## Planification
 
-For the planification, I started doing a repository on GitHub, and I made a develop branch, and I made local branches for specifical issues that I was finding and putting them into my project 
+For the planification, I started doing a repository on GitHub, and I made a develop branch, and I made local branches for specifical issues that I was finding and putting them into my project backlog, where I was putting there my main objectives each week, using this method, I could reach my objective week per week until now.
+
 ## Conclusion, opinions, reflections
 
+In my opinion, it has been quite a cumbersome job since I have faced many problems that have made me lose a week to solve it, but despite all the errors I have been able to move forward to be able to deliver this project. This has been for me like an introduction to true reality, and I have taken it as a test to check my ability to work under pressure. 
 
 
 
