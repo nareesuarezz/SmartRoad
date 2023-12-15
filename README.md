@@ -182,7 +182,7 @@ Here in the pdf you have the user manual of the app
 
 ## Technology Comparison
 
-I think my application is an hybrid app because it adapts to any platform because they are developed with a responsive design pattern. I think that is really interesting to use this type of applications because they have the same performance and user experience as native applications, but at a lower cost, also you can use the same base code for more platforms and they can be designed to run on various operating systems using the same code base and for this reason, hybrid app development is very flexible and allows you to adapt and improve them at any time without requiring great effort, time or investment.. Below I have some advantages and disadvantages of all technologies (including the Hybdrid Apps):
+My project stands out as a web application, crafted with a responsive design approach to ensure adaptability across diverse platforms. The decision to opt for a web-based solution stems from several reasons, positioning it as a superior choice when compared to other types of technologies. I think that is really interesting to use this type of applications because of the advantages of web applications over traditional applications or client-server type software are very numerous one of them are scalability: The web applications can be scaled easily. That is, additional functions can be integrated progressively and in a simple way. Another example is that they doesn't need to be installed, you can use them whenever you want without wasting storage of your device, making it more confortable to use. Below I have some advantages and disadvantages of all technologies (including the Web Apps):
 
 ## Native Apps:
 
