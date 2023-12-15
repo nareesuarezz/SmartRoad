@@ -117,7 +117,7 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/ddab5941-3439-4344-af38-77a83d41f5fa)
 
 
-3. Color Contrast:
+2. Color Contrast:
 
     _Justification:_ A carefully chosen color scheme and contrast ratios improve visibility for users with visual impairments.
    
@@ -180,51 +180,55 @@ Here in the pdf you have the user manual of the app
 
 -npm: Package management system for Node.js.
 
-## Technology Comparison:
+## Technology Comparison
 
 ## Native Apps:
-### Advantages:
--Access to device-specific features for enhanced performance.
 
--Optimal user experience tailored to the platform.
+### Advantages:
+**Optimized Performance:** Native apps offer exceptional performance as they are specifically designed for the platform, maximizing device resources.
+**Full Access to Native Features:** They have complete access to device features, such as sensors and cameras, enabling deep integration and rich user experiences.
+**Customized Interface:** They can leverage platform-specific design guidelines to provide a highly intuitive and familiar user interface.
 
 ### Disadvantages:
--Requires separate development for different platforms.
-
--Longer development time and higher costs.
+**Costly and Slow Development:** Separate development is required for iOS and Android, increasing development costs and time.
+**Slow Update Process:** Updates must go through a review process in app stores, slowing down the implementation of new features.
+**Limited Cross-Platform Reach:** Limited to specific devices, excluding users on other platforms.
 
 ## Hybrid Apps:
-### Advantages:
--Cross-platform development, reducing development time and costs.
 
--Access to device features through plugins.
+### Advantages:
+**Cross-Platform Development:** Share a codebase across platforms, reducing development costs and time.
+**Access to Native Features:** Utilize plugins to access native device features, offering a richer experience than web apps.
+**Quick Update Implementation:** Updates can be deployed rapidly without undergoing an app store review process.
 
 ### Disadvantages:
--May not match the performance of native apps.
-
--Limited access to some native features.
+**Inferior Performance:** May experience lower performance compared to native apps, especially in graphics-intensive applications.
+**Limitations in Native Features:** Some native features may be challenging to access or may not be compatible with plugins.
+**Dependency on Frameworks:** Quality and features depend heavily on the frameworks used, leading to potential limitations.
 
 ## Web Apps:
-### Advantages:
--Cross-platform compatibility without the need for separate development.
 
--Easier maintenance and updates.
+### Advantages:
+**Rapid and Economical Development:** Developed and updated easily through browsers, significantly reducing costs and time.
+**Cross-Platform Compatibility:** Accessible on any device with a browser, eliminating entry barriers for users.
+**Ease of Maintenance:** Updates and fixes are seamlessly implemented through the web.
 
 ### Disadvantages:
--Limited access to device-specific features.
-
--Potentially lower performance compared to native apps.
+**Limitations in Native Features:** Lacks full access to native device features, crucial for certain applications.
+**Inferior Performance:** May not offer the same level of performance as native apps, especially in complex applications.
+**Dependency on Connectivity:** Requires an internet connection to function, which can be inconvenient in areas with limited connectivity.
 
 ## Progressive Web Apps (PWA):
-### Advantages:
--Offline capabilities and responsive design.
 
--No need for installation through app stores.
+### Advantages:
+**Cross-Platform Compatibility:** Provides an experience similar to a native app on different platforms.
+**Offline Capabilities:** Functions offline, improving accessibility in areas with limited connectivity.
+**Easy Update:** Not dependent on app stores, allowing for quick and straightforward updates.
 
 ### Disadvantages:
--Limited access to some native features.
-
--May not provide the same level of user engagement as native apps.
+**Limitations in Native Access:** While it has access to some native features, it may lack specific platform capabilities.
+**User Engagement:** Some users may prefer the full experience of a native app.
+**Limited Performance:** Although improving, may not match the performance of native apps in all areas.
 
 ## Repository:
 https://github.com/nareesuarezz/SmartRoad
