@@ -186,48 +186,66 @@ Here in the pdf you have the user manual of the app
 
 ### Advantages:
 **Optimized Performance:** Native apps offer exceptional performance as they are specifically designed for the platform, maximizing device resources.
+
 **Full Access to Native Features:** They have complete access to device features, such as sensors and cameras, enabling deep integration and rich user experiences.
+
 **Customized Interface:** They can leverage platform-specific design guidelines to provide a highly intuitive and familiar user interface.
 
 ### Disadvantages:
 **Costly and Slow Development:** Separate development is required for iOS and Android, increasing development costs and time.
+
 **Slow Update Process:** Updates must go through a review process in app stores, slowing down the implementation of new features.
+
 **Limited Cross-Platform Reach:** Limited to specific devices, excluding users on other platforms.
 
 ## Hybrid Apps:
 
 ### Advantages:
 **Cross-Platform Development:** Share a codebase across platforms, reducing development costs and time.
+
 **Access to Native Features:** Utilize plugins to access native device features, offering a richer experience than web apps.
+
 **Quick Update Implementation:** Updates can be deployed rapidly without undergoing an app store review process.
 
 ### Disadvantages:
 **Inferior Performance:** May experience lower performance compared to native apps, especially in graphics-intensive applications.
+
 **Limitations in Native Features:** Some native features may be challenging to access or may not be compatible with plugins.
+
 **Dependency on Frameworks:** Quality and features depend heavily on the frameworks used, leading to potential limitations.
+
 
 ## Web Apps:
 
 ### Advantages:
 **Rapid and Economical Development:** Developed and updated easily through browsers, significantly reducing costs and time.
+
 **Cross-Platform Compatibility:** Accessible on any device with a browser, eliminating entry barriers for users.
+
 **Ease of Maintenance:** Updates and fixes are seamlessly implemented through the web.
 
 ### Disadvantages:
 **Limitations in Native Features:** Lacks full access to native device features, crucial for certain applications.
+
 **Inferior Performance:** May not offer the same level of performance as native apps, especially in complex applications.
+
 **Dependency on Connectivity:** Requires an internet connection to function, which can be inconvenient in areas with limited connectivity.
+
 
 ## Progressive Web Apps (PWA):
 
 ### Advantages:
 **Cross-Platform Compatibility:** Provides an experience similar to a native app on different platforms.
+
 **Offline Capabilities:** Functions offline, improving accessibility in areas with limited connectivity.
+
 **Easy Update:** Not dependent on app stores, allowing for quick and straightforward updates.
 
 ### Disadvantages:
 **Limitations in Native Access:** While it has access to some native features, it may lack specific platform capabilities.
+
 **User Engagement:** Some users may prefer the full experience of a native app.
+
 **Limited Performance:** Although improving, may not match the performance of native apps in all areas.
 
 ## Repository:
