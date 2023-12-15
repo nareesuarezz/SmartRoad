@@ -182,71 +182,72 @@ Here in the pdf you have the user manual of the app
 
 ## Technology Comparison
 
+I think my application is an hybrid app because it adapts to any platform because they are developed with a responsive design pattern. I think that is really interesting to use this type of applications because they have the same performance and user experience as native applications, but at a lower cost, also you can use the same base code for more platforms and they can be designed to run on various operating systems using the same code base and for this reason, hybrid app development is very flexible and allows you to adapt and improve them at any time without requiring great effort, time or investment.. Below I have some advantages and disadvantages of all technologies (including the Hybdrid Apps):
+
 ## Native Apps:
 
-### Advantages:
-**Optimized Performance:** Native apps offer exceptional performance as they are specifically designed for the platform, maximizing device resources.
+**Advantages:**
+- **Optimized Performance:** Native apps run really fast because they're tailor-made for each platform.
+- 
+- **Full Access to Features:** They can use all the cool features of your device, like sensors and cameras.
+- 
+- **Customized Interface:** Looks and feels just right on your device, following its design rules.
 
-**Full Access to Native Features:** They have complete access to device features, such as sensors and cameras, enabling deep integration and rich user experiences.
-
-**Customized Interface:** They can leverage platform-specific design guidelines to provide a highly intuitive and familiar user interface.
-
-### Disadvantages:
-**Costly and Slow Development:** Separate development is required for iOS and Android, increasing development costs and time.
-
-**Slow Update Process:** Updates must go through a review process in app stores, slowing down the implementation of new features.
-
-**Limited Cross-Platform Reach:** Limited to specific devices, excluding users on other platforms.
+**Disadvantages:**
+- **Costly and Slow Development:** Takes more time and money to create separate versions for iOS and Android.
+- 
+- **Slow Updates:** Adding new features is slower because updates need approval from app stores.
+- 
+- **Limited to Specific Devices:** Only works on certain types of phones, leaving out others.
 
 ## Hybrid Apps:
 
-### Advantages:
-**Cross-Platform Development:** Share a codebase across platforms, reducing development costs and time.
+**Advantages:**
+- **Cross-Platform Development:** Saves time and money by using the same code for different platforms.
+- 
+- **Access to Native Features:** Can use native device features for a better user experience.
+- 
+- **Quick Updates:** Updates can be done fast without waiting for app store approval.
 
-**Access to Native Features:** Utilize plugins to access native device features, offering a richer experience than web apps.
-
-**Quick Update Implementation:** Updates can be deployed rapidly without undergoing an app store review process.
-
-### Disadvantages:
-**Inferior Performance:** May experience lower performance compared to native apps, especially in graphics-intensive applications.
-
-**Limitations in Native Features:** Some native features may be challenging to access or may not be compatible with plugins.
-
-**Dependency on Frameworks:** Quality and features depend heavily on the frameworks used, leading to potential limitations.
-
+**Disadvantages:**
+- **Less Performance:** Might not be as fast, especially for graphics-heavy apps.
+- 
+- **Limits in Native Features:** Some cool phone features might be harder to use or not work as well.
+- 
+- **Dependent on Frameworks:** How good it is depends a lot on the tools used, which could limit what you can do.
 
 ## Web Apps:
 
-### Advantages:
-**Rapid and Economical Development:** Developed and updated easily through browsers, significantly reducing costs and time.
+**Advantages:**
+- **Rapid and Economical Development:** Quick and cheap to make and update through browsers.
+- 
+- **Cross-Platform Compatibility:** Works on any device with a browser, making it accessible to everyone.
+- 
+- **Easy Maintenance:** Updates and fixes are easy to do through the web.
 
-**Cross-Platform Compatibility:** Accessible on any device with a browser, eliminating entry barriers for users.
-
-**Ease of Maintenance:** Updates and fixes are seamlessly implemented through the web.
-
-### Disadvantages:
-**Limitations in Native Features:** Lacks full access to native device features, crucial for certain applications.
-
-**Inferior Performance:** May not offer the same level of performance as native apps, especially in complex applications.
-
-**Dependency on Connectivity:** Requires an internet connection to function, which can be inconvenient in areas with limited connectivity.
-
+**Disadvantages:**
+- **Limits in Native Features:** Can't use all the cool features of your phone.
+- 
+- **Less Performance:** Might not run as fast, especially for complicated apps.
+- 
+- **Needs Internet Connection:** Requires the internet to work, which can be a problem if the connection is bad.
 
 ## Progressive Web Apps (PWA):
 
-### Advantages:
-**Cross-Platform Compatibility:** Provides an experience similar to a native app on different platforms.
+**Advantages:**
+- **Cross-Platform Compatibility:** Feels like a native app on different platforms.
+- 
+- **Offline Capabilities:** Works even without internet, which is great in areas with bad connections.
+- 
+- **Easy Updates:** Can be updated quickly without waiting for app store approval.
 
-**Offline Capabilities:** Functions offline, improving accessibility in areas with limited connectivity.
+**Disadvantages:**
+- **Limits in Native Access:** Can't use all the features of the phone.
+- 
+- **User Engagement:** Some people might prefer using a full native app.
+- 
+- **Limited Performance:** Might not be as fast as native apps for everything.
 
-**Easy Update:** Not dependent on app stores, allowing for quick and straightforward updates.
-
-### Disadvantages:
-**Limitations in Native Access:** While it has access to some native features, it may lack specific platform capabilities.
-
-**User Engagement:** Some users may prefer the full experience of a native app.
-
-**Limited Performance:** Although improving, may not match the performance of native apps in all areas.
 
 ## Repository:
 https://github.com/nareesuarezz/SmartRoad
