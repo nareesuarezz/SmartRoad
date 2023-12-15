@@ -188,64 +188,48 @@ I think my application is an hybrid app because it adapts to any platform becaus
 
 **Advantages:**
 - **Optimized Performance:** Native apps run really fast because they're tailor-made for each platform.
-- 
 - **Full Access to Features:** They can use all the cool features of your device, like sensors and cameras.
-- 
 - **Customized Interface:** Looks and feels just right on your device, following its design rules.
 
 **Disadvantages:**
 - **Costly and Slow Development:** Takes more time and money to create separate versions for iOS and Android.
-- 
 - **Slow Updates:** Adding new features is slower because updates need approval from app stores.
-- 
 - **Limited to Specific Devices:** Only works on certain types of phones, leaving out others.
 
 ## Hybrid Apps:
 
 **Advantages:**
 - **Cross-Platform Development:** Saves time and money by using the same code for different platforms.
-- 
 - **Access to Native Features:** Can use native device features for a better user experience.
-- 
 - **Quick Updates:** Updates can be done fast without waiting for app store approval.
 
 **Disadvantages:**
 - **Less Performance:** Might not be as fast, especially for graphics-heavy apps.
-- 
 - **Limits in Native Features:** Some cool phone features might be harder to use or not work as well.
-- 
 - **Dependent on Frameworks:** How good it is depends a lot on the tools used, which could limit what you can do.
 
 ## Web Apps:
 
 **Advantages:**
 - **Rapid and Economical Development:** Quick and cheap to make and update through browsers.
-- 
 - **Cross-Platform Compatibility:** Works on any device with a browser, making it accessible to everyone.
-- 
 - **Easy Maintenance:** Updates and fixes are easy to do through the web.
 
 **Disadvantages:**
 - **Limits in Native Features:** Can't use all the cool features of your phone.
-- 
 - **Less Performance:** Might not run as fast, especially for complicated apps.
-- 
 - **Needs Internet Connection:** Requires the internet to work, which can be a problem if the connection is bad.
 
 ## Progressive Web Apps (PWA):
 
 **Advantages:**
 - **Cross-Platform Compatibility:** Feels like a native app on different platforms.
-- 
 - **Offline Capabilities:** Works even without internet, which is great in areas with bad connections.
-- 
 - **Easy Updates:** Can be updated quickly without waiting for app store approval.
 
 **Disadvantages:**
 - **Limits in Native Access:** Can't use all the features of the phone.
-- 
 - **User Engagement:** Some people might prefer using a full native app.
-- 
 - **Limited Performance:** Might not be as fast as native apps for everything.
 
 
