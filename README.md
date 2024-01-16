@@ -117,7 +117,7 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/ddab5941-3439-4344-af38-77a83d41f5fa)
 
 
-3. Color Contrast:
+2. Color Contrast:
 
     _Justification:_ A carefully chosen color scheme and contrast ratios improve visibility for users with visual impairments.
    
@@ -180,58 +180,65 @@ Here in the pdf you have the user manual of the app
 
 -npm: Package management system for Node.js.
 
-## Technology Comparison:
+## Technology Comparison
+
+My project stands out as a web application, crafted with a responsive design approach to ensure adaptability across diverse platforms. The decision to opt for a web-based solution stems from several reasons, positioning it as a superior choice when compared to other types of technologies. I think that is really interesting to use this type of applications because of the advantages of web applications over traditional applications or client-server type software are very numerous one of them are scalability: The web applications can be scaled easily. That is, additional functions can be integrated progressively and in a simple way. Another example is that they doesn't need to be installed, you can use them whenever you want without wasting storage of your device, making it more confortable to use. Below I have some advantages and disadvantages of all technologies (including the Web Apps):
 
 ## Native Apps:
-### Advantages:
--Access to device-specific features for enhanced performance.
 
--Optimal user experience tailored to the platform.
+**Advantages:**
+- **Optimized Performance:** Native apps run really fast because they're tailor-made for each platform.
+- **Full Access to Features:** They can use all the cool features of your device, like sensors and cameras.
+- **Customized Interface:** Looks and feels just right on your device, following its design rules.
 
-### Disadvantages:
--Requires separate development for different platforms.
-
--Longer development time and higher costs.
+**Disadvantages:**
+- **Costly and Slow Development:** Takes more time and money to create separate versions for iOS and Android.
+- **Slow Updates:** Adding new features is slower because updates need approval from app stores.
+- **Limited to Specific Devices:** Only works on certain types of phones, leaving out others.
 
 ## Hybrid Apps:
-### Advantages:
--Cross-platform development, reducing development time and costs.
 
--Access to device features through plugins.
+**Advantages:**
+- **Cross-Platform Development:** Saves time and money by using the same code for different platforms.
+- **Access to Native Features:** Can use native device features for a better user experience.
+- **Quick Updates:** Updates can be done fast without waiting for app store approval.
 
-### Disadvantages:
--May not match the performance of native apps.
-
--Limited access to some native features.
+**Disadvantages:**
+- **Less Performance:** Might not be as fast, especially for graphics-heavy apps.
+- **Limits in Native Features:** Some cool phone features might be harder to use or not work as well.
+- **Dependent on Frameworks:** How good it is depends a lot on the tools used, which could limit what you can do.
 
 ## Web Apps:
-### Advantages:
--Cross-platform compatibility without the need for separate development.
 
--Easier maintenance and updates.
+**Advantages:**
+- **Rapid and Economical Development:** Quick and cheap to make and update through browsers.
+- **Cross-Platform Compatibility:** Works on any device with a browser, making it accessible to everyone.
+- **Easy Maintenance:** Updates and fixes are easy to do through the web.
 
-### Disadvantages:
--Limited access to device-specific features.
-
--Potentially lower performance compared to native apps.
+**Disadvantages:**
+- **Limits in Native Features:** Can't use all the cool features of your phone.
+- **Less Performance:** Might not run as fast, especially for complicated apps.
+- **Needs Internet Connection:** Requires the internet to work, which can be a problem if the connection is bad.
 
 ## Progressive Web Apps (PWA):
-### Advantages:
--Offline capabilities and responsive design.
 
--No need for installation through app stores.
+**Advantages:**
+- **Cross-Platform Compatibility:** Feels like a native app on different platforms.
+- **Offline Capabilities:** Works even without internet, which is great in areas with bad connections.
+- **Easy Updates:** Can be updated quickly without waiting for app store approval.
 
-### Disadvantages:
--Limited access to some native features.
+**Disadvantages:**
+- **Limits in Native Access:** Can't use all the features of the phone.
+- **User Engagement:** Some people might prefer using a full native app.
+- **Limited Performance:** Might not be as fast as native apps for everything.
 
--May not provide the same level of user engagement as native apps.
 
 ## Repository:
 https://github.com/nareesuarezz/SmartRoad
 
 ## Planification
 
-For the planification, I started doing a repository on GitHub, and I made a develop branch, and I made local branches for specifical issues that I was finding and putting them into my project backlog, where I was putting there my main objectives each week, using this method, I could reach my objective week per week until now.
+For the planification, I started doing a repository on GitHub, and I made a develop branch, and I made local branches for specifical issues that I was finding and putting them into my project backlog, where I was putting there my main objectives each week, using this method, I could reach my objective week per week until now. Apart of this method, I didn't know at first how to start, so I started developing the main features that I knew that I had to make obligatory, first with the backend, and then when I was getting more ideas, I started developing at the same time both backend and frontend, I had the most problems in the backend, so in my planification, I ended first the frontend to focus in the backend then. To fix my backend I took a while but at least, I could complete it.
 
 ## Conclusion, opinions, reflections
 
