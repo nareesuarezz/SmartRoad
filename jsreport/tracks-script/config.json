@@ -1,0 +1,16 @@
+{
+    "name": "tracks-script",
+    "inheritedReadPermissions": [],
+    "inheritedEditPermissions": [],
+    "creationDate": {
+        "$$date": 1704745048286
+    },
+    "modificationDate": {
+        "$$date": 1705005728811
+    },
+    "shortid": "_5kXq3L",
+    "_id": "1q2F7FMV76poxgpb",
+    "$entitySet": "scripts",
+    "scope": "template",
+    "isGlobal": false
+}
