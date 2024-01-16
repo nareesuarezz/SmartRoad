@@ -1,0 +1,86 @@
+<html>
+
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/metro/4.1.5/css/metro.min.css">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js'></script>
+</head>
+
+<body>
+    {{#each tracks}} {{#if @index}}
+    <div style="page-break-before: always;"></div>
+    {{/if}} {{!-- {{> tracks-header}} --}}
+    <h1>{{group}}</h1>
+    <canvas id='tracks{{group}}' style="margin-bottom:30px"></canvas>
+    <table class='table striped'>
+        <thead>
+            <tr>
+                <th>Track ID</th>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Speed</th>
+                <th>Extra</th>
+                <th>Vehicle</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each rows}}
+            <tr>
+                <td>{{ID}}</td>
+                <td>{{lat}}, {{lon}}</td>
+                <td>{{Status}}</td>
+                <td>{{Speed}}</td>
+                <td>{{Extra}}</td>
+                <td>{{Vehicle_UID}}</td>
+                <td>{{Date}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    <script>
+        var data = {{{toJS accumulated}}};
+
+        Chart.defaults.global.legend.display = false;
+
+        new Chart(tracks{{group}}.getContext("2d"), {
+            type: 'bar',
+            data: {
+                labels: Object.keys(data),
+                datasets: [{
+                    fillColor: 'blue',
+                    label: "Moving",
+                    backgroundColor: "rgba(27,161,226,0.2)",
+                    borderColor: "rgba(27,161,226,1)",
+                    borderWidth: 1,
+                    hoverBackgroundColor: "rgba(27,161,226,0.4)",
+                    hoverBorderColor: "rgba(27,161,226,1)",
+                    barPercentage: 0.4, // Ajusta según tus necesidades
+                    data: Object.keys(data).map(function (o, index) {
+                         return index + 1 <= 15 ? data[o] : 0;
+                 })
+                }, 
+                ]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            stepSize: 1
+                        }
+                    }]
+                },
+                animation: {
+                    duration: 0
+                }
+            }
+        });
+    </script>
+
+
+    <div style='page-break-after: always;'></div>
+    {{/each}}
+</body>
+
+</html>

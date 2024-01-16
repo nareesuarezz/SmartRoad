@@ -12,8 +12,6 @@ const TrackList = () => {
 
   useEffect(() => {
     getTracks();
-   
-  
   }, []);
 
   const getTracks = async () => {
@@ -29,7 +27,6 @@ const TrackList = () => {
       console.error('Error fetching tracks:', error);
     }
   };
-
 
   const goBack = () => {
     window.location.href = "/login";
@@ -60,6 +57,7 @@ const TrackList = () => {
             <th>Speed</th>
             <th>Extra</th>
             <th>Vehicle</th>
+            <th>Date</th>
             <th>Actions</th>
           </tr>
         </thead>
@@ -72,6 +70,7 @@ const TrackList = () => {
               <td>{track.Speed}</td>
               <td>{JSON.stringify(track.Extra)}</td>
               <td>{track.Vehicle_UID}</td>
+              <td>{new Date(track.Date).toLocaleString()}</td>
               <td>
                 <Link to={`/track-edit/${track.ID}`} className="edit">
                   Edit

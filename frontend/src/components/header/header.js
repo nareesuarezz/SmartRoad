@@ -24,6 +24,9 @@ function Header() {
           <li className="nav-item">
             <Link to="/log-list" className="nav-link">Logs</Link>
           </li>
+          <li className="nav-item">
+            <Link to="http://localhost:5488/templates/mcAB7HS" className="nav-link" target='blank'>Reports</Link>
+          </li>
           {isAuthenticated && (
             <li className="nav-item">
               <ProfilePicture/>

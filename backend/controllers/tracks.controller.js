@@ -24,6 +24,7 @@ exports.create = async (req, res) => {
             Speed: req.body.Speed,
             Extra: req.body.Extra,
             Vehicle_UID: req.body.Vehicle_UID,
+            Date: req.body.Date
         };
 
         const createdTrack = await Tracks.create(track);

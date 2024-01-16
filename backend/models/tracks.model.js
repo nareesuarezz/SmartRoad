@@ -17,6 +17,10 @@ module.exports = (sequelize, Sequelize) => {
     },
     Extra: {
       type: Sequelize.JSON
+    },
+    Date: {
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     }
   });
 
