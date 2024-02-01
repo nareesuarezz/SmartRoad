@@ -26,6 +26,20 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   pool: dbConfig.pool
 });
 
+// Socket.IO setup for global notifications
+io.on('connection', (socket) => {
+  console.log('New WebSocket connection');
+
+  socket.on('disconnect', () => {
+    console.log('WebSocket client disconnected');
+  });
+});
+
+// Function to send global notifications
+function sendGlobalNotification(message) {
+  io.emit('globalNotification', message);
+}
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 
@@ -112,20 +126,10 @@ require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
-// WebSocket setup
-io.on('connection', (socket) => {
-  console.log('New WebSocket connection');
-
-  // Handle your WebSocket events here
-
-  socket.on('disconnect', () => {
-    console.log('WebSocket client disconnected');
-  });
-});
-
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  sendGlobalNotification("Server has started!"); // Sending a notification when server starts
 });
 
 module.exports = { app, io }; // Exporting app and io for use in other modules
