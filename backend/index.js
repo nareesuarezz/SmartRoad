@@ -1,12 +1,30 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken'); 
+const http = require('http');
+const socketIo = require('socket.io');
+const dbConfig = require("./config/db.config");
 
 const app = express();
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*", // Adjust according to your needs
+    methods: ["GET", "POST"]
+  }
+});
+
+// Sequelize setup
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+  host: dbConfig.HOST,
+  dialect: dbConfig.dialect,
+  pool: dbConfig.pool
+});
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
@@ -22,6 +40,7 @@ app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
 
+// Database sync and setup
 db.sequelize.sync({ force: true }).then(async () => {
   console.log("Database tables dropped and re-synced.");
 
@@ -37,7 +56,6 @@ db.sequelize.sync({ force: true }).then(async () => {
     });
 
     console.log('Admin predeterminado creado con éxito.');
-
     console.log('Admin Details:', createdAdmin.toJSON());
   }
 });
@@ -94,7 +112,20 @@ require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
+// WebSocket setup
+io.on('connection', (socket) => {
+  console.log('New WebSocket connection');
+
+  // Handle your WebSocket events here
+
+  socket.on('disconnect', () => {
+    console.log('WebSocket client disconnected');
+  });
+});
+
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
 });
+
+module.exports = { app, io }; // Exporting app and io for use in other modules
