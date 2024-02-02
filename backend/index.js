@@ -40,6 +40,12 @@ function sendGlobalNotification(message) {
   io.emit('globalNotification', message);
 }
 
+//Testing notifications /get
+app.get('/test-notification', (req, res) => {
+  sendGlobalNotification('This is a test notification');
+  res.send('Test notification sent');
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 
@@ -78,8 +84,8 @@ db.sequelize.sync({ force: true }).then(async () => {
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
-  // Imprime el encabezado de autorización
-  console.log('Authorization Header:', token);
+  // // Imprime el encabezado de autorización
+  // console.log('Authorization Header:', token);
 
   if (token && token.indexOf('Basic ') === 0) {
     // verify auth basic credentials
@@ -129,7 +135,7 @@ require("./routes/subscription.routes")(app);
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
-  sendGlobalNotification("Server has started!"); // Sending a notification when server starts
+  sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
 module.exports = { app, io }; // Exporting app and io for use in other modules
