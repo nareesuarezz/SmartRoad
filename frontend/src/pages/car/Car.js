@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import logoCar from '../../img/car.png';
 import './Car.css';
-import bikeWarningSound from '../../sounds/sound3.mp3';
+import * as sounds from '../../sounds';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import axios from 'axios';
@@ -29,9 +29,26 @@ function Car() {
     }, [showModal]);
 
     const playWarningSound = () => {
-        const audio = new Audio(bikeWarningSound);
+        const selectedSound = localStorage.getItem('notificationSound');
+        let soundToPlay;
+    
+        switch (selectedSound) {
+          case sounds.sound1:
+            soundToPlay = sounds.sound1;
+            break;
+          case sounds.sound2:
+            soundToPlay = sounds.sound2;
+            break;
+          case sounds.sound3:
+            soundToPlay = sounds.sound3;
+            break;
+          default:
+            soundToPlay = sounds.sound1;
+        }
+    
+        const audio = new Audio(soundToPlay);
         audio.play();
-    };
+      };
 
     const sendNotification = async (subscriptionName, notificationMessage) => {
         try {

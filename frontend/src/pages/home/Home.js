@@ -2,33 +2,40 @@ import React, { useState } from 'react';
 import logoBicycle from '../../img/bike.png';
 import logoCar from '../../img/car.png';
 import './Home.css';
+import * as sounds from '../../sounds/index'
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
 
 
 function Home() {
   const [subscription, setSubscription] = useState(null);
+  const [selectedSound, setSelectedSound] = useState(localStorage.getItem('notificationSound') || sounds.sound1);
+
+  const handleSoundChange = (event) => {
+    setSelectedSound(event.target.value);
+    localStorage.setItem('notificationSound', event.target.value);
+  };
 
   const handleClick = async (vehicle) => {
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-  
+
       if (position && Notification.permission === 'granted') {
         await createVehicleAndTrack(vehicle, position.coords);
-        
+
         if (vehicle === 'car') {
           const serviceWorkerReg = await regSw();
           await subscribe(serviceWorkerReg, 'car');
         }
-        
+
         window.location.href = `/${vehicle}`;
       }
     } catch (error) {
       console.error('Error al solicitar permisos:', error);
     }
   };
-  
+
 
   const askForLocationPermission = () => {
     return new Promise((resolve, reject) => {
@@ -124,12 +131,24 @@ function Home() {
           <img src={logoBicycle} alt="Logo de bicicleta" />
           <p className='bicycle'>Bicycle</p>
         </div>
-        
+
         <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
           <img src={logoCar} alt="Logo de coche" />
           <p className='car'>Car</p>
         </div>
-       
+
+        <div className="sound-selector">
+          <label htmlFor="notification-sound">Select a notification sound:</label>
+          <select id="notification-sound" value={selectedSound} onChange={handleSoundChange}>
+            {Object.keys(sounds).map((soundKey) => (
+              <option key={soundKey} value={sounds[soundKey]}>
+                {soundKey}
+              </option>
+            ))}
+          </select>
+        </div>
+
+
       </div>
       <div className='admin'>
         <p>Are you an admin?</p>
