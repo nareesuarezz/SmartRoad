@@ -11,6 +11,55 @@ function Car() {
     const [showModal, setShowModal] = useState(false);
     const [subscription, setSubscription] = useState(null);
 
+    //Location
+    const trackAddGeo = async () => {
+        try {
+            const response = await axios.get('http://localhost:8080/api/vehicles');
+            const vehicles = response.data;
+            const lastVehicleId = vehicles[vehicles.length - 1].UID; // Asume que 'id' es el nombre del campo de ID
+            console.log(lastVehicleId   );
+
+            navigator.geolocation.watchPosition(async (position) => {
+                const location = {
+                    type: 'Point',
+                    coordinates: [position.coords.latitude, position.coords.longitude],
+                };
+
+                const formData = {
+                    Location: location,
+                    Admin_UID: 'replace-with-admin-id', // Replace with the actual admin ID
+                    Speed: 40,
+                    Vehicle_UID: lastVehicleId,
+                };
+
+                const config = {
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                };
+                console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
+                await axios.post('http://localhost:8080/api/tracks', formData, config);
+            });
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    useEffect(() => {
+        // Call the function here to start tracking
+        trackAddGeo();
+    }, []); // Empty dependency array to run it only once
+
+    useEffect(() => {
+        const locationUpdateInterval = setInterval(() => {
+            // Call the trackAddGeo function every 5 seconds
+            trackAddGeo();
+        }, 5000);
+
+        return () => clearInterval(locationUpdateInterval);
+    }, []);
+
+    //Notification
     useEffect(() => {
         const notificationInterval = setInterval(() => {
             if (showModal) {
