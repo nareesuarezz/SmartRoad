@@ -1,32 +1,48 @@
 import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
+import notificationSound from '../../sounds/sound.mp3'; // Update with your sound file path
 
-const SOCKET_SERVER_URL = "http://localhost:8080"; // Replace with your server URL
+const SOCKET_SERVER_URL = "http://localhost:8080";
 
 const NotificationsComponent = () => {
-  const [notifications, setNotifications] = useState([]);
+  const [showModal, setShowModal] = useState(false);
+  const [currentNotification, setCurrentNotification] = useState('');
 
   useEffect(() => {
-    // Establishing WebSocket connection
     const socket = io(SOCKET_SERVER_URL);
 
-    // Setting up event listener for global notifications
     socket.on('globalNotification', (message) => {
-      setNotifications(notifs => [...notifs, message]);
+      setCurrentNotification(message);
+      setShowModal(true);
+      playNotificationSound();
+
+      const hideModalTimeout = setTimeout(() => {
+        setShowModal(false);
+      }, 5000);
+
+      return () => clearTimeout(hideModalTimeout);
     });
 
-    // Cleanup function to close socket connection
     return () => {
       socket.disconnect();
     };
   }, []);
 
+  const playNotificationSound = () => {
+    const audio = new Audio(notificationSound);
+    audio.play();
+  };
+
   return (
     <div>
       <h2>Notifications</h2>
-      {notifications.map((notif, index) => (
-        <p key={index}>{notif}</p>
-      ))}
+      {showModal && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <p>{currentNotification}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
