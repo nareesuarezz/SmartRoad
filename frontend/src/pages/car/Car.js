@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import logoCar from '../../img/car.png';
 import './Car.css';
 import bikeWarningSound from '../../sounds/sound3.mp3';
-import { ArrowLeftOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, ConsoleSqlOutlined } from '@ant-design/icons';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import axios from 'axios';
 
@@ -11,49 +11,61 @@ function Car() {
     const [showModal, setShowModal] = useState(false);
     const [subscription, setSubscription] = useState(null);
 
+
     //Location
-    const trackAddGeo = async () => {
+    const addTrackGeo = async () => {
         try {
             const response = await axios.get('http://localhost:8080/api/vehicles');
-            const vehicles = response.data;
-            const lastVehicleId = vehicles[vehicles.length - 1].UID; // Asume que 'id' es el nombre del campo de ID
-            console.log(lastVehicleId   );
+            const vehicle = response.data;
+            const lastVehicleId = vehicle[vehicle.length - 1].UID;
 
+            // const data = {
+            //     Latitude: '',
+            //     Longitude: '',
+            //     Status: 'Stopped',
+            //     Speed: '4',
+            //     Extra: 'pepe',
+            //     Vehicle_UID: lastVehicleId,
+            // }
+
+            console.log(data)
+            await axios.post('http://localhost:8080/api/tracks', {
+                ...data,
+                location: trackGeo
+            })
+
+        } catch (err) {
+            console.error(err);
+        }
+    }
+
+    const trackGeo = async () => {
+        try {
             navigator.geolocation.watchPosition(async (position) => {
                 const location = {
                     type: 'Point',
                     coordinates: [position.coords.latitude, position.coords.longitude],
                 };
 
-                const formData = {
-                    Location: location,
-                    Admin_UID: 'replace-with-admin-id', // Replace with the actual admin ID
-                    Speed: 40,
-                    Vehicle_UID: lastVehicleId,
-                };
-
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                };
                 console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
-                await axios.post('http://localhost:8080/api/tracks', formData, config);
+                return location;
+
             });
         } catch (err) {
             console.error(err);
         }
     };
 
+
     useEffect(() => {
         // Call the function here to start tracking
-        trackAddGeo();
+        addTrackGeo();
     }, []); // Empty dependency array to run it only once
 
     useEffect(() => {
         const locationUpdateInterval = setInterval(() => {
             // Call the trackAddGeo function every 5 seconds
-            trackAddGeo();
+            addTrackGeo();
         }, 5000);
 
         return () => clearInterval(locationUpdateInterval);
@@ -176,4 +188,4 @@ function Car() {
     );
 }
 
-export default Car;
+export default Car; 

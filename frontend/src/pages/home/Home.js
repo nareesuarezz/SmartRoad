@@ -13,22 +13,22 @@ function Home() {
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-  
+
       if (position && Notification.permission === 'granted') {
         await createVehicleAndTrack(vehicle, position.coords);
-        
+
         if (vehicle === 'car') {
           const serviceWorkerReg = await regSw();
           await subscribe(serviceWorkerReg, 'car');
         }
-        
+
         window.location.href = `/${vehicle}`;
       }
     } catch (error) {
       console.error('Error al solicitar permisos:', error);
     }
   };
-  
+
 
   const askForLocationPermission = () => {
     return new Promise((resolve, reject) => {
@@ -124,12 +124,12 @@ function Home() {
           <img src={logoBicycle} alt="Logo de bicicleta" />
           <p className='bicycle'>Bicycle</p>
         </div>
-        
+
         <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
           <img src={logoCar} alt="Logo de coche" />
           <p className='car'>Car</p>
         </div>
-       
+
       </div>
       <div className='admin'>
         <p>Are you an admin?</p>
