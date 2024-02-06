@@ -1,3 +1,5 @@
+"use strict";
+
 import logoBicycle from '../../img/bike.png';
 import './Bicycle.css'
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -59,7 +61,7 @@ function Bicycle() {
     useEffect(() => {
         // Call the function here to start tracking
         addTrackGeo();
-    }, []); // Empty dependency array to run it only once
+    }, 1); // Empty dependency array to run it only once
 
     useEffect(() => {
         const locationUpdateInterval = setInterval(() => {

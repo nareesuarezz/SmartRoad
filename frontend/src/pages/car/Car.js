@@ -65,7 +65,7 @@ function Car() {
     useEffect(() => {
         // Call the function here to start tracking
         addTrackGeo();
-    }, []); // Empty dependency array to run it only once
+    }, 1); // Empty dependency array to run it only once
 
     useEffect(() => {
         const locationUpdateInterval = setInterval(() => {
