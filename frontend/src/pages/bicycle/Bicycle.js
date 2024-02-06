@@ -7,49 +7,64 @@ import { useEffect } from 'react';
 function Bicycle() {
 
     //Location
-    //Location
-    const trackAddGeo = async () => {
+    const addTrackGeo = async () => {
         try {
+            // Obtener la ubicación utilizando trackGeo
+            const location = await trackGeo();
+
             const response = await axios.get('http://localhost:8080/api/vehicles');
-            const vehicles = response.data;
-            const lastVehicleId = vehicles[vehicles.length - 1].UID; // Asume que 'id' es el nombre del campo de ID
-            console.log(lastVehicleId);
+            const vehicle = response.data;
+            const lastVehicleId = vehicle[vehicle.length - 1].UID;
 
-            navigator.geolocation.watchPosition(async (position) => {
-                const location = {
-                    type: 'Point',
-                    coordinates: [position.coords.latitude, position.coords.longitude],
-                };
+            const data = {
+                Latitude: '',
+                Longitude: '',
+                Status: 'Stopped',
+                Speed: '0',
+                Extra: '',
+                Vehicle_UID: lastVehicleId,
+                Location: location, // Usar la ubicación obtenida de trackGeo aquí
+            };
 
-                const formData = {
-                    Location: location,
-                    Admin_UID: 'replace-with-admin-id', // Replace with the actual admin ID
-                    Speed: 4,
-                    Vehicle_UID: lastVehicleId,
-                };
+            // Imprimir la ubicación para verificar
+            // console.log('Ubicación obtenida:', location);
 
-                const config = {
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                };
-                console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
-                await axios.post('http://localhost:8080/api/tracks', formData, config);
-            });
+            // Llamar a axios.post con los datos actualizados
+            await axios.post('http://localhost:8080/api/tracks', data);
+
         } catch (err) {
-            console.error(err);
+            console.error(err.response);
         }
+    };
+
+    //Función para recoger la localización y devolverla
+    const trackGeo = () => {
+        return new Promise((resolve, reject) => {
+            try {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const location = {
+                        type: 'Point',
+                        coordinates: [position.coords.latitude, position.coords.longitude],
+                    };
+                    // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
+                    resolve(location);  //Devuelve la localización recogida
+                });
+            } catch (error) {
+                console.error(error);
+                reject(error);
+            }
+        });
     };
 
     useEffect(() => {
         // Call the function here to start tracking
-        trackAddGeo();
+        addTrackGeo();
     }, []); // Empty dependency array to run it only once
 
     useEffect(() => {
         const locationUpdateInterval = setInterval(() => {
             // Call the trackAddGeo function every 5 seconds
-            trackAddGeo();
+            addTrackGeo();
         }, 5000);
 
         return () => clearInterval(locationUpdateInterval);
