@@ -159,7 +159,7 @@ app.post('/send-notification', (req, res) => {
   }
 });
 
-
+require("./routes/sounds.routes")(app);
 require("./routes/logs.routes")(app);
 require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
