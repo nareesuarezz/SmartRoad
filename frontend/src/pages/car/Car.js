@@ -10,6 +10,7 @@ function Car() {
     const API = process.env.REACT_APP_API_URL;
     const [showModal, setShowModal] = useState(false);
     const [subscription, setSubscription] = useState(null);
+    const time = 5000;
 
 
     // Location

@@ -1,11 +1,17 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
-const bcrypt = require('bcryptjs')
+const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const bodyParser = require('body-parser');
+<<<<<<< HEAD
 const jwt = require('jsonwebtoken'); 
 const { Sequelize } = require('sequelize');
+=======
+const jwt = require('jsonwebtoken');
+const http = require('http');
+const socketIo = require('socket.io');
+>>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
 const dbConfig = require("./config/db.config");
 
 const app = express();
@@ -14,6 +20,16 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   dialect: dbConfig.dialect,
   pool: dbConfig.pool
 });
+
+
+// Sequelize setup
+const { Sequelize } = require('sequelize');
+const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
+  host: dbConfig.HOST,
+  dialect: dbConfig.dialect,
+  pool: dbConfig.pool
+});
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
@@ -30,6 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 const db = require("./models");
 // db.sequelize.sync();
 
+// Database sync and setup
 db.sequelize.sync({ force: true }).then(async () => {
   console.log("Database tables dropped and re-synced.");
 
@@ -41,11 +58,10 @@ db.sequelize.sync({ force: true }).then(async () => {
     const createdAdmin = await db.Admin.create({
       Username: 'prueba',
       Password: hashedPassword,
-      filename: 'user.jpg' 
+      filename: 'user.jpg'
     });
 
     console.log('Admin predeterminado creado con éxito.');
-
     console.log('Admin Details:', createdAdmin.toJSON());
   }
 });
@@ -53,6 +69,12 @@ db.sequelize.sync({ force: true }).then(async () => {
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
+<<<<<<< HEAD
+=======
+  // // Imprime el encabezado de autorización
+  // console.log('Authorization Header:', token);
+
+>>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
@@ -78,7 +100,7 @@ app.use(function (req, res, next) {
           message: "Invalid user."
         });
       } else {
-        req.user = user; 
+        req.user = user;
         req.token = token;
         next();
       }
@@ -88,6 +110,53 @@ app.use(function (req, res, next) {
   }
 });
 
+<<<<<<< HEAD
+=======
+const server = http.createServer(app);
+const io = socketIo(server, {
+  cors: {
+    origin: "*", // Adjust according to your needs
+    methods: ["GET", "POST"]
+  }
+});
+
+// Socket.IO setup for global notifications
+io.on('connection', (socket) => {
+  console.log('New WebSocket connection');
+
+  socket.on('disconnect', () => {
+    console.log('WebSocket client disconnected');
+  });
+});
+
+// Function to send global notifications
+function sendGlobalNotification(message) {
+  io.emit('globalNotification', message);
+}
+
+//Testing notifications /get
+app.get('/test-notification', (req, res) => {
+  sendGlobalNotification('This is a test notification');
+  res.send('Test notification sent');
+});
+
+// Endpoint para enviar una notificación global
+app.post('/send-notification', (req, res) => {
+  try {
+    const message = req.body;
+    console.log("Socorro")
+
+    console.log(message)
+    sendGlobalNotification(message);
+    res.send('Notificación enviada');
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Server error');
+  }
+});
+
+
+>>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
 require("./routes/logs.routes")(app);
 require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
@@ -95,8 +164,13 @@ require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
 const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
+  sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
+<<<<<<< HEAD
 module.exports = app;
+=======
+module.exports = { app, io }; // Exporting app and io for use in other modules
+>>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
