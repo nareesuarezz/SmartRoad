@@ -11,6 +11,72 @@ function Car() {
     const [showModal, setShowModal] = useState(false);
     const [subscription, setSubscription] = useState(null);
 
+
+    // Location
+    const addTrackGeo = async () => {
+        try {
+            // Obtener la ubicación utilizando trackGeo
+            const location = await trackGeo();
+
+            const response = await axios.get('http://localhost:8080/api/vehicles');
+            const vehicle = response.data;
+            const lastVehicleId = vehicle[vehicle.length - 1].UID;
+
+            const data = {
+                Latitude: '',
+                Longitude: '',
+                Status: 'Stopped',
+                Speed: '0',
+                Extra: '',
+                Vehicle_UID: lastVehicleId,
+                Location: location, // Usar la ubicación obtenida de trackGeo aquí
+            };
+
+            // Imprimir la ubicación para verificar
+            // console.log('Ubicación obtenida:', location);
+
+            // Llamar a axios.post con los datos actualizados
+            await axios.post('http://localhost:8080/api/tracks', data);
+
+        } catch (err) {
+            console.error(err.response);
+        }
+    };
+
+    //Función para recoger la localización y devolverla
+    const trackGeo = () => {
+        return new Promise((resolve, reject) => {
+            try {
+                navigator.geolocation.getCurrentPosition((position) => {
+                    const location = {
+                        type: 'Point',
+                        coordinates: [position.coords.latitude, position.coords.longitude],
+                    };
+                    // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
+                    resolve(location);  //Devuelve la localización recogida
+                });
+            } catch (error) {
+                console.error(error);
+                reject(error);
+            }
+        });
+    };
+
+    useEffect(() => {
+        // Call the function here to start tracking
+        addTrackGeo();
+    }, 1); // Empty dependency array to run it only once
+
+    useEffect(() => {
+        const locationUpdateInterval = setInterval(() => {
+            // Call the trackAddGeo function every 5 seconds
+            addTrackGeo();
+        }, 5000);
+
+        return () => clearInterval(locationUpdateInterval);
+    }, []);
+
+    //Notification
     useEffect(() => {
         const notificationInterval = setInterval(() => {
             if (showModal) {
@@ -144,4 +210,4 @@ function Car() {
     );
 }
 
-export default Car;
+export default Car; 
