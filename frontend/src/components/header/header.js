@@ -25,6 +25,9 @@ function Header() {
             <Link to="/log-list" className="nav-link">Logs</Link>
           </li>
           <li className="nav-item">
+            <Link to="/sound-list" className="nav-link">Sounds</Link>
+          </li>
+          <li className="nav-item">
             <Link to="http://localhost:5488/templates/mcAB7HS" className="nav-link" target='blank'>Reports</Link>
           </li>
           {isAuthenticated && (

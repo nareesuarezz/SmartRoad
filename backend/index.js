@@ -25,7 +25,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 
 var corsOptions = {
-  origin: "*"
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+  preflightContinue: true,
 };
 
 app.use(cors(corsOptions));
@@ -51,8 +55,23 @@ db.sequelize.sync({ force: true }).then(async () => {
       filename: 'user.jpg'
     });
 
+    const createdSound1 = await db.Sounds.create({
+      filename: 'sound1.mp3' 
+    });
+    const createdSound2 = await db.Sounds.create({
+      filename: 'sound2.mp3' 
+    });
+    const createdSound3 = await db.Sounds.create({
+      filename: 'sound3.mp3' 
+    });
+
     console.log('Admin predeterminado creado con éxito.');
     console.log('Admin Details:', createdAdmin.toJSON());
+    console.log('Sound1 Details:', createdSound1.toJSON());
+    console.log('Sound2 Details:', createdSound2.toJSON());
+    console.log('Sound3 Details:', createdSound3.toJSON());
+
+
   }
 });
 

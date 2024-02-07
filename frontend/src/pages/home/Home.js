@@ -1,26 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logoBicycle from '../../img/bike.png';
 import logoCar from '../../img/car.png';
 import './Home.css';
-import * as sounds from '../../sounds/index'
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
-
+import { useNavigate } from 'react-router-dom';
 
 function Home() {
   const [subscription, setSubscription] = useState(null);
-  const [selectedSound, setSelectedSound] = useState(localStorage.getItem('notificationSound') || sounds.sound1);
+  const [availableSounds, setAvailableSounds] = useState([]);
+  const [selectedSound, setSelectedSound] = useState('');
+  const navigate = useNavigate();
 
-  const handleSoundChange = (event) => {
-    setSelectedSound(event.target.value);
-    localStorage.setItem('notificationSound', event.target.value);
-  };
+  useEffect(() => {
+    axios.get('http://localhost:8080/api/sounds')
+      .then(response => {
+        setAvailableSounds(response.data);
+        setSelectedSound(response.data[0]);
+      })
+      .catch(error => console.error('Error retrieving sounds:', error));
+  }, []);
 
   const handleClick = async (vehicle) => {
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-
+      debugger;
+      localStorage.setItem('selectedSound',selectedSound);
+      navigate(`/${vehicle}`, { state: { selectedSound } });
       if (position && Notification.permission === 'granted') {
         await createVehicleAndTrack(vehicle, position.coords);
 
@@ -35,7 +42,6 @@ function Home() {
       console.error('Error al solicitar permisos:', error);
     }
   };
-
 
   const askForLocationPermission = () => {
     return new Promise((resolve, reject) => {
@@ -117,6 +123,10 @@ function Home() {
     window.location.href = "/login";
   };
 
+  const handleSoundChange = (event) => {
+    setSelectedSound(event.target.value);
+  };
+
   return (
     <>
       <div className="title">
@@ -136,19 +146,17 @@ function Home() {
           <img src={logoCar} alt="Logo de coche" />
           <p className='car'>Car</p>
         </div>
+      </div>
 
-        <div className="sound-selector">
-          <label htmlFor="notification-sound">Select a notification sound:</label>
-          <select id="notification-sound" value={selectedSound} onChange={handleSoundChange}>
-            {Object.keys(sounds).map((soundKey) => (
-              <option key={soundKey} value={sounds[soundKey]}>
-                {soundKey}
-              </option>
-            ))}
-          </select>
-        </div>
-
-
+      <div className="sound-selector">
+        <label htmlFor="notification-sound">Select a notification sound:</label>
+        <select id="notification-sound" value={selectedSound} onChange={handleSoundChange}>
+          {availableSounds.map((soundFileName) => (
+            <option key={soundFileName} value={soundFileName}>
+              {soundFileName}
+            </option>
+          ))}
+        </select>
       </div>
       <div className='admin'>
         <p>Are you an admin?</p>
