@@ -1,9 +1,6 @@
-// admins.routes.js
 module.exports = app => {
   const admins = require("../controllers/admins.controller");
   const auth = require("../controllers/auth");
-
-  const isAuthenticated = auth.isAuthenticated;
 
   const upload = require('../multer/upload');
 

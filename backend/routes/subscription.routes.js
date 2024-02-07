@@ -11,5 +11,7 @@ module.exports = app => {
 
   router.get("/", subscriptions.findAll);
 
+  router.post("/sendCustomNotification", subscriptions.sendCustomNotification);
+
   app.use("/api/subscriptions", router);
 }

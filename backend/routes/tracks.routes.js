@@ -18,7 +18,7 @@
       router.put("/:id", tracks.update);
     
       // Delete a Car with id
-      router.delete("/:id", tracks.delete);
+      router.delete("/:id",tracks.delete);
     
       // Delete all Cars
       router.delete("/", tracks.deleteAll);

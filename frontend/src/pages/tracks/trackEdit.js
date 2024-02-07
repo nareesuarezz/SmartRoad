@@ -24,36 +24,19 @@ const TrackEdit = ({ getTracks }) => {
     };
 
     useEffect(() => {
-
-        // Obtén el ID del admin cuando el componente se monta
-        const fetchAdminId = async () => {
-            try {
-                const authToken = AuthService.getAuthToken();
-                const decodedToken = AuthService.decodeAuthToken(authToken);
-                setAdminId(decodedToken.UID);
-            } catch (error) {
-                console.error('Error fetching admin ID:', error);
-            }
-        };
-
-        fetchAdminId();
-
-
         const fetchTrackData = async () => {
             try {
                 const response = await axios.get(`http://localhost:8080/api/tracks/${id}`);
                 const trackData = response.data;
 
-                // Asegúrate de que Location esté en el formato correcto antes de asignarlo
                 if (trackData.Location && trackData.Location.coordinates) {
-                    // Asigna los datos de la ubicación al estado del formulario
                     setFormData({
                         ...trackData,
                         Latitude: trackData.Location.coordinates[1].toString(),
                         Longitude: trackData.Location.coordinates[0].toString(),
                     });
                 } else {
-                    console.error('Datos de ubicación no válidos:', trackData.Location);
+                    console.error('Invalid location data:', trackData.Location);
                 }
             } catch (error) {
                 console.error('Error fetching track data:', error);
@@ -77,47 +60,48 @@ const TrackEdit = ({ getTracks }) => {
         });
     };
 
-// 
+    const handleSubmit = async (e) => {
+        e.preventDefault();
 
-const handleSubmit = async (e) => {
-    e.preventDefault();
+        const authToken = AuthService.getAuthToken();
 
-    // Recupera el token del almacenamiento local
-    const authToken = AuthService.getAuthToken();
+        const config = {
+          headers: {
+            'Authorization': `Bearer ${authToken}`,
+          }
+        };
 
-    const config = {
-      headers: {
-        'Authorization': `Bearer ${authToken}`,
-      }
+        if (!formData.Latitude || !formData.Longitude || !formData.Status || (!formData.Speed && formData.Status !== 'stopped') || !formData.Vehicle_UID) {
+          const missingFields = Object.entries(formData)
+            .filter(([key, value]) => !value)
+            .map(([key]) => key);
+
+          alert(`Please complete the following fields: ${missingFields.join(', ')}`);
+          return;
+        }
+
+        if (formData.Status === 'moving' && Number(formData.Speed) === 0) {
+          alert("Error: You can't put 0 speed on a moving vehicle.");
+          return;
+        }
+
+        const location = {
+          type: 'Point',
+          coordinates: [parseFloat(formData.Longitude), parseFloat(formData.Latitude)],
+        };
+
+        try {
+            await axios.put(`http://localhost:8080/api/tracks/${id}`, {
+            ...formData,
+            Location: location,
+            Admin_UID: adminId,
+            Speed: formData.Status === 'stopped' ? 0 : formData.Speed,
+          }, config);
+          goBack();
+        } catch (error) {
+          console.error('Error updating track:', error);
+        }
     };
-
-    if (!formData.Latitude || !formData.Longitude || !formData.Status || !formData.Speed || !formData.Vehicle_UID) {
-      const missingFields = Object.entries(formData)
-        .filter(([key, value]) => !value)
-        .map(([key]) => key);
-
-      alert(`Por favor, complete los siguientes campos: ${missingFields.join(', ')}`);
-      return;
-    }
-
-    const location = {
-      type: 'Point',
-      coordinates: [parseFloat(formData.Longitude), parseFloat(formData.Latitude)],
-    };
-
-    try {
-        await axios.put(`http://localhost:8080/api/tracks/${id}`, {
-        ...formData,
-        Location: location,
-        Admin_UID: adminId,
-      }, config);
-      goBack();
-    } catch (error) {
-      console.error('Error updating track:', error);
-    }
-  };
-
-
 
     return (
         <>
@@ -141,7 +125,7 @@ const handleSubmit = async (e) => {
                 </label>
                 <label>
                     Speed:
-                    <input type="text" name="Speed" value={formData.Speed} onChange={handleChange} />
+                    <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} disabled={formData.Status === 'stopped'} />
                 </label>
                 <label>
                     Extra:
@@ -151,7 +135,7 @@ const handleSubmit = async (e) => {
                     Vehicle UID:
                     <input type="text" name="Vehicle_UID" value={formData.Vehicle_UID} onChange={handleChange} />
                 </label>
-                <button type="submit">Edit Track</button>
+                <button type="submit">Update Track</button>
             </form>
         </>
     );

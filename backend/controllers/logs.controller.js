@@ -1,9 +1,7 @@
 const db = require("../models");
 const Logs = db.Log;
 
-// Create and Save a new Log
 exports.create = (req, res) => {
-    // Create a Log
     const log = {
         Log_ID: req.body.Log_ID,
         Admin_UID: req.body.Admin_UID,
@@ -11,7 +9,6 @@ exports.create = (req, res) => {
         Action: req.body.Action
     };
 
-    // Save Log in the database
     Logs.create(log)
         .then(data => {
             res.send(data);
@@ -23,7 +20,6 @@ exports.create = (req, res) => {
         });
 };
 
-// Retrieve all Logs from the database.
 exports.findAll = (req, res) => {
     Logs.findAll()
         .then(data => {
@@ -36,7 +32,6 @@ exports.findAll = (req, res) => {
         });
 };
 
-// Find a single Log with an id
 exports.findOne = (req, res) => {
     const id = req.params.id;
 
@@ -56,5 +51,68 @@ exports.findOne = (req, res) => {
             });
         });
 };
+
+exports.update = (req, res) => {
+    const id = req.params.id;
+  
+    Logs.update(req.body, {
+      where: { Log_ID: id }
+    })
+      .then(num => {
+        if (num == 1) {
+          res.send({
+            message: "Log was updated successfully."
+          });
+        } else {
+          res.send({
+            message: `Cannot update Log with id=${id}. Maybe Log was not found or req.body is empty!`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Error updating Log with id=" + id
+        });
+      });
+  };
+  
+  exports.delete = (req, res) => {
+    const id = req.params.id;
+  
+    Logs.destroy({
+      where: { Log_ID: id }
+    })
+      .then(num => {
+        if (num == 1) {
+          res.send({
+            message: "Log was deleted successfully."
+          });
+        } else {
+          res.send({
+            message: `Cannot delete Log with id=${id}. Maybe Log was not found!`
+          });
+        }
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: "Could not delete Log with id=" + id
+        });
+      });
+  };
+  
+  exports.deleteAll = (req, res) => {
+    Logs.destroy({
+      where: {},
+      truncate: false
+    })
+      .then(nums => {
+        res.send({ message: `${nums} Logs were deleted successfully.` });
+      })
+      .catch(err => {
+        res.status(500).send({
+          message: err.message || "Some error occurred while removing all logs."
+        });
+      });
+  };
 
 

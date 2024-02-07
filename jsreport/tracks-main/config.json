@@ -1,0 +1,40 @@
+{
+    "phantom": {
+        "waitForJS": true
+    },
+    "recipe": "chrome-pdf",
+    "engine": "handlebars",
+    "scripts": [
+        {
+            "shortid": "_5kXq3L"
+        }
+    ],
+    "name": "tracks-main",
+    "chrome": {
+        "printBackground": true,
+        "marginTop": "4cm",
+        "marginRight": "1.5cm",
+        "marginBottom": "1.5cm",
+        "marginLeft": "1.5cm",
+        "waitForJS": false
+    },
+    "pdfOperations": [
+        {
+            "type": "merge",
+            "templateShortid": "nxXPZen",
+            "renderForEveryPage": false,
+            "mergeWholeDocument": true
+        }
+    ],
+    "inheritedReadPermissions": [],
+    "inheritedEditPermissions": [],
+    "creationDate": {
+        "$$date": 1704745048277
+    },
+    "modificationDate": {
+        "$$date": 1705333890855
+    },
+    "shortid": "mcAB7HS",
+    "_id": "iIrjD5XRtNVs30Mm",
+    "$entitySet": "templates"
+}

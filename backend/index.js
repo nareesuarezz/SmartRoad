@@ -34,6 +34,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
+// db.sequelize.sync();
 
 // Database sync and setup
 db.sequelize.sync({ force: true }).then(async () => {
@@ -55,7 +56,6 @@ db.sequelize.sync({ force: true }).then(async () => {
   }
 });
 
-
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
@@ -63,12 +63,10 @@ app.use(function (req, res, next) {
   // console.log('Authorization Header:', token);
 
   if (token && token.indexOf('Basic ') === 0) {
-    // verify auth basic credentials
     const base64Credentials = req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
     const [username, password] = credentials.split(':');
 
-    // Imprime las credenciales decodificadas
     console.log('Decoded Credentials:', username, password);
 
     req.body.Username = username;
@@ -82,7 +80,6 @@ app.use(function (req, res, next) {
 
   if (token) {
     token = token.replace('Bearer ', '');
-    // .env should contain a line like JWT_SECRET=V3RY#1MP0RT@NT$3CR3T#
     jwt.verify(token, process.env.JWT_SECRET, function (err, user) {
       if (err) {
         return res.status(401).json({

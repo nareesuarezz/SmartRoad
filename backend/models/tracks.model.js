@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
       primaryKey: true
     },
     Location: {
-      type: Sequelize.DataTypes.GEOMETRY('POINT'),
+      type: Sequelize.GEOMETRY('POINT'),
       allowNull: false,
     },
     Status: {
@@ -17,6 +17,10 @@ module.exports = (sequelize, Sequelize) => {
     },
     Extra: {
       type: Sequelize.JSON
+    },
+    Date: {
+      type: Sequelize.DATE,
+      defaultValue: Sequelize.literal('CURRENT_TIMESTAMP')
     }
   });
 

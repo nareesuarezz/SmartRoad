@@ -1,86 +1,143 @@
-import React from 'react';
+import React, { useState } from 'react';
 import logoBicycle from '../../img/bike.png';
 import logoCar from '../../img/car.png';
 import './Home.css';
+import axios from 'axios';
+import { regSw, subscribe } from '../../services/subscriptionService';
+
 
 function Home() {
-    const handleClick = (vehicle) => {
-        // debugger;
-        const x = document.getElementById("demo");
+  const [subscription, setSubscription] = useState(null);
 
-        function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.watchPosition(
-            (position) => showPosition(position, vehicle),
-            showError,
-            { enableHighAccuracy: true }
-        );
+  const handleClick = async (vehicle) => {
+    try {
+      await askForNotificationPermission();
+      const position = await askForLocationPermission();
+
+      if (position && Notification.permission === 'granted') {
+        await createVehicleAndTrack(vehicle, position.coords);
+
+        if (vehicle === 'car') {
+          const serviceWorkerReg = await regSw();
+          await subscribe(serviceWorkerReg, 'car');
+        }
+
+        window.location.href = `/${vehicle}`;
+      }
+    } catch (error) {
+      console.error('Error al solicitar permisos:', error);
+    }
+  };
+
+
+  const askForLocationPermission = () => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => resolve(position),
+        (error) => reject(error),
+        { enableHighAccuracy: true }
+      );
+    });
+  };
+
+  const askForNotificationPermission = async () => {
+    console.log('Estado actual de los permisos de notificaciones:', Notification.permission);
+
+    if (Notification.permission === 'granted') {
+      return;
+    }
+
+    const permission = await Notification.requestPermission();
+
+    if (permission === 'granted') {
+      console.log('Permisos de notificaciones concedidos');
+      return;
     } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
+      throw new Error('Permiso de notificaciones denegado');
     }
-}
+  };
 
+  const createVehicleAndTrack = async (vehicle, coords) => {
+    try {
+      const createdVehicle = await createVehicle(vehicle);
 
-        function showPosition(position, vehicle) {
-            x.innerHTML = "Latitude: " + position.coords.latitude +
-                "<br>Longitude: " + position.coords.longitude;
+      const createdTrack = await createTrack(createdVehicle.UID, coords);
 
-            if (vehicle === 'bicycle') {
-                window.location.href = "/bicycle";
-            } else if (vehicle === 'car') {
-                window.location.href = "/car";
-            }
-        }
-
-        function showError(error) {
-            switch (error.code) {
-                case error.PERMISSION_DENIED:
-                    x.innerHTML = "User denied the request for Geolocation.";
-                    break;
-                case error.POSITION_UNAVAILABLE:
-                    x.innerHTML = "Location information is unavailable.";
-                    break;
-                case error.TIMEOUT:
-                    x.innerHTML = "The request to get user location timed out.";
-                    break;
-                case error.UNKNOWN_ERROR:
-                    x.innerHTML = "An unknown error occurred.";
-                    break;
-            }
-        }
-
-        getLocation();
+      console.log('Vehicle and track created successfully:', createdVehicle, createdTrack);
+    } catch (error) {
+      console.error('Error creating vehicle and track:', error);
+      throw error;
     }
+  };
 
-    const goLogin = () => {
-        window.location.href = "/login";
+  const createVehicle = async (vehicle) => {
+    try {
+      const response = await axios.post(`http://localhost:8080/api/vehicles`, {
+        Vehicle: vehicle,
+      });
+
+      console.log(`Vehicle created successfully`);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating vehicle:', error);
+      throw error;
     }
+  };
 
-    return (
-        <>
-            <div className="title">
-                <h1>SmartRoad</h1>
-            </div>
-            <div className="question">
-                <h2>What are you driving?</h2>
-            </div>
+  const createTrack = async (vehicleId, coords) => {
+    const location = {
+      type: 'Point',
+      coordinates: [parseFloat(coords.latitude), parseFloat(coords.longitude)],
+    };
+    try {
+      const response = await axios.post(`http://localhost:8080/api/tracks`, {
+        Location: location,
+        Status: 'stopped',
+        Speed: 0,
+        Extra: null,
+        Vehicle_UID: vehicleId,
+      });
 
-            <div className="vehicle-container">
-                <div className="vehicle-box bicycle-box" onClick={() => handleClick('bicycle')}>
-                    <img src={logoBicycle} alt="Logo de bicicleta" />
-                </div>
-                <p className='bicycle'>Bicycle</p>
-                <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
-                    <img src={logoCar} alt="Logo de coche" />
-                </div>
-                <p className='car'>Car</p>
-            </div>
-            <div className='admin'>
-                <p>Are you an admin?</p>
-                <p className='log' onClick={goLogin}>Log in here</p>
-            </div>
-        </>
-    );
+      console.log(`Track created successfully: ${response.data}`);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating track:', error);
+      throw error;
+    }
+  };
+
+  const goLogin = () => {
+    window.location.href = "/login";
+  };
+
+  return (
+    <>
+      <div className="title">
+        <h1>SmartRoad</h1>
+      </div>
+      <div className="question">
+        <h2>What are you driving?</h2>
+      </div>
+
+      <div className="vehicle-container">
+        <div className="vehicle-box bicycle-box" onClick={() => handleClick('bicycle')}>
+          <img src={logoBicycle} alt="Logo de bicicleta" />
+          <p className='bicycle'>Bicycle</p>
+        </div>
+
+        <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
+          <img src={logoCar} alt="Logo de coche" />
+          <p className='car'>Car</p>
+        </div>
+
+      </div>
+      <div className='admin'>
+        <p>Are you an admin?</p>
+        <p className='log' onClick={goLogin}>Log in here</p>
+      </div>
+      <a className='help' href='/html/Introduction.html'>Need help?</a>
+    </>
+  );
 }
 
 export default Home;

@@ -46,7 +46,6 @@
                         <tr>
                             <th>ID</th>
                             <th>Username</th>
-                            <th>Password</th>
                             <th>Image</th>
                             <th>Actions</th>
                         </tr>
@@ -56,7 +55,6 @@
                             <tr key={admin.UID}>
                                 <td>{admin.UID}</td>
                                 <td>{admin.Username}</td>
-                                <td>{admin.Password}</td>
                                 <td><img src={`http://localhost:8080/images/${admin.filename}`} alt="Admin Avatar" width="60" /></td>
                                 <td>
                                     <Link to="#" onClick={() => deleteAdmin(admin.UID)} className="delete">
