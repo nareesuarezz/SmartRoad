@@ -16,6 +16,7 @@ import AdminList from './pages/admins/adminList';
 import AdminAdd from './pages/admins/adminAdd';
 import AdminEdit from './pages/admins/adminEdit';
 import LogList from './pages/logs/logList';
+import NotificationsComponent from './components/websocketTest/NotificationsComponent';
 
 function App() {
 
@@ -52,6 +53,7 @@ function App() {
           <Route path="/admin-add" element={<AdminAdd />} />
           <Route path="/admin-edit/:id" element={<AdminEdit />} />
           <Route path="/log-list" element={<LogList />} />
+          <Route path="/websocketTest" element={<NotificationsComponent />} />
         </Routes>
       </BrowserRouter>
     </>
