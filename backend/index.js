@@ -23,6 +23,8 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
+app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
+
 
 var corsOptions = {
   origin: "*",
@@ -78,8 +80,6 @@ db.sequelize.sync({ force: true }).then(async () => {
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
-  // // Imprime el encabezado de autorización
-  // console.log('Authorization Header:', token);
 
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];

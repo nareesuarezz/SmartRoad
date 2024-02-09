@@ -25,8 +25,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const sounds = await Sounds.findAll();
-    const soundFileNames = sounds.map(sound => sound.filename);
-    res.send(soundFileNames);
+    res.send(sounds); 
   } catch (error) {
     console.error(error);
     res.status(500).send({
@@ -34,6 +33,7 @@ exports.getAll = async (req, res) => {
     });
   }
 };
+
 
 exports.getOne = async (req, res) => {
   try {
@@ -45,7 +45,11 @@ exports.getOne = async (req, res) => {
       });
     }
 
-    res.send(sound);
+    // Define la ruta al archivo de sonido
+    const filePath = path.join(__dirname, '../public/sounds/', sound.filename);
+
+    // Envía el archivo de sonido como respuesta
+    res.sendFile(filePath);
   } catch (error) {
     console.error(error);
     res.status(500).send({
@@ -53,6 +57,7 @@ exports.getOne = async (req, res) => {
     });
   }
 };
+
 
 
 
