@@ -17,6 +17,12 @@ import AdminAdd from './pages/admins/adminAdd';
 import AdminEdit from './pages/admins/adminEdit';
 import LogList from './pages/logs/logList';
 import NotificationsComponent from './components/websocketTest/NotificationsComponent';
+import SoundList from './pages/sounds/soundList';
+import SoundAdd from './pages/sounds/soundsAdd';
+import SoundEdit from './pages/sounds/soundsEdit';
+
+
+
 
 function App() {
 
@@ -54,6 +60,11 @@ function App() {
           <Route path="/admin-edit/:id" element={<AdminEdit />} />
           <Route path="/log-list" element={<LogList />} />
           <Route path="/websocketTest" element={<NotificationsComponent />} />
+          <Route path="/sound-list" element={<SoundList />} />
+          <Route path="/sound-add" element={<SoundAdd />} />
+          <Route path="/sound-edit/:id" element={<SoundEdit />} />
+
+
         </Routes>
       </BrowserRouter>
     </>
