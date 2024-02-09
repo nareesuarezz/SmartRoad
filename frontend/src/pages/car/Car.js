@@ -14,27 +14,27 @@ function Car() {
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
 
+  const SOUND_API = 'http://localhost:8080/api';
+
   useEffect(() => {
-    // Crea un elemento de audio y configúralo
     const audio = new Audio();
     setAudioElement(audio);
-
-    // Carga dinámicamente el archivo de sonido desde el backend
+  
     if (selectedSound) {
-      const soundUrl = `${API}/sounds/${selectedSound}`;
-      console.log('Loading sound from:', soundUrl);
-
-      axios.get(soundUrl, { responseType: 'blob' })
-        .then(response => {
-          const blob = new Blob([response.data], { type: response.headers['content-type'] });
-          const url = URL.createObjectURL(blob);
-          audio.src = url;
-          console.log('Sound loaded successfully:', soundUrl);
-        })
-        .catch(error => console.error('Error loading sound:', error));
+      audio.volume = 1.0; // Establece el volumen al máximo
+      const soundUrl = `${SOUND_API}/sounds/${selectedSound}`; // Asume que selectedSound es el nombre del archivo sin la extensión
+      audio.src = soundUrl;
+      audio.oncanplay = () => {
+        console.log('Sound loaded successfully');
+        audio.play();
+      };
+      audio.onerror = () => {
+        console.log('Error loading sound');
+      };
     }
-
-  }, [selectedSound, API]);
+  }, [selectedSound]);
+  
+  
 
 
     // Location
@@ -108,7 +108,7 @@ function Car() {
         setShowModal(false);
         // Reproduce el sonido cuando se muestra el modal
         if (audioElement) {
-          audioElement.play();
+          console.log('Playing sound');
         }
       } else {
         setShowModal(true);

@@ -14,7 +14,8 @@ const SoundList = () => {
 
   const getSounds = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/sounds', {});
+      const response = await axios.get('http://localhost:8080/api/sounds/', {});
+      console.log(response.data); 
       setSounds(response.data);
     } catch (error) {
       console.error('Error fetching sounds:', error);
@@ -26,7 +27,7 @@ const SoundList = () => {
       await axios.delete(`http://localhost:8080/api/sounds/${id}`);
       getSounds();
     } catch (error) {
-      console.error(`Error deleting sounds with id=${id}:`, error);
+      console.error(`Error deleting sound with id=${id}:`, error);
     }
   };
 
@@ -53,14 +54,16 @@ const SoundList = () => {
         </thead>
         <tbody>
           {sounds.map((sound, index) => (
-            <tr key={sound.id}>
+            <tr key={sound.id || index}>
               <td>{sound.id}</td>
               <td>{sound.filename}</td>
               <td>
-                <audio controls>
-                <source src={`http://localhost:8080/api/sounds/${sound.id}`} type="audio/mp3" />
-                  Your browser does not support the audio tag.
-                </audio>
+                {sound.id && (
+                  <audio controls>
+                    <source src={`http://localhost:8080/api/sounds/${sound.id}`} type="audio/mp3" />
+                    Your browser does not support the audio tag.
+                  </audio>
+                )}
               </td>
               <td>
                 <Link to={`/sound-edit/${sound.id}`} className="edit">

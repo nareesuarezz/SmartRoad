@@ -16,7 +16,7 @@ function Home() {
     axios.get('http://localhost:8080/api/sounds')
       .then(response => {
         setAvailableSounds(response.data);
-        setSelectedSound(response.data[0]);
+        setSelectedSound(response.data[0].id);
       })
       .catch(error => console.error('Error retrieving sounds:', error));
   }, []);
@@ -26,7 +26,7 @@ function Home() {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
       debugger;
-      localStorage.setItem('selectedSound',selectedSound);
+      localStorage.setItem('selectedSound', selectedSound);
       navigate(`/${vehicle}`, { state: { selectedSound } });
       if (position && Notification.permission === 'granted') {
         await createVehicleAndTrack(vehicle, position.coords);
@@ -150,10 +150,10 @@ function Home() {
 
       <div className="sound-selector">
         <label htmlFor="notification-sound">Select a notification sound:</label>
-        <select id="notification-sound" value={selectedSound} onChange={handleSoundChange}>
-          {availableSounds.map((soundFileName) => (
-            <option key={soundFileName} value={soundFileName}>
-              {soundFileName}
+        <select onChange={handleSoundChange}>
+          {availableSounds.map((sound, index) => (
+            <option key={index} value={sound.id}>
+              {sound.filename}
             </option>
           ))}
         </select>
