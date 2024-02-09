@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 
-const URL = process.env.LOCAHOST_URL;
+const URL = process.env.LOCALHOST_URL;
 
 const LogList = () => {
   const [logs, setLogs] = useState([]);

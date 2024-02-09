@@ -5,9 +5,11 @@ import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
 
-const URL = process.env.LOCAHOST_URL;
+
 
 function Home() {
+  const URL = process.env.LOCALHOST_URL;
+  console.log(URL)
   const [subscription, setSubscription] = useState(null);
 
   const handleClick = async (vehicle) => {

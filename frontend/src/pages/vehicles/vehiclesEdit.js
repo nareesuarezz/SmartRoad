@@ -3,7 +3,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
-const URL = process.env.LOCAHOST_URL;
+const URL = process.env.LOCALHOST_URL;
 
 const VehicleEdit = ({ getVehicles }) => {
     const navigate = useNavigate();

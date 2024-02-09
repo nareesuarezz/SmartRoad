@@ -11,7 +11,7 @@ function Car() {
     const [showModal, setShowModal] = useState(false);
     const [subscription, setSubscription] = useState(null);
 
-    const URL = process.env.LOCAHOST_URL;
+    const URL = process.env.LOCALHOST_URL;
 
     // Location
     const addTrackGeo = async () => {

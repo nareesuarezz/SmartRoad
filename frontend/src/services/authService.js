@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const URL = process.env.LOCAHOST_URL;
+const URL = process.env.LOCALHOST_URL;
 const API_URL = `${URL}/api`;
 const SIGNIN_URL = `${API_URL}/admins/signin`;
 

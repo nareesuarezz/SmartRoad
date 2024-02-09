@@ -4,7 +4,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import './trackAdd.css';
 import AuthService from '../../services/authService';
 
-const URL = process.env.LOCAHOST_URL;
+const URL = process.env.LOCALHOST_URL;
 
 const TrackAdd = ({ getTracks }) => {
   const [formData, setFormData] = useState({

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
-const URL = process.env.LOCAHOST_URL;
+const URL = process.env.LOCALHOST_URL;
 
 const AdminAdd = ({ getAdmins }) => {
   const [formData, setFormData] = useState({
