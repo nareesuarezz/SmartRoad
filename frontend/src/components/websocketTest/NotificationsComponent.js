@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import './NotificationTest.css'
-const notificationSound    = localStorage.getItem("selectedSound");
+const notificationSound = localStorage.getItem("selectedSound");
 
 const SOCKET_SERVER_URL = "http://localhost:8080";
 
@@ -32,9 +32,12 @@ const NotificationsComponent = () => {
   }, []);
 
   const playNotificationSound = () => {
-    const audio = new Audio(notificationSound);
+    const soundUrl = '/sounds/lego.mp3';
+    const audio = new Audio(soundUrl);
+    audio.volume = 0.4; // Establece el volumen al máximo
     audio.play();
   };
+  
 
   const sendNotification = async () => {
     const qs = require('qs');
