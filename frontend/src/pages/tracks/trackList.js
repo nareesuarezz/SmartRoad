@@ -6,7 +6,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
 
-const URL = process.env.LOCALHOST_URL;
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackList = () => {
   const [tracks, setTracks] = useState([]);

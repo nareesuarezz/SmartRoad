@@ -6,7 +6,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useEffect } from 'react';
 
-const API = process.env.LOCALHOST_URL;
+const API = process.env.REACT_APP_LOCALHOST_URL;
 
 function Bicycle() {
 

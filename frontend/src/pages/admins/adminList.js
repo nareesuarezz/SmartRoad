@@ -4,7 +4,7 @@
     import { ArrowLeftOutlined } from '@ant-design/icons';
     import Header from '../../components/header/header';
 
-    const URL = process.env.LOCALHOST_URL;
+    const URL = process.env.REACT_APP_LOCALHOST_URL;
 
     const AdminList = () => {
         const [admins, setAdmins] = useState([]);

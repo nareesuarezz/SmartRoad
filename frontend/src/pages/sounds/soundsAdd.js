@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 
 const SoundAdd = ({ getAdmins }) => {
   const [formData, setFormData] = useState({
@@ -39,7 +41,7 @@ const SoundAdd = ({ getAdmins }) => {
       const formDataForUpload = new FormData();
       formDataForUpload.append('filename', formData.Sound); 
 
-      await axios.post('http://localhost:8080/api/sounds', formDataForUpload);
+      await axios.post(`${URL}/api/sounds`, formDataForUpload);
       goBack();
     } catch (error) {
       console.error('Error adding sound:', error);

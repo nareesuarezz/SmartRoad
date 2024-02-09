@@ -7,14 +7,15 @@ import axios from 'axios';
 
 function Car() {
   const API = process.env.REACT_APP_API_URL;
+  const URL = process.env.REACT_APP_LOCALHOST_URL;
   const [showModal, setShowModal] = useState(false);
   const [subscription, setSubscription] = useState(null);
   const selectedSound = localStorage.getItem("selectedSound");
 
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
-
-  const SOUND_API = 'http://localhost:8080/api';
+  console.log(URL)
+  const SOUND_API = `${URL}/api`;
 
   useEffect(() => {
     const audio = new Audio();
@@ -36,7 +37,6 @@ function Car() {
   
   
 
-    const URL = process.env.LOCALHOST_URL;
 
     // Location
     const addTrackGeo = async () => {

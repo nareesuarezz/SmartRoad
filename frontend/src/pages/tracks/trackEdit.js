@@ -4,7 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import AuthService from '../../services/authService';
 
-const URL = process.env.LOCALHOST_URL;
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackEdit = ({ getTracks }) => {
     const navigate = useNavigate();

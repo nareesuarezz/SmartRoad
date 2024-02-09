@@ -5,10 +5,10 @@ import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import { useNavigate } from 'react-router-dom';
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 function Home() {
-  const URL = process.env.LOCALHOST_URL;
   console.log(URL)
   const [subscription, setSubscription] = useState(null);
   const [availableSounds, setAvailableSounds] = useState([]);
@@ -16,7 +16,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/sounds')
+    axios.get(`${URL}/api/sounds`)
       .then(response => {
         setAvailableSounds(response.data);
         setSelectedSound(response.data[0].id);
