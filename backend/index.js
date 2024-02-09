@@ -1,16 +1,23 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const http = require('http');
+const https = require('https');
 const socketIo = require('socket.io');
 const dbConfig = require("./config/db.config");
 
 const app = express();
 
+// Provide paths to your cert and key
+const certOptions = {
+  key: fs.readFileSync(path.join(__dirname, '.cert', 'cert.key')),
+  cert: fs.readFileSync(path.join(__dirname, '.cert', 'cert.crt'))
+};
 
 // Sequelize setup
 const { Sequelize } = require('sequelize');
@@ -97,7 +104,7 @@ app.use(function (req, res, next) {
   }
 });
 
-const server = http.createServer(app);
+const server = https.createServer(certOptions, app);
 const io = socketIo(server, {
   cors: {
     origin: "*", // Adjust according to your needs
@@ -147,7 +154,7 @@ require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
-const PORT = process.env.PORT || 8080;
+const PORT = process.env.PORT || 443;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
