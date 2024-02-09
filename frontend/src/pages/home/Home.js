@@ -5,6 +5,7 @@ import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
 
+const URL = process.env.LOCAHOST_URL;
 
 function Home() {
   const [subscription, setSubscription] = useState(null);
@@ -72,7 +73,7 @@ function Home() {
 
   const createVehicle = async (vehicle) => {
     try {
-      const response = await axios.post(`http://localhost:8080/api/vehicles`, {
+      const response = await axios.post(`${URL}/api/vehicles`, {
         Vehicle: vehicle,
       });
 
@@ -90,7 +91,7 @@ function Home() {
       coordinates: [parseFloat(coords.latitude), parseFloat(coords.longitude)],
     };
     try {
-      const response = await axios.post(`http://localhost:8080/api/tracks`, {
+      const response = await axios.post(`${URL}/api/tracks`, {
         Location: location,
         Status: 'stopped',
         Speed: 0,

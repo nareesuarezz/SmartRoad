@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 
+const URL = process.env.LOCAHOST_URL;
+
 const VehicleList = () => {
   const [vehicles, setVehicles] = useState([]);
 
@@ -13,7 +15,7 @@ const VehicleList = () => {
 
   const getVehicles = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/vehicles');
+      const response = await axios.get(`${URL}/api/vehicles`);
       setVehicles(response.data);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
@@ -22,7 +24,7 @@ const VehicleList = () => {
 
   const deleteVehicle = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/vehicles/${id}`);
+      await axios.delete(`${URL}/api/vehicles/${id}`);
       getVehicles();
     } catch (error) {
       console.error(`Error deleting vehicle with id=${id}:`, error);

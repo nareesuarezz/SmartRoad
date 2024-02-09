@@ -4,7 +4,7 @@ import axios from 'axios';
 import './NotificationTest.css'
 import notificationSound from '../../sounds/sound.mp3'; // Update with your sound file path
 
-const SOCKET_SERVER_URL = "http://localhost:8080";
+const SOCKET_SERVER_URL = process.env.LOCAHOST_URL;
 
 const NotificationsComponent = () => {
   const [showModal, setShowModal] = useState(false);

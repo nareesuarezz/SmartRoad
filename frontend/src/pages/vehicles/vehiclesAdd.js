@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
+const URL = process.env.LOCAHOST_URL;
+
 const VehicleAdd = ({ getVehicles }) => {
   const [formData, setFormData] = useState({
     Vehicle: '',
@@ -23,7 +25,7 @@ const VehicleAdd = ({ getVehicles }) => {
 
 
     try {
-      await axios.post('http://localhost:8080/api/vehicles', {
+      await axios.post(`${URL}/api/vehicles`, {
         ...formData,
       });
       goBack();

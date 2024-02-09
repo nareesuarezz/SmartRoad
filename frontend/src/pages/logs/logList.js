@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 
+const URL = process.env.LOCAHOST_URL;
+
 const LogList = () => {
   const [logs, setLogs] = useState([]);
 
@@ -13,7 +15,7 @@ const LogList = () => {
 
   const getLogs = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/logs');
+      const response = await axios.get(`${URL}/api/logs`);
       setLogs(response.data);
     } catch (error) {
       console.error('Error fetching logs:', error);

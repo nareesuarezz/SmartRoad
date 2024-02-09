@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
+const URL = process.env.LOCAHOST_URL;
+
 const AdminAdd = ({ getAdmins }) => {
   const [formData, setFormData] = useState({
     Username: '',
@@ -56,7 +58,7 @@ const AdminAdd = ({ getAdmins }) => {
       formDataForUpload.append('Password', formData.Password);
       formDataForUpload.append('filename', formData.Image);
 
-      await axios.post('http://localhost:8080/api/admins', formDataForUpload);
+      await axios.post(`${URL}/api/admins`, formDataForUpload);
       goBack();
     } catch (error) {
       console.error('Error adding admin:', error);

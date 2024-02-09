@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import AuthService from '../../services/authService';
 
+const URL = process.env.LOCAHOST_URL;
+
 const TrackEdit = ({ getTracks }) => {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -26,7 +28,7 @@ const TrackEdit = ({ getTracks }) => {
     useEffect(() => {
         const fetchTrackData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/tracks/${id}`);
+                const response = await axios.get(`${URL}/api/tracks/${id}`);
                 const trackData = response.data;
 
                 if (trackData.Location && trackData.Location.coordinates) {
@@ -91,7 +93,7 @@ const TrackEdit = ({ getTracks }) => {
         };
 
         try {
-            await axios.put(`http://localhost:8080/api/tracks/${id}`, {
+            await axios.put(`${URL}/api/tracks/${id}`, {
             ...formData,
             Location: location,
             Admin_UID: adminId,

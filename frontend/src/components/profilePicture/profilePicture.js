@@ -2,6 +2,8 @@ import React from 'react';
 import './profilePicture.css'
 import { Link } from 'react-router-dom';
 
+const URL = process.env.LOCAHOST_URL;
+
 const ProfilePicture = () => {
   const adminInfo = JSON.parse(localStorage.getItem('adminInfo'));
 
@@ -13,8 +15,7 @@ const ProfilePicture = () => {
     <Link to={`/admin-edit/${adminInfo.UID}`}>                                
     <div className="profile-picture">
       <img
-      
-        src={`http://localhost:8080/images/${adminInfo.filename}`}
+        src={`${URL}/images/${adminInfo.filename}`}
         alt="Admin Avatar"
         width="50"
         height="50"
