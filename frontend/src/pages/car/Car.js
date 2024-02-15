@@ -7,14 +7,15 @@ import axios from 'axios';
 
 function Car() {
   const API = process.env.REACT_APP_API_URL;
+  const URL = process.env.REACT_APP_LOCALHOST_URL;
   const [showModal, setShowModal] = useState(false);
   const [subscription, setSubscription] = useState(null);
   const selectedSound = localStorage.getItem("selectedSound");
 
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
-
-  const SOUND_API = 'http://localhost:8080/api';
+  console.log(URL)
+  const SOUND_API = `${URL}/api`;
 
   useEffect(() => {
     const audio = new Audio();
@@ -43,7 +44,7 @@ function Car() {
             // Obtener la ubicación utilizando trackGeo
             const location = await trackGeo();
 
-            const response = await axios.get('http://localhost:8080/api/vehicles');
+            const response = await axios.get(`${URL}/api/vehicles`);
             const vehicle = response.data;
             const lastVehicleId = vehicle[vehicle.length - 1].UID;
 
@@ -61,7 +62,7 @@ function Car() {
             // console.log('Ubicación obtenida:', location);
 
             // Llamar a axios.post con los datos actualizados
-            await axios.post('http://localhost:8080/api/tracks', data);
+            await axios.post(`${URL}/api/tracks`, data);
 
         } catch (err) {
             console.error(err.response);

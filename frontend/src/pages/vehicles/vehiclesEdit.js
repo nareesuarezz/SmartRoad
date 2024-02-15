@@ -3,6 +3,8 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 const VehicleEdit = ({ getVehicles }) => {
     const navigate = useNavigate();
     const { id } = useParams();
@@ -18,7 +20,7 @@ const VehicleEdit = ({ getVehicles }) => {
     useEffect(() => {
         const fetchVehicleData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/vehicles/${id}`);
+                const response = await axios.get(`${URL}/api/vehicles/${id}`);
                 const vehicleData = response.data;
 
                 setFormData({
@@ -44,7 +46,7 @@ const VehicleEdit = ({ getVehicles }) => {
 
 
         try {
-            await axios.put(`http://localhost:8080/api/vehicles/${id}`, {
+            await axios.put(`${URL}/api/vehicles/${id}`, {
                 ...formData,
             });
             goBack();

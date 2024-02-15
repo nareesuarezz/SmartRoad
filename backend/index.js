@@ -1,16 +1,32 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const http = require('http');
+const https = require('https');
 const socketIo = require('socket.io');
 const dbConfig = require("./config/db.config");
 
-const app = express();
+const USING_HTTPS = process.env.USING_HTTPS == "true" ? true : false;
+const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || 443;
 
+
+const HTTP = express();
+
+if (USING_HTTPS && PORT != 443) {
+  HTTP.get("*", (req, res) =>
+    res.redirect("https://" + process.env.HOST + ":" + process.env.PORT)
+  );
+
+  HTTP.listen(PORT);
+}
+
+const app = express();
 
 // Sequelize setup
 const { Sequelize } = require('sequelize');
@@ -19,7 +35,6 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   dialect: dbConfig.dialect,
   pool: dbConfig.pool
 });
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
@@ -35,12 +50,10 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
-// db.sequelize.sync();
 
 // Database sync and setup
 db.sequelize.sync({ force: true }).then(async () => {
@@ -116,8 +129,27 @@ app.use(function (req, res, next) {
   }
 });
 
-const server = http.createServer(app);
-const io = socketIo(server, {
+let SERVER = null;
+
+if (USING_HTTPS) {
+  const CERTS = () => {
+    try {
+      return {
+        key: fs.readFileSync(path.join(__dirname, ".cert/cert.key")),
+        cert: fs.readFileSync(path.join(__dirname, ".cert/cert.crt")),
+      };
+    } catch (err) {
+      console.log("No certificates found: " + err);
+    }
+  };
+  SERVER  = https.createServer(CERTS(), app);
+} else {
+  SERVER = http.createServer(app);
+}
+
+
+
+const io = socketIo(SERVER, {
   cors: {
     origin: "*", // Adjust according to your needs
     methods: ["GET", "POST"]
@@ -166,8 +198,7 @@ require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
+(USING_HTTPS ? SERVER : app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });

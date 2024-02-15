@@ -5,15 +5,18 @@ import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import { useNavigate } from 'react-router-dom';
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 
 function Home() {
+  console.log(URL)
   const [subscription, setSubscription] = useState(null);
   const [availableSounds, setAvailableSounds] = useState([]);
   const [selectedSound, setSelectedSound] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/sounds')
+    axios.get(`${URL}/api/sounds`)
       .then(response => {
         setAvailableSounds(response.data);
         setSelectedSound(response.data[0].id);
@@ -85,7 +88,7 @@ function Home() {
 
   const createVehicle = async (vehicle) => {
     try {
-      const response = await axios.post(`http://localhost:8080/api/vehicles`, {
+      const response = await axios.post(`${URL}/api/vehicles`, {
         Vehicle: vehicle,
       });
 
@@ -103,7 +106,7 @@ function Home() {
       coordinates: [parseFloat(coords.latitude), parseFloat(coords.longitude)],
     };
     try {
-      const response = await axios.post(`http://localhost:8080/api/tracks`, {
+      const response = await axios.post(`${URL}/api/tracks`, {
         Location: location,
         Status: 'stopped',
         Speed: 0,

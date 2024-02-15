@@ -4,7 +4,9 @@ import { Link } from 'react-router-dom';
 import './trackList.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
-import AuthService from '../../services/authService'; 
+import AuthService from '../../services/authService';
+
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackList = () => {
   const [tracks, setTracks] = useState([]);
@@ -17,7 +19,7 @@ const TrackList = () => {
   const getTracks = async () => {
     try {
       const authToken = AuthService.getAuthToken();
-      const response = await axios.get('http://localhost:8080/api/tracks', {
+      const response = await axios.get(`${URL}/api/tracks`, {
         headers: {
           Authorization: `Bearer ${authToken}`,
         },
