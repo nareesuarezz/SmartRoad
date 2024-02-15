@@ -1,26 +1,37 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const bodyParser = require('body-parser');
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
 const jwt = require('jsonwebtoken'); 
 const { Sequelize } = require('sequelize');
-=======
+=========
 const jwt = require('jsonwebtoken');
 const http = require('http');
+const https = require('https');
 const socketIo = require('socket.io');
->>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
+>>>>>>>>> Temporary merge branch 2
 const dbConfig = require("./config/db.config");
 
-const app = express();
-const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
-  host: dbConfig.HOST,
-  dialect: dbConfig.dialect,
-  pool: dbConfig.pool
-});
+const USING_HTTPS = process.env.USING_HTTPS == "true" ? true : false;
+const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || 443;
 
+
+const HTTP = express();
+
+if (USING_HTTPS && PORT != 443) {
+  HTTP.get("*", (req, res) =>
+    res.redirect("https://" + process.env.HOST + ":" + process.env.PORT)
+  );
+
+  HTTP.listen(PORT);
+}
+
+const app = express();
 
 // Sequelize setup
 const { Sequelize } = require('sequelize');
@@ -30,21 +41,24 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   pool: dbConfig.pool
 });
 
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
+app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
+
 
 var corsOptions = {
-  origin: "*"
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+  preflightContinue: true,
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
-// db.sequelize.sync();
 
 // Database sync and setup
 db.sequelize.sync({ force: true }).then(async () => {
@@ -61,20 +75,35 @@ db.sequelize.sync({ force: true }).then(async () => {
       filename: 'user.jpg'
     });
 
+    const createdSound1 = await db.Sounds.create({
+      filename: 'sound1.mp3' 
+    });
+    const createdSound2 = await db.Sounds.create({
+      filename: 'sound2.mp3' 
+    });
+    const createdSound3 = await db.Sounds.create({
+      filename: 'sound3.mp3' 
+    });
+
     console.log('Admin predeterminado creado con éxito.');
     console.log('Admin Details:', createdAdmin.toJSON());
+    console.log('Sound1 Details:', createdSound1.toJSON());
+    console.log('Sound2 Details:', createdSound2.toJSON());
+    console.log('Sound3 Details:', createdSound3.toJSON());
+
+
   }
 });
 
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
-<<<<<<< HEAD
-=======
+<<<<<<<<< Temporary merge branch 1
+=========
   // // Imprime el encabezado de autorización
   // console.log('Authorization Header:', token);
 
->>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
+>>>>>>>>> Temporary merge branch 2
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
@@ -110,8 +139,8 @@ app.use(function (req, res, next) {
   }
 });
 
-<<<<<<< HEAD
-=======
+<<<<<<<<< Temporary merge branch 1
+=========
 const server = http.createServer(app);
 const io = socketIo(server, {
   cors: {
@@ -156,21 +185,20 @@ app.post('/send-notification', (req, res) => {
 });
 
 
->>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
+>>>>>>>>> Temporary merge branch 2
 require("./routes/logs.routes")(app);
 require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
+(USING_HTTPS ? SERVER : app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
-<<<<<<< HEAD
+<<<<<<<<< Temporary merge branch 1
 module.exports = app;
-=======
+=========
 module.exports = { app, io }; // Exporting app and io for use in other modules
->>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
+>>>>>>>>> Temporary merge branch 2

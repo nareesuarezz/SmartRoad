@@ -19,6 +19,7 @@ const db = {};
 db.Sequelize = Sequelize;
 db.sequelize = sequelize;
 
+db.Sounds = require("./sounds.model.js")(sequelize, Sequelize);
 db.Vehicle = require("./vehicles.model.js")(sequelize, Sequelize);
 db.Track = require("./tracks.model.js")(sequelize, Sequelize);
 db.Admin = require("./admins.model.js")(sequelize, Sequelize);

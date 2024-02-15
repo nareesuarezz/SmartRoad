@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-const API_URL = 'http://localhost:8080/api';
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+const API_URL = `${URL}/api`;
 const SIGNIN_URL = `${API_URL}/admins/signin`;
 
 const AuthService = {

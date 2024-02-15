@@ -6,6 +6,8 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useEffect } from 'react';
 
+const API = process.env.REACT_APP_LOCALHOST_URL;
+
 function Bicycle() {
 
     //Location
@@ -14,7 +16,7 @@ function Bicycle() {
             // Obtener la ubicación utilizando trackGeo
             const location = await trackGeo();
 
-            const response = await axios.get('http://localhost:8080/api/vehicles');
+            const response = await axios.get(`${API}/api/vehicles`);
             const vehicle = response.data;
             const lastVehicleId = vehicle[vehicle.length - 1].UID;
 
@@ -32,7 +34,7 @@ function Bicycle() {
             // console.log('Ubicación obtenida:', location);
 
             // Llamar a axios.post con los datos actualizados
-            await axios.post('http://localhost:8080/api/tracks', data);
+            await axios.post(`${API}/api/tracks`, data);
 
         } catch (err) {
             console.error(err.response);

@@ -4,6 +4,8 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import './trackAdd.css';
 import AuthService from '../../services/authService';
 
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 const TrackAdd = ({ getTracks }) => {
   const [formData, setFormData] = useState({
     Latitude: '',
@@ -70,7 +72,7 @@ const TrackAdd = ({ getTracks }) => {
     };
 
     try {
-      await axios.post('http://localhost:8080/api/tracks', {
+      await axios.post(`${URL}/api/tracks`, {
         ...formData,
         Location: location,
         Admin_UID: adminId,

@@ -4,6 +4,8 @@
     import { ArrowLeftOutlined } from '@ant-design/icons';
     import Header from '../../components/header/header';
 
+    const URL = process.env.REACT_APP_LOCALHOST_URL;
+
     const AdminList = () => {
         const [admins, setAdmins] = useState([]);
 
@@ -13,7 +15,7 @@
 
         const getAdmins = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/admins');
+                const response = await axios.get(`${URL}/api/admins`);
                 setAdmins(response.data);
             } catch (error) {
                 console.error('Error fetching admins:', error);
@@ -22,7 +24,7 @@
 
         const deleteAdmin = async (id) => {
             try {
-                await axios.delete(`http://localhost:8080/api/admins/${id}`);
+                await axios.delete(`${URL}/api/admins/${id}`);
                 getAdmins();
             } catch (error) {
                 console.error(`Error deleting admin with id=${id}:`, error);
@@ -55,7 +57,7 @@
                             <tr key={admin.UID}>
                                 <td>{admin.UID}</td>
                                 <td>{admin.Username}</td>
-                                <td><img src={`http://localhost:8080/images/${admin.filename}`} alt="Admin Avatar" width="60" /></td>
+                                <td><img src={`${URL}/images/${admin.filename}`} alt="Admin Avatar" width="60" /></td>
                                 <td>
                                     <Link to="#" onClick={() => deleteAdmin(admin.UID)} className="delete">
                                         Delete
