@@ -11,6 +11,9 @@ function Car() {
   const [showModal, setShowModal] = useState(false);
   const [subscription, setSubscription] = useState(null);
   const selectedSound = localStorage.getItem("selectedSound");
+  const [lastVehicleId, setLastVehicleId] = useState(null);
+
+  const time = 5000;
 
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
@@ -20,7 +23,7 @@ function Car() {
   useEffect(() => {
     const audio = new Audio();
     setAudioElement(audio);
-  
+
     if (selectedSound) {
       audio.volume = 1.0; // Establece el volumen al máximo
       const soundUrl = `${SOUND_API}/sounds/${selectedSound}`; // Asume que selectedSound es el nombre del archivo sin la extensión
@@ -34,75 +37,147 @@ function Car() {
       };
     }
   }, [selectedSound]);
-  
-  
 
+  // Location
+  const addTrackGeo = async (lastVehicleId) => {
+    try {
+      console.log("antes de trackGeo")
+      const location = await trackGeo();
 
-    // Location
-    const addTrackGeo = async () => {
-        try {
-            // Obtener la ubicación utilizando trackGeo
-            const location = await trackGeo();
+      const data = {
+        Location: location,
+        Status: 'Moving',
+        Speed: '0',
+        Extra: 'coche',
+        Vehicle_UID: lastVehicleId,
+      };
 
-            const response = await axios.get(`${URL}/api/vehicles`);
-            const vehicle = response.data;
-            const lastVehicleId = vehicle[vehicle.length - 1].UID;
+      await axios.post('https://localhost/api/tracks', data).then(console.log('post'));
 
-            const data = {
-                Latitude: '',
-                Longitude: '',
-                Status: 'Stopped',
-                Speed: '0',
-                Extra: '',
-                Vehicle_UID: lastVehicleId,
-                Location: location, // Usar la ubicación obtenida de trackGeo aquí
-            };
+    } catch (err) {
+      console.error(err.response);
+    }
+  };
 
-            // Imprimir la ubicación para verificar
-            // console.log('Ubicación obtenida:', location);
-
-            // Llamar a axios.post con los datos actualizados
-            await axios.post(`${URL}/api/tracks`, data);
-
-        } catch (err) {
-            console.error(err.response);
-        }
-    };
-
-    //Función para recoger la localización y devolverla
-    const trackGeo = () => {
-        return new Promise((resolve, reject) => {
-            try {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const location = {
-                        type: 'Point',
-                        coordinates: [position.coords.latitude, position.coords.longitude],
-                    };
-                    // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
-                    resolve(location);  //Devuelve la localización recogida
-                });
-            } catch (error) {
-                console.error(error);
-                reject(error);
-            }
+  //Función para recoger la localización y devolverla
+  const trackGeo = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const location = {
+            type: 'Point',
+            coordinates: [position.coords.latitude, position.coords.longitude],
+          };
+          // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
+          resolve(location);  //Devuelve la localización recogida
         });
+      } catch (error) {
+        console.error(error);
+        reject(error);
+      }
+    });
+  };
+
+  //Get Status
+  // const getStatusStopped = async (lastVehicleId) => {
+  //   return new Promise(async (resolve, reject) => {
+  //     try {
+  //       let countStatus = 0; // Inicializar el contador de estado a 0
+
+  //       // Bucle para comprobar el estado durante 30 segundos (6 iteraciones * 5 segundos cada una)
+  //       for (let i = 0; i < 6; i++) {
+  //         const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}`);
+  //         const lastTrackStatus = response.data[0]?.Status; // Obtener el último estado
+
+  //         // Si el estado es "Stopped", incrementar el contador
+  //         if (lastTrackStatus === 'Stopped') {
+  //           countStatus++;
+  //         } else {
+  //           countStatus = 0; // Reiniciar el contador si el estado no es "Stopped"
+  //         }
+
+  //         // Si el contador llega a 6, significa que el estado ha sido "Stopped" durante 30 segundos
+  //         if (countStatus === 6) {
+  //           resolve(true); // Resuelve la promesa con true
+  //           return; // Salir del bucle
+  //         }
+
+  //         // Esperar 5 segundos antes de la siguiente comprobación
+  //         debugger
+  //         await new Promise(resolve => setTimeout(resolve, time));
+  //       }
+
+  //       // Si el estado no es "Stopped" durante 30 segundos, resolver con false
+  //       resolve(false);
+  //     } catch (error) {
+  //       console.error(error);
+  //       reject(error);
+  //     }
+  //   });
+  // };
+  useEffect(() => {
+    let consecutiveStoppedCount = 0;
+
+    const checkStatus = async () => {
+      try {
+        const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_sort=createdAt:desc&_limit=1`);
+        const lastTrackStatus = response.data[0]?.Status;
+
+        if (lastTrackStatus === 'Stopped') {
+          consecutiveStoppedCount++;
+        } else {
+          consecutiveStoppedCount = 0;
+        }
+
+        if (consecutiveStoppedCount === 6) {
+          console.log('Vehicle has been stopped for 30 seconds. Navigating to /home.');
+          goBack();
+          return;
+        }
+
+        // Esperar 5 segundos antes de la siguiente verificación
+        setTimeout(checkStatus, time);
+      } catch (error) {
+        console.error('Error checking status:', error);
+      }
     };
 
-    useEffect(() => {
-        // Call the function here to start tracking
-        addTrackGeo();
-    }, 1); // Empty dependency array to run it only once
+    // Comenzar el monitoreo cuando haya un último vehículo ID
+    if (lastVehicleId) {
+      checkStatus();
+    }
 
-    useEffect(() => {
-        const locationUpdateInterval = setInterval(() => {
-            // Call the trackAddGeo function every 5 seconds
-            addTrackGeo();
-        }, 5000);
+    // Limpiar intervalo cuando se desmonte el componente
+    return () => {
+      consecutiveStoppedCount = 0; // Reiniciar el contador al desmontar el componente
+    };
+  }, [lastVehicleId]);
 
-        return () => clearInterval(locationUpdateInterval);
-    }, []);
 
-    //Notification
+  //Location UseEffect
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Recogiendo ID del vehiculo");
+      const response = await axios.get('https://localhost/api/vehicles');
+      const vehicles = response.data;
+      const lastId = vehicles[vehicles.length - 1].UID;
+      setLastVehicleId(lastId);
+      console.log("ID del vehiculo: ", lastId);
+    };
+
+    fetchData(); // Llamada inicial para recoger el ID del vehículo
+
+    const locationUpdateInterval = setInterval(() => {
+      if (lastVehicleId) {
+        console.log("Cada 5 segundos tiburcio");
+        addTrackGeo(lastVehicleId);
+      }
+    }, time);
+
+    return () => clearInterval(locationUpdateInterval);
+  }, [lastVehicleId]); // Agregar lastVehicleId como dependencia
+
+  //Notification
   useEffect(() => {
     const notificationInterval = setInterval(() => {
       if (showModal) {
@@ -136,7 +211,7 @@ function Car() {
 
       console.log(`Sending notification to ${subscriptionName}: ${notificationMessage}`);
     } catch (error) {
-      console.error('Error al enviar notificación al backend:', error);
+      console.error('Error al enviar notificación al backend:', error.response);
     }
   };
 
