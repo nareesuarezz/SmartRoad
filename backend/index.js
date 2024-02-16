@@ -5,6 +5,8 @@ const fs = require('fs');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken'); 
+const { Sequelize } = require('sequelize');
 const jwt = require('jsonwebtoken');
 const http = require('http');
 const https = require('https');
@@ -93,6 +95,8 @@ db.sequelize.sync({ force: true }).then(async () => {
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
+  // // Imprime el encabezado de autorización
+  // console.log('Authorization Header:', token);
 
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];
@@ -129,27 +133,8 @@ app.use(function (req, res, next) {
   }
 });
 
-let SERVER = null;
-
-if (USING_HTTPS) {
-  const CERTS = () => {
-    try {
-      return {
-        key: fs.readFileSync(path.join(__dirname, ".cert/cert.key")),
-        cert: fs.readFileSync(path.join(__dirname, ".cert/cert.crt")),
-      };
-    } catch (err) {
-      console.log("No certificates found: " + err);
-    }
-  };
-  SERVER  = https.createServer(CERTS(), app);
-} else {
-  SERVER = http.createServer(app);
-}
-
-
-
-const io = socketIo(SERVER, {
+const server = http.createServer(app);
+const io = socketIo(server, {
   cors: {
     origin: "*", // Adjust according to your needs
     methods: ["GET", "POST"]
@@ -191,7 +176,7 @@ app.post('/send-notification', (req, res) => {
   }
 });
 
-require("./routes/sounds.routes")(app);
+
 require("./routes/logs.routes")(app);
 require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
@@ -203,4 +188,5 @@ require("./routes/subscription.routes")(app);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
+module.exports = app;
 module.exports = { app, io }; // Exporting app and io for use in other modules
