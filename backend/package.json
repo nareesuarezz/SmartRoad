@@ -23,16 +23,10 @@
     "mysql2": "^3.6.5",
     "nodemon": "^3.0.3",
     "sequelize": "^6.21.6",
-<<<<<<< HEAD
-<<<<<<< HEAD
     "supertest": "^6.3.3",
-=======
     "socket.io": "^4.7.4",
->>>>>>> 425789f4b608171d5f1ba2c9b57c00035ee8b649
-=======
     "socket.io": "^4.7.4",
     "supertest": "^6.3.3",
->>>>>>> develop
     "web-push": "^3.6.6"
   }
 }
