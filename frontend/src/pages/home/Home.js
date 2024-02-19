@@ -28,7 +28,6 @@ function Home() {
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-      debugger;
       localStorage.setItem('selectedSound', selectedSound);
       navigate(`/${vehicle}`, { state: { selectedSound } });
       if (position && Notification.permission === 'granted') {
@@ -108,7 +107,7 @@ function Home() {
     try {
       const response = await axios.post(`${URL}/api/tracks`, {
         Location: location,
-        Status: 'stopped',
+        Status: 'Moving',
         Speed: 0,
         Extra: null,
         Vehicle_UID: vehicleId,
