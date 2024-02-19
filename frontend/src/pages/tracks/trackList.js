@@ -1,16 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import './trackList.css';
+import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css'; // Importa los estilos de Leaflet
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
+
+const customIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/mark.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+const lastTrackIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/last.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackList = () => {
   const [tracks, setTracks] = useState([]);
-  const [adminId, setAdminId] = useState(null); 
+  const [adminId, setAdminId] = useState(null);
+  const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]); // Coordenadas de Gran Canaria
 
   useEffect(() => {
     getTracks();
@@ -30,16 +47,46 @@ const TrackList = () => {
     }
   };
 
-  const goBack = () => {
-    window.location.href = "/login";
+  const groupTracksByVehicle = () => {
+    const groupedTracks = {};
+    tracks.forEach((track) => {
+      const vehicleUID = track.Vehicle_UID;
+      if (!groupedTracks[vehicleUID]) {
+        groupedTracks[vehicleUID] = [];
+      }
+      groupedTracks[vehicleUID].push(track);
+    });
+    return groupedTracks;
   };
 
-  const fetchAdminId = async () => {
-    try {
-      const authToken = AuthService.getAuthToken();
-    } catch (error) {
-      console.error('Error fetching admin ID:', error);
-    }
+  const goBack = () => {
+    window.location.href = '/login';
+  };
+
+  const renderTracksOnMap = () => {
+    const groupedTracks = groupTracksByVehicle();
+
+    return Object.values(groupedTracks).map((vehicleTracks, index) => {
+      const trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
+      return (
+        <React.Fragment key={index}>
+          {vehicleTracks.map((track, trackIndex) => (
+            <Marker
+              key={track.ID}
+              position={track.Location.coordinates.reverse()}
+              icon={trackIndex === vehicleTracks.length - 1 ? lastTrackIcon : customIcon}
+            >
+              <Popup>
+                <p>{`Track ID: ${track.ID}`}</p>
+                <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
+                <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
+              </Popup>
+            </Marker>
+          ))}
+          <Polyline positions={trackCoordinates} color="blue" />
+        </React.Fragment>
+      );
+    });
   };
 
   return (
@@ -47,41 +94,20 @@ const TrackList = () => {
       <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
       <Link to="/track-add" className="add">
-        Add New Track
+        Add track
       </Link>
 
-      <table className="table is-striped is-fullwidth">
-        <thead>
-          <tr>
-            <th>Track nº</th>
-            <th>Location</th>
-            <th>Status</th>
-            <th>Speed</th>
-            <th>Extra</th>
-            <th>Vehicle</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {tracks.map((track, index) => (
-            <tr key={track.ID}>
-              <td>{track.ID}</td>
-              <td>{track.Location.coordinates.join(', ')}</td>
-              <td>{track.Status}</td>
-              <td>{track.Speed}</td>
-              <td>{JSON.stringify(track.Extra)}</td>
-              <td>{track.Vehicle_UID}</td>
-              <td>{new Date(track.Date).toLocaleString()}</td>
-              <td>
-                <Link to={`/track-edit/${track.ID}`} className="edit">
-                  Edit
-                </Link>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+        <MapContainer center={mapCenter} zoom={12} style={{ height: '500px', width: '700px' }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          {renderTracksOnMap()}
+        </MapContainer>
+      </div>
+
+
     </div>
   );
 };
