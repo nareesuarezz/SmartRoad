@@ -46,6 +46,7 @@ function Car() {
       console.log("antes de trackGeo")
       const location = await trackGeo();
 
+      console.log(lastVehicleId)
       const data = {
         Location: location,
         Status: 'Stopped',
@@ -123,7 +124,7 @@ function Car() {
   useEffect(() => {
     const fetchData = async () => {
       console.log("Recogiendo ID del vehiculo");
-      const response = await axios.get('https://localhost/api/vehicles');
+      const response = await axios.get('https://localhost/api/vehicles?_sort=createdAt:desc&_limit=1');
       const vehicles = response.data;
       const lastId = vehicles[vehicles.length - 1].UID;
       setLastVehicleId(lastId);
