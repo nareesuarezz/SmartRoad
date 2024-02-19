@@ -18,6 +18,8 @@ const createLogEntry = async (action, trackId, adminId) => {
 
 exports.create = async (req, res) => {
     try {
+        const adminId = req.user.UID;
+
         const track = {
             Location: req.body.Location,
             Status: req.body.Status,
@@ -28,6 +30,7 @@ exports.create = async (req, res) => {
         };
 
         const createdTrack = await Tracks.create(track);
+        await createLogEntry('CREATE', createdTrack.ID, adminId);
 
         res.status(201).send({ message: "Track created successfully." });
     } catch (error) {

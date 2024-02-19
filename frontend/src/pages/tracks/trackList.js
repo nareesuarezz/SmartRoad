@@ -3,17 +3,31 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
 import L from 'leaflet';
-import './trackList.css';
+import 'leaflet/dist/leaflet.css'; // Importa los estilos de Leaflet
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
+
+const customIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/mark.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
+const lastTrackIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/last.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackList = () => {
   const [tracks, setTracks] = useState([]);
   const [adminId, setAdminId] = useState(null);
-  const [mapCenter, setMapCenter] = useState([0, 0]); // Set the initial map center
+  const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]); // Coordenadas de Gran Canaria
 
   useEffect(() => {
     getTracks();
@@ -28,18 +42,11 @@ const TrackList = () => {
         },
       });
       setTracks(response.data);
-
-      // Find the center of the map based on the first track's location
-      if (response.data.length > 0) {
-        const firstTrack = response.data[0];
-        setMapCenter(firstTrack.Location.coordinates.reverse());
-      }
     } catch (error) {
       console.error('Error fetching tracks:', error);
     }
   };
 
-  // Helper function to group tracks by vehicle UID
   const groupTracksByVehicle = () => {
     const groupedTracks = {};
     tracks.forEach((track) => {
@@ -59,28 +66,27 @@ const TrackList = () => {
   const renderTracksOnMap = () => {
     const groupedTracks = groupTracksByVehicle();
 
-    return Object.values(groupedTracks).map((vehicleTracks, index) => (
-      <React.Fragment key={index}>
-        {vehicleTracks.map((track) => (
-          <Marker
-            key={track.ID}
-            position={track.Location.coordinates.reverse()}
-            icon={L.icon({ iconUrl: 'path/to/marker-icon.png', iconSize: [25, 41] })}
-          >
-            <Popup>
-              <p>{`Track ID: ${track.ID}`}</p>
-              <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
-              {/* Add other track details as needed */}
-            </Popup>
-          </Marker>
-        ))}
-        {/* Connect tracks with a Polyline */}
-        <Polyline
-          positions={vehicleTracks.map((track) => track.Location.coordinates.reverse())}
-          color="blue"
-        />
-      </React.Fragment>
-    ));
+    return Object.values(groupedTracks).map((vehicleTracks, index) => {
+      const trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
+      return (
+        <React.Fragment key={index}>
+          {vehicleTracks.map((track, trackIndex) => (
+            <Marker
+              key={track.ID}
+              position={track.Location.coordinates.reverse()}
+              icon={trackIndex === vehicleTracks.length - 1 ? lastTrackIcon : customIcon}
+            >
+              <Popup>
+                <p>{`Track ID: ${track.ID}`}</p>
+                <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
+                <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
+              </Popup>
+            </Marker>
+          ))}
+          <Polyline positions={trackCoordinates} color="blue" />
+        </React.Fragment>
+      );
+    });
   };
 
   return (
@@ -88,16 +94,20 @@ const TrackList = () => {
       <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
       <Link to="/track-add" className="add">
-        Add New Track
+        Add track
       </Link>
 
-      <MapContainer center={mapCenter} zoom={12}>
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {renderTracksOnMap()}
-      </MapContainer>
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
+        <MapContainer center={mapCenter} zoom={12} style={{ height: '500px', width: '700px' }}>
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          />
+          {renderTracksOnMap()}
+        </MapContainer>
+      </div>
+
+
     </div>
   );
 };
