@@ -15,6 +15,8 @@ function Car() {
 
   const time = 5000;
 
+  let postsT = 0;
+
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
   console.log(URL)
@@ -46,7 +48,7 @@ function Car() {
 
       const data = {
         Location: location,
-        Status: 'Moving',
+        Status: 'Stopped',
         Speed: '0',
         Extra: 'coche',
         Vehicle_UID: lastVehicleId,
@@ -68,7 +70,6 @@ function Car() {
             type: 'Point',
             coordinates: [position.coords.latitude, position.coords.longitude],
           };
-          // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
           resolve(location);  //Devuelve la localización recogida
         });
       } catch (error) {
@@ -78,50 +79,14 @@ function Car() {
     });
   };
 
-  //Get Status
-  // const getStatusStopped = async (lastVehicleId) => {
-  //   return new Promise(async (resolve, reject) => {
-  //     try {
-  //       let countStatus = 0; // Inicializar el contador de estado a 0
-
-  //       // Bucle para comprobar el estado durante 30 segundos (6 iteraciones * 5 segundos cada una)
-  //       for (let i = 0; i < 6; i++) {
-  //         const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}`);
-  //         const lastTrackStatus = response.data[0]?.Status; // Obtener el último estado
-
-  //         // Si el estado es "Stopped", incrementar el contador
-  //         if (lastTrackStatus === 'Stopped') {
-  //           countStatus++;
-  //         } else {
-  //           countStatus = 0; // Reiniciar el contador si el estado no es "Stopped"
-  //         }
-
-  //         // Si el contador llega a 6, significa que el estado ha sido "Stopped" durante 30 segundos
-  //         if (countStatus === 6) {
-  //           resolve(true); // Resuelve la promesa con true
-  //           return; // Salir del bucle
-  //         }
-
-  //         // Esperar 5 segundos antes de la siguiente comprobación
-  //         debugger
-  //         await new Promise(resolve => setTimeout(resolve, time));
-  //       }
-
-  //       // Si el estado no es "Stopped" durante 30 segundos, resolver con false
-  //       resolve(false);
-  //     } catch (error) {
-  //       console.error(error);
-  //       reject(error);
-  //     }
-  //   });
-  // };
+  //Status UseEffect
   useEffect(() => {
     let consecutiveStoppedCount = 0;
 
     const checkStatus = async () => {
       try {
-        const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_sort=createdAt:desc&_limit=1`);
-        const lastTrackStatus = response.data[0]?.Status;
+        const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+        const lastTrackStatus = response.data[postsT]?.Status;
 
         if (lastTrackStatus === 'Stopped') {
           consecutiveStoppedCount++;
@@ -130,13 +95,12 @@ function Car() {
         }
 
         if (consecutiveStoppedCount === 6) {
-          console.log('Vehicle has been stopped for 30 seconds. Navigating to /home.');
           goBack();
           return;
         }
 
-        // Esperar 5 segundos antes de la siguiente verificación
-        setTimeout(checkStatus, time);
+        // Esperar 1 minuto (60 segundos) antes de la siguiente verificación
+        setTimeout(checkStatus, 60 * 1000); // Convertir minutos a milisegundos
       } catch (error) {
         console.error('Error checking status:', error);
       }
@@ -152,6 +116,7 @@ function Car() {
       consecutiveStoppedCount = 0; // Reiniciar el contador al desmontar el componente
     };
   }, [lastVehicleId]);
+
 
 
   //Location UseEffect
@@ -170,6 +135,8 @@ function Car() {
     const locationUpdateInterval = setInterval(() => {
       if (lastVehicleId) {
         console.log("Cada 5 segundos tiburcio");
+        postsT++;
+        console.log(postsT);
         addTrackGeo(lastVehicleId);
       }
     }, time);
