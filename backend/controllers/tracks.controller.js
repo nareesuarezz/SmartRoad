@@ -18,12 +18,10 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
         lat: parseFloat(req.query.lat), // Asume que recibes la latitud como query param
         lng: parseFloat(req.query.lng), // Asume que recibes la longitud como query param
     };
-    console.log(clientLocation)
+
 
     // Convierte las coordenadas en un punto geográfico para la consulta
     const locationPoint = Sequelize.fn('ST_GeomFromText', `POINT(${clientLocation.lng} ${clientLocation.lat})`);
-
-    console.log(locationPoint)
 
     // Calcula la distancia desde la ubicación del cliente hasta la ubicación de cada track
     const distance = Sequelize.fn(
@@ -48,7 +46,8 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
             logging: console.log // Opcional: para ver la consulta generada
         });
 
-        console.log('Tracks encontrados:', recentTracks);
+        console.log('Tracks encontrados:', recentTracks)
+        res.status(200).send({recentTracks})
     } catch (error) {
         console.error('Error al buscar tracks recientes dentro del radio:', error);
         res.status(500).send({
