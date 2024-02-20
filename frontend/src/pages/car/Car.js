@@ -42,17 +42,15 @@ function Car() {
       // Obtener la ubicación utilizando trackGeo
       const location = await trackGeo();
 
-      const response = await axios.get(`${URL}/api/vehicles`);
-      const vehicle = response.data;
-      const lastVehicleId = vehicle[vehicle.length - 1].UID;
-
       const data = {
+        Location: location,
         Status: 'Stopped',
         Speed: '0',
-        Extra: '',
+        Extra: 'coche',
         Vehicle_UID: lastVehicleId,
-        Location: location, // Usar la ubicación obtenida de trackGeo aquí
       };
+
+      await axios.post('https://localhost/api/tracks', data).then(console.log('post'));
 
       // Imprimir la ubicación para verificar
       // console.log('Ubicación obtenida:', location);
