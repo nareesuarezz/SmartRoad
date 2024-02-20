@@ -150,7 +150,6 @@ function Car() {
 
     const locationUpdateInterval = setInterval(() => {
       if (lastVehicleId) {
-        console.log("Cada 5 segundos tiburcio");
         postsT++;
         console.log(postsT);
         addTrackGeo(lastVehicleId);
