@@ -1,14 +1,20 @@
 "use strict";
 
+import React, { useState, useEffect } from 'react';
 import logoBicycle from '../../img/bike.png';
 import './Bicycle.css'
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
-import { useEffect } from 'react';
-
-const API = process.env.REACT_APP_LOCALHOST_URL;
 
 function Bicycle() {
+
+    const API = process.env.REACT_APP_LOCALHOST_URL;
+
+    const [lastVehicleId, setLastVehicleId] = useState(null);
+
+    const time = 5000;
+
+    let postsT = 0;
 
     //Location
     const addTrackGeo = async () => {
@@ -30,9 +36,6 @@ function Bicycle() {
                 Location: location, // Usar la ubicación obtenida de trackGeo aquí
             };
 
-            // Imprimir la ubicación para verificar
-            // console.log('Ubicación obtenida:', location);
-
             // Llamar a axios.post con los datos actualizados
             await axios.post(`${API}/api/tracks`, data);
 
@@ -50,7 +53,6 @@ function Bicycle() {
                         type: 'Point',
                         coordinates: [position.coords.latitude, position.coords.longitude],
                     };
-                    // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
                     resolve(location);  //Devuelve la localización recogida
                 });
             } catch (error) {
@@ -60,19 +62,71 @@ function Bicycle() {
         });
     };
 
+    //Status UseEffect
     useEffect(() => {
-        // Call the function here to start tracking
-        addTrackGeo();
-    }, 1); // Empty dependency array to run it only once
+        let consecutiveStoppedCount = 0;
 
+        const checkStatus = async () => {
+            try {
+                const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+                const lastTrackStatus = response.data[postsT]?.Status;
+
+                if (lastTrackStatus === 'Stopped') {
+                    consecutiveStoppedCount++;
+                } else {
+                    consecutiveStoppedCount = 0;
+                }
+
+                if (consecutiveStoppedCount === 6) {
+                    goBack();
+                    return;
+                }
+
+                // Esperar 1 minuto (60 segundos) antes de la siguiente verificación
+                setTimeout(checkStatus, 60 * 1000); // Convertir minutos a milisegundos
+            } catch (error) {
+                console.error('Error checking status:', error);
+            }
+        };
+
+        // Comenzar el monitoreo cuando haya un último vehículo ID
+        if (lastVehicleId) {
+            checkStatus();
+        }
+
+        // Limpiar intervalo cuando se desmonte el componente
+        return () => {
+            consecutiveStoppedCount = 0; // Reiniciar el contador al desmontar el componente
+        };
+    }, [lastVehicleId]);
+
+
+
+    //Location UseEffect
     useEffect(() => {
+        const fetchData = async () => {
+            console.log("Recogiendo ID del vehiculo");
+            const response = await axios.get('https://localhost/api/vehicles');
+            const vehicles = response.data;
+            const lastId = vehicles[vehicles.length - 1].UID;
+            setLastVehicleId(lastId);
+            console.log("ID del vehiculo: ", lastId);
+        };
+
+        fetchData(); // Llamada inicial para recoger el ID del vehículo
+
         const locationUpdateInterval = setInterval(() => {
-            // Call the trackAddGeo function every 5 seconds
-            addTrackGeo();
-        }, 5000);
+            if (lastVehicleId) {
+                console.log("Cada 5 segundos tiburcio");
+                postsT++;
+                console.log(postsT);
+                addTrackGeo(lastVehicleId);
+            }
+        }, time);
 
         return () => clearInterval(locationUpdateInterval);
-    }, []);
+    }, [lastVehicleId]); // Agregar lastVehicleId como dependencia
+
 
     const goBack = () => {
         window.location.href = "/home";

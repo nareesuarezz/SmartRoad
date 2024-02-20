@@ -71,13 +71,13 @@ db.sequelize.sync({ force: true }).then(async () => {
     });
 
     const createdSound1 = await db.Sounds.create({
-      filename: 'sound1.mp3' 
+      filename: 'sound1.mp3'
     });
     const createdSound2 = await db.Sounds.create({
-      filename: 'sound2.mp3' 
+      filename: 'sound2.mp3'
     });
     const createdSound3 = await db.Sounds.create({
-      filename: 'sound3.mp3' 
+      filename: 'sound3.mp3'
     });
 
     console.log('Admin predeterminado creado con éxito.');
@@ -142,7 +142,7 @@ if (USING_HTTPS) {
       console.log("No certificates found: " + err);
     }
   };
-  SERVER  = https.createServer(CERTS(), app);
+  SERVER = https.createServer(CERTS(), app);
 } else {
   SERVER = http.createServer(app);
 }

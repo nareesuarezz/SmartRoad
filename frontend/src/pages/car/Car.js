@@ -11,6 +11,11 @@ function Car() {
   const [showModal, setShowModal] = useState(false);
   const [subscription, setSubscription] = useState(null);
   const selectedSound = localStorage.getItem("selectedSound");
+  const [lastVehicleId, setLastVehicleId] = useState(null);
+
+  const time = 5000;
+
+  let postsT = 0;
 
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
@@ -19,6 +24,7 @@ function Car() {
   useEffect(() => {
     const audio = new Audio();
     setAudioElement(audio);
+  
     if (selectedSound) {
       audio.volume = 1.0; // Establece el volumen al máximo
       const soundUrl = `${SOUND_API}/sounds/${selectedSound}`; // Asume que selectedSound es el nombre del archivo sin la extensión
@@ -32,14 +38,13 @@ function Car() {
       };
     }
   }, [selectedSound]);
-
-
+  
+  
 
 
   // Location
-  const addTrackGeo = async () => {
+  const addTrackGeo = async (lastVehicleId) => {
     try {
-      // Obtener la ubicación utilizando trackGeo
       const location = await trackGeo();
 
       const data = {
@@ -83,7 +88,6 @@ function Car() {
             type: 'Point',
             coordinates: [position.coords.latitude, position.coords.longitude],
           };
-          // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
           resolve(location);  //Devuelve la localización recogida
         });
       } catch (error) {
@@ -93,16 +97,70 @@ function Car() {
     });
   };
 
+  //Status UseEffect
   useEffect(() => {
-    const locationUpdateInterval = setInterval(() => {
-      // Call the trackAddGeo function every 5 seconds
-      addTrackGeo();
-    }, 5000);
+    let consecutiveStoppedCount = 0;
 
-    addTrackGeo();
+    const checkStatus = async () => {
+      try {
+        const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+        const lastTrackStatus = response.data[postsT]?.Status;
+
+        if (lastTrackStatus === 'Stopped') {
+          consecutiveStoppedCount++;
+        } else {
+          consecutiveStoppedCount = 0;
+        }
+
+        if (consecutiveStoppedCount === 6) {
+          goBack();
+          return;
+        }
+
+        // Esperar 1 minuto (60 segundos) antes de la siguiente verificación
+        setTimeout(checkStatus, 60 * 1000); // Convertir minutos a milisegundos
+      } catch (error) {
+        console.error('Error checking status:', error);
+      }
+    };
+
+    // Comenzar el monitoreo cuando haya un último vehículo ID
+    if (lastVehicleId) {
+      checkStatus();
+    }
+
+    // Limpiar intervalo cuando se desmonte el componente
+    return () => {
+      consecutiveStoppedCount = 0; // Reiniciar el contador al desmontar el componente
+    };
+  }, [lastVehicleId]);
+
+
+
+  //Location UseEffect
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Recogiendo ID del vehiculo");
+      const response = await axios.get('https://localhost/api/vehicles');
+      const vehicles = response.data;
+      const lastId = vehicles[vehicles.length - 1].UID;
+      setLastVehicleId(lastId);
+      console.log("ID del vehiculo: ", lastId);
+    };
+
+    fetchData(); // Llamada inicial para recoger el ID del vehículo
+
+    const locationUpdateInterval = setInterval(() => {
+      if (lastVehicleId) {
+        console.log("Cada 5 segundos tiburcio");
+        postsT++;
+        console.log(postsT);
+        addTrackGeo(lastVehicleId);
+      }
+    }, time);
 
     return () => clearInterval(locationUpdateInterval);
-  }, []);
+  }, [lastVehicleId]); // Agregar lastVehicleId como dependencia
 
   //Notification
   useEffect(() => {
@@ -138,7 +196,7 @@ function Car() {
 
       console.log(`Sending notification to ${subscriptionName}: ${notificationMessage}`);
     } catch (error) {
-      console.error('Error al enviar notificación al backend:', error);
+      console.error('Error al enviar notificación al backend:', error.response);
     }
   };
 
@@ -222,5 +280,4 @@ function Car() {
     </>
   );
 }
-
-export default Car; 
+export default Car;

@@ -47,12 +47,16 @@ const AdminEdit = ({ getAdmins }) => {
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
       const file = e.target.files[0];
-      setFormData({
-        ...formData,
-        Image: file,
-      });
-
-      setPreviewImage(URL.createObjectURL(file));
+  
+      if (file) {
+        setFormData({
+          ...formData,
+          Image: file,
+        });
+  
+        const imageUrl = window.URL.createObjectURL(file);
+        setPreviewImage(imageUrl);
+      }
     } else {
       setFormData({
         ...formData,
@@ -60,6 +64,7 @@ const AdminEdit = ({ getAdmins }) => {
       });
     }
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();

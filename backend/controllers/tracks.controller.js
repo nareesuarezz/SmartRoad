@@ -81,6 +81,7 @@ const createLogEntry = async (action, trackId, adminId) => {
 
 exports.create = async (req, res) => {
     try {
+
         const track = {
             Location: req.body.Location,
             Status: req.body.Status,
