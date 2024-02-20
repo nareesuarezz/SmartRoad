@@ -55,7 +55,7 @@ function Car() {
         Vehicle_UID: lastVehicleId,
       };
 
-      await axios.post('https://localhost/api/tracks', data).then(console.log('post'));
+      await axios.post('https://localhost/api/tracks', data);
 
       // Imprimir la ubicación para verificar
       // console.log('Ubicación obtenida:', location);
