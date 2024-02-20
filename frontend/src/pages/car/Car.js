@@ -62,8 +62,6 @@ function Car() {
 
       // Llamar a axios.post con los datos actualizados
       await axios.post(`${URL}/api/tracks`, data);
-      console.log(data.Location.coordinates[0])
-      console.log(data.Location.coordinates[1])
       const recentTracks = await axios.get(`${URL}/api/tracks/recent-within-radius`, {
         params: {
           lat: [data.Location.coordinates[0]],
