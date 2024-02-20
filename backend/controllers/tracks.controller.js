@@ -20,12 +20,6 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
     };
     console.log(clientLocation)
 
-
-    // Verifica que lat y lng sean números válidos
-    if (isNaN(clientLocation.lat) || isNaN(clientLocation.lng)) {
-        return res.status(400).send({ message: "Latitud y/o longitud inválidas." });
-    }
-
     // Convierte las coordenadas en un punto geográfico para la consulta
     const locationPoint = Sequelize.fn('ST_GeomFromText', `POINT(${clientLocation.lng} ${clientLocation.lat})`);
 
@@ -55,9 +49,6 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
         });
 
         console.log('Tracks encontrados:', recentTracks);
-        res.status(200).json(recentTracks).send({
-            message: "AAAAAAAAAAAAAAAAAAAAAAAAAA"
-        });
     } catch (error) {
         console.error('Error al buscar tracks recientes dentro del radio:', error);
         res.status(500).send({
