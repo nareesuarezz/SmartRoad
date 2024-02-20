@@ -52,7 +52,7 @@ async function subscribe(serviceWorkerReg, subscriptionName) {
 
 async function unregisterFromServiceWorker() {
     try {
-        const serviceWorkerReg = await navigator.serviceWorker.getRegistration('../sw.js');
+        const serviceWorkerReg = await navigator.serviceWorker.getRegistration('/sw.js');
         if (!serviceWorkerReg) return;
 
         const subscription = await serviceWorkerReg.pushManager.getSubscription();
