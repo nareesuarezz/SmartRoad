@@ -19,13 +19,12 @@ function Car() {
 
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
-  console.log(URL)
   const SOUND_API = `${URL}/api`;
 
   useEffect(() => {
     const audio = new Audio();
     setAudioElement(audio);
-
+  
     if (selectedSound) {
       audio.volume = 1.0; // Establece el volumen al máximo
       const soundUrl = `${SOUND_API}/sounds/${selectedSound}`; // Asume que selectedSound es el nombre del archivo sin la extensión
@@ -39,11 +38,13 @@ function Car() {
       };
     }
   }, [selectedSound]);
+  
+  
+
 
   // Location
   const addTrackGeo = async (lastVehicleId) => {
     try {
-      console.log("antes de trackGeo")
       const location = await trackGeo();
 
       const data = {
@@ -55,9 +56,33 @@ function Car() {
       };
 
       await axios.post('https://localhost/api/tracks', data).then(console.log('post'));
+      const data = {
+        Status: 'Stopped',
+        Speed: '0',
+        Extra: '',
+        Vehicle_UID: lastVehicleId,
+        Location: location, // Usar la ubicación obtenida de trackGeo aquí
+      };
+
+      // Imprimir la ubicación para verificar
+      // console.log('Ubicación obtenida:', location);
+
+      // Llamar a axios.post con los datos actualizados
+      await axios.post(`${URL}/api/tracks`, data);
+      console.log(data.Location.coordinates[0])
+      console.log(data.Location.coordinates[1])
+      const recentTracks = await axios.get(`${URL}/api/tracks/recent-within-radius`, {
+        params: {
+          lat: [data.Location.coordinates[0]],
+          lng: [data.Location.coordinates[1]]
+        }
+      })
+
+
+      console.log(recentTracks)
 
     } catch (err) {
-      console.error(err.response);
+      console.error(err);
     }
   };
 
@@ -262,5 +287,4 @@ function Car() {
     </>
   );
 }
-
 export default Car;

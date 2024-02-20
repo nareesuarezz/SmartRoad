@@ -63,8 +63,8 @@ const VehicleEdit = ({ getVehicles }) => {
                     Vehicle:
                     <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
                         <option value="">Select</option>
-                        <option value="Bike">Bike</option>
-                        <option value="Car">Car</option>
+                        <option value="bicycle">Bike</option>
+                        <option value="car">Car</option>
                     </select>
                 </label>
                 <button type="submit">Edit Vehicle</button>
