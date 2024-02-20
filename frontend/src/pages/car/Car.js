@@ -14,13 +14,11 @@ function Car() {
 
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
-  console.log(URL)
   const SOUND_API = `${URL}/api`;
 
   useEffect(() => {
     const audio = new Audio();
     setAudioElement(audio);
-  
     if (selectedSound) {
       audio.volume = 1.0; // Establece el volumen al máximo
       const soundUrl = `${SOUND_API}/sounds/${selectedSound}`; // Asume que selectedSound es el nombre del archivo sin la extensión
@@ -34,75 +32,81 @@ function Car() {
       };
     }
   }, [selectedSound]);
-  
-  
 
 
-    // Location
-    const addTrackGeo = async () => {
-        try {
-            // Obtener la ubicación utilizando trackGeo
-            const location = await trackGeo();
 
-            const response = await axios.get(`${URL}/api/vehicles`);
-            const vehicle = response.data;
-            const lastVehicleId = vehicle[vehicle.length - 1].UID;
 
-            const data = {
-                Latitude: '',
-                Longitude: '',
-                Status: 'Stopped',
-                Speed: '0',
-                Extra: '',
-                Vehicle_UID: lastVehicleId,
-                Location: location, // Usar la ubicación obtenida de trackGeo aquí
-            };
+  // Location
+  const addTrackGeo = async () => {
+    try {
+      // Obtener la ubicación utilizando trackGeo
+      const location = await trackGeo();
 
-            // Imprimir la ubicación para verificar
-            // console.log('Ubicación obtenida:', location);
+      const response = await axios.get(`${URL}/api/vehicles`);
+      const vehicle = response.data;
+      const lastVehicleId = vehicle[vehicle.length - 1].UID;
 
-            // Llamar a axios.post con los datos actualizados
-            await axios.post(`${URL}/api/tracks`, data);
+      const data = {
+        Status: 'Stopped',
+        Speed: '0',
+        Extra: '',
+        Vehicle_UID: lastVehicleId,
+        Location: location, // Usar la ubicación obtenida de trackGeo aquí
+      };
 
-        } catch (err) {
-            console.error(err.response);
+      // Imprimir la ubicación para verificar
+      // console.log('Ubicación obtenida:', location);
+
+      // Llamar a axios.post con los datos actualizados
+      await axios.post(`${URL}/api/tracks`, data);
+      console.log(data.Location.coordinates[0])
+      console.log(data.Location.coordinates[1])
+      const recentTracks = await axios.get(`${URL}/api/tracks/recent-within-radius`, {
+        params: {
+          lat: [data.Location.coordinates[0]],
+          lng: [data.Location.coordinates[1]]
         }
-    };
+      })
 
-    //Función para recoger la localización y devolverla
-    const trackGeo = () => {
-        return new Promise((resolve, reject) => {
-            try {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const location = {
-                        type: 'Point',
-                        coordinates: [position.coords.latitude, position.coords.longitude],
-                    };
-                    // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
-                    resolve(location);  //Devuelve la localización recogida
-                });
-            } catch (error) {
-                console.error(error);
-                reject(error);
-            }
+
+      console.log(recentTracks)
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  //Función para recoger la localización y devolverla
+  const trackGeo = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const location = {
+            type: 'Point',
+            coordinates: [position.coords.latitude, position.coords.longitude],
+          };
+          // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
+          resolve(location);  //Devuelve la localización recogida
         });
-    };
+      } catch (error) {
+        console.error(error);
+        reject(error);
+      }
+    });
+  };
 
-    useEffect(() => {
-        // Call the function here to start tracking
-        addTrackGeo();
-    }, 1); // Empty dependency array to run it only once
+  useEffect(() => {
+    const locationUpdateInterval = setInterval(() => {
+      // Call the trackAddGeo function every 5 seconds
+      addTrackGeo();
+    }, 5000);
 
-    useEffect(() => {
-        const locationUpdateInterval = setInterval(() => {
-            // Call the trackAddGeo function every 5 seconds
-            addTrackGeo();
-        }, 5000);
+    addTrackGeo();
 
-        return () => clearInterval(locationUpdateInterval);
-    }, []);
+    return () => clearInterval(locationUpdateInterval);
+  }, []);
 
-    //Notification
+  //Notification
   useEffect(() => {
     const notificationInterval = setInterval(() => {
       if (showModal) {

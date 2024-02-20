@@ -28,7 +28,6 @@ function Home() {
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-      debugger;
       localStorage.setItem('selectedSound', selectedSound);
       navigate(`/${vehicle}`, { state: { selectedSound } });
       if (position && Notification.permission === 'granted') {
