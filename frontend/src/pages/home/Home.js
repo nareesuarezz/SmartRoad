@@ -9,7 +9,6 @@ const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 function Home() {
-  console.log(URL)
   const [subscription, setSubscription] = useState(null);
   const [availableSounds, setAvailableSounds] = useState([]);
   const [selectedSound, setSelectedSound] = useState('');
