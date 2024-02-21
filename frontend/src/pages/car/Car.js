@@ -69,7 +69,7 @@ function Car() {
         }
       })
 
-
+      console.log(`tracks encontrados: ${recentTracks}`)
       console.log(recentTracks)
 
     } catch (err) {

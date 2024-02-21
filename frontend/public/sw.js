@@ -1,10 +1,11 @@
 self.addEventListener('push', function (event) {
-  const options = {
-    body: event.data.text(),
-  };
-  event.waitUntil(self.registration.showNotification('Notificación SmartRoad', options));
-});
+  // Parsea los datos de la notificación
+  const data = JSON.parse(event.data.text());
 
-self.addEventListener('notificationclick', function (event) {
-  event.notification.close();
+  const options = {
+    body: data.description,
+    image: data.image
+  };
+
+  event.waitUntil(self.registration.showNotification(data.title, options));
 });
