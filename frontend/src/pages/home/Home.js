@@ -5,6 +5,8 @@ import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import { useNavigate } from 'react-router-dom';
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 
 function Home() {
   const [subscription, setSubscription] = useState(null);
@@ -13,7 +15,7 @@ function Home() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    axios.get('http://localhost:8080/api/sounds')
+    axios.get(`${URL}/api/sounds`)
       .then(response => {
         setAvailableSounds(response.data);
         setSelectedSound(response.data[0].id);
@@ -25,7 +27,6 @@ function Home() {
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-      debugger;
       localStorage.setItem('selectedSound', selectedSound);
       navigate(`/${vehicle}`, { state: { selectedSound } });
       if (position && Notification.permission === 'granted') {
@@ -85,7 +86,7 @@ function Home() {
 
   const createVehicle = async (vehicle) => {
     try {
-      const response = await axios.post(`http://localhost:8080/api/vehicles`, {
+      const response = await axios.post(`${URL}/api/vehicles`, {
         Vehicle: vehicle,
       });
 
@@ -103,9 +104,9 @@ function Home() {
       coordinates: [parseFloat(coords.latitude), parseFloat(coords.longitude)],
     };
     try {
-      const response = await axios.post(`http://localhost:8080/api/tracks`, {
+      const response = await axios.post(`${URL}/api/tracks`, {
         Location: location,
-        Status: 'stopped',
+        Status: 'Moving',
         Speed: 0,
         Extra: null,
         Vehicle_UID: vehicleId,

@@ -2,10 +2,8 @@ import React, { useEffect, useState } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 import './NotificationTest.css'
-const notificationSound = localStorage.getItem("selectedSound");
 
-const SOCKET_SERVER_URL = "http://localhost:8080";
-
+const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
 const NotificationsComponent = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentNotification, setCurrentNotification] = useState('');
@@ -32,9 +30,9 @@ const NotificationsComponent = () => {
   }, []);
 
   const playNotificationSound = () => {
-    const soundUrl = '/sounds/lego.mp3';
-    const audio = new Audio(soundUrl);
-    audio.volume = 0.4; // Establece el volumen al máximo
+    const notificationSound = '/sounds/lego.mp3';
+    const audio = new Audio(notificationSound);
+    audio.volume = 0.4;
     audio.play();
   };
   
@@ -42,7 +40,7 @@ const NotificationsComponent = () => {
   const sendNotification = async () => {
     const qs = require('qs');
     let data = qs.stringify({
-      'message': 'asdjnfksajdnflkjn'
+      'message': 'CAREFULL, ACCIDENT NEAR UWU'
     });
 
     await axios.post(`${SOCKET_SERVER_URL}/send-notification`, data)

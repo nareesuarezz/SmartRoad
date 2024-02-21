@@ -199,6 +199,7 @@
         options
       );
     } catch (error) {
-      throw (error);
+      console.error('Error sending notification:', error);
     }
+    
   }

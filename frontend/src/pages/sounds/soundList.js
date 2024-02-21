@@ -4,6 +4,8 @@ import { Link } from 'react-router-dom';
 import './trackList.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 
 const SoundList = () => {
   const [sounds, setSounds] = useState([]);
@@ -14,7 +16,7 @@ const SoundList = () => {
 
   const getSounds = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/sounds/', {});
+      const response = await axios.get(`${URL}/api/sounds/`, {});
       console.log(response.data); 
       setSounds(response.data);
     } catch (error) {
@@ -24,7 +26,7 @@ const SoundList = () => {
 
   const deleteSound = async (id) => {
     try {
-      await axios.delete(`http://localhost:8080/api/sounds/${id}`);
+      await axios.delete(`${URL}/api/sounds/${id}`);
       getSounds();
     } catch (error) {
       console.error(`Error deleting sound with id=${id}:`, error);
@@ -60,7 +62,7 @@ const SoundList = () => {
               <td>
                 {sound.id && (
                   <audio controls>
-                    <source src={`http://localhost:8080/api/sounds/${sound.id}`} type="audio/mp3" />
+                    <source src={`${URL}/api/sounds/${sound.id}`} type="audio/mp3" />
                     Your browser does not support the audio tag.
                   </audio>
                 )}

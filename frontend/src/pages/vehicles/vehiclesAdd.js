@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 const VehicleAdd = ({ getVehicles }) => {
   const [formData, setFormData] = useState({
     Vehicle: '',
@@ -23,7 +25,7 @@ const VehicleAdd = ({ getVehicles }) => {
 
 
     try {
-      await axios.post('http://localhost:8080/api/vehicles', {
+      await axios.post(`${URL}/api/vehicles`, {
         ...formData,
       });
       goBack();
@@ -40,8 +42,8 @@ const VehicleAdd = ({ getVehicles }) => {
           Vehicle:
           <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
             <option value="">Select</option>
-            <option value="Car">Car</option>
-            <option value="Bike">Bike</option>
+            <option value="car">Car</option>
+            <option value="bicycle">Bike</option>
           </select>
         </label>
       <button type="submit" className="submit">Add Vehicle</button>

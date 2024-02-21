@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
 const AdminAdd = ({ getAdmins }) => {
   const [formData, setFormData] = useState({
     Username: '',
@@ -15,21 +17,27 @@ const AdminAdd = ({ getAdmins }) => {
     window.location.href = "/admin-list";
   };
 
-  const handleChange = (e) => {
-    if (e.target.name === 'Image') {
+const handleChange = (e) => {
+  if (e.target.name === 'Image') {
+    const file = e.target.files[0];
+
+    if (file) {
       setFormData({
         ...formData,
-        Image: e.target.files[0],
+        Image: file,
       });
 
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
-    } else {
-      setFormData({
-        ...formData,
-        [e.target.name]: e.target.value,
-      });
+      const imageUrl = window.URL.createObjectURL(file);
+      setPreviewImage(imageUrl);
     }
-  };
+  } else {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  }
+};
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,7 +64,7 @@ const AdminAdd = ({ getAdmins }) => {
       formDataForUpload.append('Password', formData.Password);
       formDataForUpload.append('filename', formData.Image);
 
-      await axios.post('http://localhost:8080/api/admins', formDataForUpload);
+      await axios.post(`${URL}/api/admins`, formDataForUpload);
       goBack();
     } catch (error) {
       console.error('Error adding admin:', error);
