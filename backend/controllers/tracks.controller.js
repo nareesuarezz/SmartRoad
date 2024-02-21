@@ -12,13 +12,10 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
     // Calcula el tiempo mínimo (hace X minutos desde ahora)
     const timeAgo = new Date(new Date() - MINUTES_AGO * 60000);
 
-
-
     const clientLocation = {
         lat: parseFloat(req.query.lat), // Asume que recibes la latitud como query param
         lng: parseFloat(req.query.lng), // Asume que recibes la longitud como query param
     };
-
 
     // Convierte las coordenadas en un punto geográfico para la consulta
     const locationPoint = Sequelize.fn('ST_GeomFromText', `POINT(${clientLocation.lng} ${clientLocation.lat})`);
@@ -35,15 +32,20 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
             attributes: {
                 include: [[distance, 'distance']]
             },
+            include: [{
+                model: db.Vehicle,
+                as: 'Vehicles', // Coincide con el alias utilizado en la definición de la asociación
+                where: { Vehicle: 'bicycle' },
+                required: true
+            }],
             where: {
                 Date: {
                     [Op.gt]: timeAgo // Mayor que el tiempo calculado para 'hace X minutos'
                 },
-                // Asegúrate de tener la columna Location correctamente configurada para utilizar funciones geoespaciales
                 [Op.and]: Sequelize.where(distance, { [Op.lte]: RADIUS_IN_METERS }) // Menor o igual al radio especificado
             },
-            order: Sequelize.col('distance'), // Ordena los resultados por distancia
-            logging: console.log // Opcional: para ver la consulta generada
+            order: [[Sequelize.col('distance')]], // Ordena los resultados por distancia
+            logging: console.log
         });
 
         console.log(recentTracks)
