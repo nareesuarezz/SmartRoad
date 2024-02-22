@@ -152,7 +152,7 @@ if (USING_HTTPS) {
 const io = socketIo(SERVER, {
   cors: {
     origin: "*", // Adjust according to your needs
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST", "PUT", "DELETE"]
   }
 });
 

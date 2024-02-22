@@ -27,8 +27,6 @@ function Bicycle() {
             const lastVehicleId = vehicle[vehicle.length - 1].UID;
 
             const data = {
-                Latitude: '',
-                Longitude: '',
                 Status: 'Stopped',
                 Speed: '0',
                 Extra: '',
@@ -38,6 +36,8 @@ function Bicycle() {
 
             // Llamar a axios.post con los datos actualizados
             await axios.post(`${API}/api/tracks`, data);
+
+            console.log(data.Location.coordinates)
 
         } catch (err) {
             console.error(err.response);

@@ -6,7 +6,7 @@ const Sequelize = db.Sequelize;
 
 // Variables para ajustes de desarrollo
 const MINUTES_AGO = 10; // Encuentra tracks subidos en los últimos 10 minutos
-const RADIUS_IN_METERS = 10000; // Encuentra tracks dentro de un radio de 500 metros
+const RADIUS_IN_METERS = 500; // Encuentra tracks dentro de un radio de 500 metros
 
 exports.findRecentTracksWithinRadius = async (req, res) => {
     // Calcula el tiempo mínimo (hace X minutos desde ahora)
@@ -18,7 +18,7 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
     };
 
     // Convierte las coordenadas en un punto geográfico para la consulta
-    const locationPoint = Sequelize.fn('ST_GeomFromText', `POINT(${clientLocation.lng} ${clientLocation.lat})`);
+    const locationPoint = Sequelize.fn('ST_GeomFromText', `POINT(${clientLocation.lat} ${clientLocation.lng})`);
 
     // Calcula la distancia desde la ubicación del cliente hasta la ubicación de cada track
     const distance = Sequelize.fn(
@@ -26,6 +26,8 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
         Sequelize.col('Location'),
         locationPoint
     );
+
+    console.log("SOCORROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",distance.args)
 
     try {
         const recentTracks = await db.Track.findAll({
@@ -48,7 +50,7 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
             logging: console.log
         });
 
-        console.log(recentTracks)
+        console.log("LKFHBJDFHNKSJDHn", recentTracks)
         res.status(200).send({
             recentTracks: recentTracks
         })
