@@ -22,7 +22,6 @@ function Car() {
 
   // Agrega un estado para el elemento de audio
   const [audioElement, setAudioElement] = useState(null);
-  console.log(URL)
   const SOUND_API = `${URL}/api`;
 
   useEffect(() => {
@@ -34,7 +33,6 @@ function Car() {
       const soundUrl = `${SOUND_API}/sounds/${selectedSound}`; // Asume que selectedSound es el nombre del archivo sin la extensión
       audio.src = soundUrl;
       audio.oncanplay = () => {
-        console.log('Sound loaded successfully');
         audio.play();
       };
       audio.onerror = () => {
@@ -43,10 +41,12 @@ function Car() {
     }
   }, [selectedSound]);
 
+
+
+
   // Location
   const addTrackGeo = async (lastVehicleId) => {
     try {
-      console.log("antes de trackGeo")
       const location = await trackGeo();
 
       console.log(lastVehicleId)
@@ -58,10 +58,24 @@ function Car() {
         Vehicle_UID: lastVehicleId,
       };
 
-      await axios.post('https://localhost/api/tracks', data).then(console.log('post'));
+      await axios.post('https://localhost/api/tracks', data);
+
+      // Imprimir la ubicación para verificar
+      // console.log('Ubicación obtenida:', location);
+
+      // Llamar a axios.post con los datos actualizados
+      await axios.post(`${URL}/api/tracks`, data);
+      const recentTracks = await axios.get(`${URL}/api/tracks/recent-within-radius`, {
+        params: {
+          lat: [data.Location.coordinates[0]],
+          lng: [data.Location.coordinates[1]]
+        }
+      })
+
+      console.log(recentTracks.data.recentTracks)
 
     } catch (err) {
-      console.error(err.response);
+      console.error(err);
     }
   };
 
@@ -138,7 +152,6 @@ function Car() {
 
     const locationUpdateInterval = setInterval(() => {
       if (lastVehicleId) {
-        console.log("Cada 5 segundos tiburcio");
         postsT++;
         console.log(postsT);
         addTrackGeo(lastVehicleId);
@@ -149,29 +162,28 @@ function Car() {
   }, [lastVehicleId]); // Agregar lastVehicleId como dependencia
 
   //Notification
-  useEffect(() => {
-    const notificationInterval = setInterval(() => {
-      if (showModal) {
-        setShowModal(false);
-        // Reproduce el sonido cuando se muestra el modal
-        if (audioElement) {
-          console.log('Playing sound');
-        }
-      } else {
-        setShowModal(true);
-        sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
-      }
-    }, 10000);
+  // useEffect(() => {
+  //   const notificationInterval = setInterval(() => {
+  //     if (showModal) {
+  //       setShowModal(false);
+  //       // Reproduce el sonido cuando se muestra el modal
+  //       if (audioElement) {
+  //       }
+  //     } else {
+  //       setShowModal(true);
+  //       sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
+  //     }
+  //   }, 10000);
 
-    return () => {
-      clearInterval(notificationInterval);
-      // Detén la reproducción del sonido al desmontar el componente
-      if (audioElement) {
-        audioElement.pause();
-        audioElement.currentTime = 0;
-      }
-    };
-  }, [showModal, audioElement]);
+  //   return () => {
+  //     clearInterval(notificationInterval);
+  //     // Detén la reproducción del sonido al desmontar el componente
+  //     if (audioElement) {
+  //       audioElement.pause();
+  //       audioElement.currentTime = 0;
+  //     }
+  //   };
+  // }, [showModal, audioElement]);
 
   const sendNotification = async (subscriptionName, notificationMessage) => {
     try {
@@ -212,28 +224,24 @@ function Car() {
   }, []);
 
   useEffect(() => {
-    return () => {
-      const handleUnmount = async () => {
-        try {
-          const serviceWorkerReg = await regSw();
-          if (subscription) {
-            console.log('Unsubscribing from:', subscription.endpoint);
-            await axios.post(`${API}/deleteByEndpoint`, { endpoint: subscription.endpoint });
-            const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
-            if (existingSubscription) {
-              await existingSubscription.unsubscribe();
-              console.log('Unsubscription successful');
-            }
-            setSubscription(null);
-          }
-        } catch (error) {
-          console.error('Error during unsubscription:', error);
+    // Esta función se llamará cuando el componente se desmonte
+    return async () => {
+      try {
+        const serviceWorkerReg = await regSw();
+        const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
+        if (existingSubscription) {
+          console.log('Unsubscribing from:', existingSubscription.endpoint);
+          await axios.post(`${API}/deleteByEndpoint`, { endpoint: existingSubscription.endpoint });
+          await existingSubscription.unsubscribe();
+          console.log('Unsubscription successful');
+          // Aquí asumimos que `setSubscription` actualiza el estado del componente, si es aplicable
+          setSubscription(null);
         }
-      };
-
-      handleUnmount();
+      } catch (error) {
+        console.error('Error during unsubscription:', error);
+      }
     };
-  }, [subscription]);
+  }, []);
 
   return (
     <>
@@ -268,5 +276,4 @@ function Car() {
     </>
   );
 }
-
 export default Car;

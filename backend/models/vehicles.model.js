@@ -6,7 +6,7 @@ module.exports = (sequelize, Sequelize) => {
         primaryKey: true
       },
       Vehicle: {
-        type: Sequelize.STRING
+        type: Sequelize.ENUM('car', 'bicycle')
       }
     });
   

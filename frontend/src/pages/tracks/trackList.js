@@ -10,15 +10,15 @@ import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
-const customIcon = new L.Icon({
-  iconUrl: process.env.PUBLIC_URL + '/images/mark.png',
+const carIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/car.png',
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
 });
 
-const lastTrackIcon = new L.Icon({
-  iconUrl: process.env.PUBLIC_URL + '/images/last.png',
+const bicycleIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/bicycle.png',
   iconSize: [32, 32],
   iconAnchor: [16, 32],
   popupAnchor: [0, -32],
@@ -45,11 +45,23 @@ const TrackList = () => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-      setTracks(response.data);
+
+      // Asegúrate de que cada track tenga la información del vehículo
+      const tracksWithVehicleInfo = await Promise.all(response.data.map(async (track) => {
+        const vehicleResponse = await axios.get(`${URL}/api/vehicles/${track.Vehicle_UID}`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        return { ...track, vehicleType: vehicleResponse.data.Vehicle };
+      }));
+
+      setTracks(tracksWithVehicleInfo);
     } catch (error) {
       console.error('Error fetching tracks:', error);
     }
   };
+
 
   const groupTracksByVehicle = () => {
     const groupedTracks = {};
@@ -74,19 +86,23 @@ const TrackList = () => {
       const trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
       return (
         <React.Fragment key={index}>
-          {vehicleTracks.map((track, trackIndex) => (
-            <Marker
-              key={track.ID}
-              position={track.Location.coordinates.reverse()}
-              icon={trackIndex === vehicleTracks.length - 1 ? lastTrackIcon : customIcon}
-            >
-              <Popup>
-                <p>{`Track ID: ${track.ID}`}</p>
-                <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
-                <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
-              </Popup>
-            </Marker>
-          ))}
+          {vehicleTracks.map((track, trackIndex) => {
+            const icon = track.vehicleType === 'car' ? carIcon : bicycleIcon;
+            return (
+              <Marker
+                key={track.ID}
+                position={track.Location.coordinates.reverse()}
+                icon={icon}
+              >
+                <Popup>
+                  <p>{`Track ID: ${track.ID}`}</p>
+                  <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
+                  <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
+                </Popup>
+              </Marker>
+            );
+          })}
+
           <Polyline positions={trackCoordinates} color="blue" />
         </React.Fragment>
       );

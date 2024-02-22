@@ -49,8 +49,8 @@ const VehicleAdd = ({ getVehicles }) => {
           {t('Vehicle')}:
           <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
             <option value="">{t('Select')}</option>
-            <option value="Car"></option>
-            <option value="Bike">{t('Bike')}</option>
+            <option value="car">{t('Car')}</option>
+            <option value="bicycle">{t('Bike')}</option>
           </select>
         </label>
         <button type="submit" className="submit">{t('Add Vehicle')}</button>
