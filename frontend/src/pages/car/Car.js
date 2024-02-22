@@ -158,28 +158,28 @@ function Car() {
   }, [lastVehicleId]); // Agregar lastVehicleId como dependencia
 
   //Notification
-  // useEffect(() => {
-  //   const notificationInterval = setInterval(() => {
-  //     if (showModal) {
-  //       setShowModal(false);
-  //       // Reproduce el sonido cuando se muestra el modal
-  //       if (audioElement) {
-  //       }
-  //     } else {
-  //       setShowModal(true);
-  //       sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
-  //     }
-  //   }, 10000);
+  useEffect(() => {
+    const notificationInterval = setInterval(() => {
+      if (showModal) {
+        setShowModal(false);
+        // Reproduce el sonido cuando se muestra el modal
+        if (audioElement) { 
+        }
+      } else {
+        setShowModal(true);
+        sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
+      }
+    }, 10000);
 
-  //   return () => {
-  //     clearInterval(notificationInterval);
-  //     // Detén la reproducción del sonido al desmontar el componente
-  //     if (audioElement) {
-  //       audioElement.pause();
-  //       audioElement.currentTime = 0;
-  //     }
-  //   };
-  // }, [showModal, audioElement]);
+    return () => {
+      clearInterval(notificationInterval);
+      // Detén la reproducción del sonido al desmontar el componente
+      if (audioElement) {
+        audioElement.pause();
+        audioElement.currentTime = 0;
+      }
+    };
+  }, [showModal, audioElement]);
 
   const sendNotification = async (subscriptionName, notificationMessage) => {
     try {
