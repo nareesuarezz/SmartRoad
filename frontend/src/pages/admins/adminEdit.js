@@ -2,21 +2,26 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const AdminEdit = ({ getAdmins }) => {
+
+  const { t } = useTranslation();
+
   const navigate = useNavigate();
   const { id } = useParams();
 
   const [formData, setFormData] = useState({
     Username: '',
-    Password: '',  
+    Password: '',
     Image: null,
   });
 
   const [previewImage, setPreviewImage] = useState('');
-  const [adminInfo, setAdminInfo] = useState(null); 
+  const [adminInfo, setAdminInfo] = useState(null);
 
   const goBack = () => {
     navigate('/admin-list');
@@ -30,12 +35,12 @@ const AdminEdit = ({ getAdmins }) => {
 
         setFormData({
           Username: adminData.Username,
-          Password: '',  
+          Password: '',
           Image: null,
         });
 
         setPreviewImage(`${URL}/uploads/${adminData.filename}`);
-        setAdminInfo(adminData); 
+        setAdminInfo(adminData);
       } catch (error) {
         console.error('Error fetching admin data:', error);
       }
@@ -47,13 +52,13 @@ const AdminEdit = ({ getAdmins }) => {
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
       const file = e.target.files[0];
-  
+
       if (file) {
         setFormData({
           ...formData,
           Image: file,
         });
-  
+
         const imageUrl = window.URL.createObjectURL(file);
         setPreviewImage(imageUrl);
       }
@@ -64,7 +69,7 @@ const AdminEdit = ({ getAdmins }) => {
       });
     }
   };
-  
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -96,17 +101,20 @@ const AdminEdit = ({ getAdmins }) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <form onSubmit={handleSubmit} encType="multipart/form-data">
         <label>
-          Username:
+          {t('Username')}:
           <input type="text" name="Username" value={formData.Username} onChange={handleChange} />
         </label>
         <label>
-          Password:
+          {t('Password')}:
           <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
         </label>
         <label>
-          Image:
+          {t('Image')}:
           <input type="file" name="Image" onChange={handleChange} accept="image/*" />
           {previewImage && (
             <div className="image-preview">
@@ -114,7 +122,7 @@ const AdminEdit = ({ getAdmins }) => {
             </div>
           )}
         </label>
-        <button type="submit">Edit Admin</button>
+        <button type="submit">{t('Edit Admin')}</button>
       </form>
     </>
   );

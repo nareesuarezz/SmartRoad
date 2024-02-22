@@ -4,10 +4,14 @@ import { Link } from 'react-router-dom';
 import './trackList.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 const SoundList = () => {
+  const { t } = useTranslation();
+
   const [sounds, setSounds] = useState([]);
 
   useEffect(() => {
@@ -17,7 +21,7 @@ const SoundList = () => {
   const getSounds = async () => {
     try {
       const response = await axios.get(`${URL}/api/sounds/`, {});
-      console.log(response.data); 
+      console.log(response.data);
       setSounds(response.data);
     } catch (error) {
       console.error('Error fetching sounds:', error);
@@ -41,17 +45,20 @@ const SoundList = () => {
     <div>
       <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <Link to="/sound-add" className="add">
-        Add New Sound
+        {t('Add New Sound')}
       </Link>
 
       <table className="table is-striped is-fullwidth">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Sound</th>
-            <th>Player</th>
-            <th>Action</th>
+            <th>{t('Sound')}</th>
+            <th>{t('Player')}</th>
+            <th>{t('Action')}</th>
           </tr>
         </thead>
         <tbody>
@@ -63,16 +70,16 @@ const SoundList = () => {
                 {sound.id && (
                   <audio controls>
                     <source src={`${URL}/api/sounds/${sound.id}`} type="audio/mp3" />
-                    Your browser does not support the audio tag.
+                    {t('Your browser does not support the audio tag.')}
                   </audio>
                 )}
               </td>
               <td>
                 <Link to={`/sound-edit/${sound.id}`} className="edit">
-                  Edit
+                  {t('Edit')}
                 </Link>
                 <Link to="#" onClick={() => deleteSound(sound.id)} className="delete">
-                  Delete
+                  {t('Delete')}
                 </Link>
               </td>
             </tr>

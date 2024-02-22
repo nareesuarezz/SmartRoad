@@ -3,12 +3,16 @@ import './Login.css';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import AuthService from '../../services/authService';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+
+  const { t } = useTranslation();
 
   const goTracks = async () => {
     try {
@@ -31,14 +35,17 @@ const Login = () => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <div className="container-wrapper">
         <div className="container">
           <div className="left">
-            <h2 className="heading">Login</h2>
+            <h2 className="heading">{t('Login')}</h2>
           </div>
           <form className="form">
             <div className="formGroup">
-              <label htmlFor="username">Username:</label>
+              <label htmlFor="username">{t('Username')}:</label>
               <input
                 type="text"
                 id="username"
@@ -47,7 +54,7 @@ const Login = () => {
               />
             </div>
             <div className="formGroup">
-              <label htmlFor="password">Password:</label>
+              <label htmlFor="password">{t('Password')}:</label>
               <div className="password-input">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -61,11 +68,11 @@ const Login = () => {
               </div>
             </div>
             <div className="formGroup forgot-password">
-              <a href="#">Did you forget your password?</a>
+              <a href="#">{t('Did you forget your password?')}</a>
             </div>
             {error && <div className="error-message">{error}</div>}
             <button type="button" onClick={goTracks}>
-              Login
+              {t('Login')}
             </button>
           </form>
         </div>

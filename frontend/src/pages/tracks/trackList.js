@@ -7,6 +7,8 @@ import 'leaflet/dist/leaflet.css'; // Importa los estilos de Leaflet
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const customIcon = new L.Icon({
   iconUrl: process.env.PUBLIC_URL + '/images/mark.png',
@@ -25,6 +27,8 @@ const lastTrackIcon = new L.Icon({
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackList = () => {
+  const { t } = useTranslation();
+
   const [tracks, setTracks] = useState([]);
   const [adminId, setAdminId] = useState(null);
   const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]); // Coordenadas de Gran Canaria
@@ -93,8 +97,11 @@ const TrackList = () => {
     <div>
       <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <Link to="/track-add" className="add">
-        Add track
+        {t('Add Track')}
       </Link>
 
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>

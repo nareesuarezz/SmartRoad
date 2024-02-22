@@ -3,10 +3,14 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const VehicleList = () => {
+  const { t } = useTranslation();
+
   const [vehicles, setVehicles] = useState([]);
 
   useEffect(() => {
@@ -37,18 +41,21 @@ const VehicleList = () => {
 
   return (
     <div>
-      <Header/>
+      <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <Link to="/vehicle-add" className="add">
-        Add New Vehicle
+        {t('Add New Vehicle')}
       </Link>
 
       <table className="table is-striped is-fullwidth">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Vehicle</th>
-            <th>Actions</th>
+            <th>{t('Vehicle')}</th>
+            <th>{t('Actions')}</th>
           </tr>
         </thead>
         <tbody>
@@ -58,10 +65,10 @@ const VehicleList = () => {
               <td>{vehicle.Vehicle}</td>
               <td>
                 <Link to={`/vehicle-edit/${vehicle.UID}`} className="edit">
-                  Edit
+                  {t('Edit')}
                 </Link>
                 <Link to="#" onClick={() => deleteVehicle(vehicle.UID)} className="delete">
-                  Delete
+                  {t('Delete')}
                 </Link>
               </td>
             </tr>

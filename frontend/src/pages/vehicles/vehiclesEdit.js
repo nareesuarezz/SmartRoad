@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const VehicleEdit = ({ getVehicles }) => {
+    const { t } = useTranslation();
+
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -58,16 +62,19 @@ const VehicleEdit = ({ getVehicles }) => {
     return (
         <>
             <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+            <div>
+                <LanguageSwitcher />
+            </div>
             <form onSubmit={handleSubmit}>
                 <label>
-                    Vehicle:
+                    {t('Vehicle')}:
                     <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
-                        <option value="">Select</option>
-                        <option value="Bike">Bike</option>
-                        <option value="Car">Car</option>
+                        <option value="">{t('Select')}</option>
+                        <option value="Bike">{t('Bike')}</option>
+                        <option value="Car">{t('Car')}</option>
                     </select>
                 </label>
-                <button type="submit">Edit Vehicle</button>
+                <button type="submit">{t('Edit Vehicle')}</button>
             </form>
         </>
     );

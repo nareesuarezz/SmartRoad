@@ -3,10 +3,14 @@ import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import './trackAdd.css';
 import AuthService from '../../services/authService';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackAdd = ({ getTracks }) => {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     Latitude: '',
     Longitude: '',
@@ -85,42 +89,45 @@ const TrackAdd = ({ getTracks }) => {
   }
 
   useEffect(() => {
-   
+
   }, []);
 
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <form onSubmit={handleSubmit}>
         <label>
-          Latitude:
+          {t('Latitude')}:
           <input type="text" name="Latitude" value={formData.Latitude} onChange={(e) => handleLocationChange('Latitude', e.target.value)} />
         </label>
         <label>
-          Longitude:
+          {t('Longitude')}:
           <input type="text" name="Longitude" value={formData.Longitude} onChange={(e) => handleLocationChange('Longitude', e.target.value)} />
         </label>
         <label>
-          Status:
+          {t('Status')}
           <select name="Status" value={formData.Status} onChange={handleChange}>
-            <option value="select">Select</option>
-            <option value="stopped">Stopped</option>
-            <option value="moving">Moving</option>
+            <option value="select">{t('Select')}</option>
+            <option value="stopped">{t('Stopped')}</option>
+            <option value="moving">{t('Moving')}</option>
           </select>
         </label>
         <label>
-          Speed:
+          {t('Speed')}:
           <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} disabled={formData.Status === 'stopped'} />
         </label>
         <label>
-          Extra:
+          {t('Extra')}:
           <input type="text" name="Extra" value={formData.Extra} onChange={handleChange} />
         </label>
         <label>
-          Vehicle UID:
+          {t('Vehicle_UID')}:
           <input type="text" name="Vehicle_UID" value={formData.Vehicle_UID} onChange={handleChange} />
         </label>
-        <button type="submit">Add Track</button>
+        <button type="submit">{t('Add Track')}</button>
       </form>
     </>
   );

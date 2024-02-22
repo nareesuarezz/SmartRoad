@@ -4,8 +4,11 @@ import './Car.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 function Car() {
+  const { t } = useTranslation();
   const API = process.env.REACT_APP_API_URL;
   const URL = process.env.REACT_APP_LOCALHOST_URL;
   const [showModal, setShowModal] = useState(false);
@@ -237,26 +240,28 @@ function Car() {
       <div className='arrow' onClick={() => goBack()}>
         <ArrowLeftOutlined />
       </div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <div className='car-title'>
-        <h1>SmartRoad</h1>
+        <h1>{t('SmartRoad')}</h1>
       </div>
       <div className='logged'>
-        <h2>You are now logged as a...</h2>
+        <h2>{t('You are now logged as a...')}</h2>
       </div>
 
       <div className='car-container'>
         <div className='vehicle-box car-box'>
-          <img src={logoCar} alt='Logo de Coche' />
+          <img src={logoCar} alt={t('Logo de Coche')} />
         </div>
-        <p className='car'>Car</p>
+        <p className='car'>{t('Car')}</p>
 
-        <h3 className='warn'>Now you will be warned in case that a bike passes near you.</h3>
+        <h3 className='warn'>{t('Now you will be warned in case that a bike passes near you.')}</h3>
       </div>
-
       {showModal && (
         <div className='modal-overlay'>
           <div className='modal'>
-            <p>WARNING: THERE IS A BICYCLE NEAR YOU</p>
+            <p>{t('WARNING: THERE IS A BICYCLE NEAR YOU')}</p>
           </div>
         </div>
       )}
