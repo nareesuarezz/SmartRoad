@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const AdminAdd = ({ getAdmins }) => {
+
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     Username: '',
     Password: '',
@@ -17,26 +22,26 @@ const AdminAdd = ({ getAdmins }) => {
     window.location.href = "/admin-list";
   };
 
-const handleChange = (e) => {
-  if (e.target.name === 'Image') {
-    const file = e.target.files[0];
+  const handleChange = (e) => {
+    if (e.target.name === 'Image') {
+      const file = e.target.files[0];
 
-    if (file) {
+      if (file) {
+        setFormData({
+          ...formData,
+          Image: file,
+        });
+
+        const imageUrl = window.URL.createObjectURL(file);
+        setPreviewImage(imageUrl);
+      }
+    } else {
       setFormData({
         ...formData,
-        Image: file,
+        [e.target.name]: e.target.value,
       });
-
-      const imageUrl = window.URL.createObjectURL(file);
-      setPreviewImage(imageUrl);
     }
-  } else {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
-  }
-};
+  };
 
 
   const handleSubmit = async (e) => {
@@ -74,17 +79,20 @@ const handleChange = (e) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <form onSubmit={handleSubmit}>
         <label>
-          Username:
+          {t('Username')}:
           <input type="text" name="Username" value={formData.Username} onChange={handleChange} />
         </label>
         <label>
-          Password:
+          {t('Password')}:
           <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
         </label>
         <label>
-          Image:
+          {t('Image')}:
           <input type="file" name="Image" onChange={handleChange} accept="image/*" />
           {previewImage && (
             <div className="image-preview">
@@ -92,7 +100,7 @@ const handleChange = (e) => {
             </div>
           )}
         </label>
-        <button type="submit">Add Admin</button>
+        <button type="submit">{t('Add Admin')}</button>
       </form>
     </>
   );

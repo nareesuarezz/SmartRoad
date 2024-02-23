@@ -2,10 +2,14 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 const SoundEdit = ({ getSounds }) => {
+    const { t } = useTranslation();
+
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -82,12 +86,15 @@ const SoundEdit = ({ getSounds }) => {
     return (
         <>
             <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+            <div>
+                <LanguageSwitcher />
+            </div>
             <form onSubmit={handleSubmit} encType="multipart/form-data">
                 <label>
-                    Sound:
+                    {t('Sound')}:
                     <input type="file" name="Sound" onChange={handleChange} accept="audio/*" />
                 </label>
-                <button type="submit">Edit Sound</button>
+                <button type="submit">{t('Edit Sound')}</button>
             </form>
         </>
     );

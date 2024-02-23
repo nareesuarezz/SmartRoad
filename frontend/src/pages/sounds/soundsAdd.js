@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 const SoundAdd = ({ getAdmins }) => {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     Sound: null,
   });
-
 
   const goBack = () => {
     window.location.href = "/sound-list";
@@ -39,7 +42,7 @@ const SoundAdd = ({ getAdmins }) => {
 
     try {
       const formDataForUpload = new FormData();
-      formDataForUpload.append('filename', formData.Sound); 
+      formDataForUpload.append('filename', formData.Sound);
 
       await axios.post(`${URL}/api/sounds`, formDataForUpload);
       goBack();
@@ -52,12 +55,15 @@ const SoundAdd = ({ getAdmins }) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <form onSubmit={handleSubmit}>
         <label>
-          Sound:
+          {t('Sound')}:
           <input type="file" name="Sound" onChange={handleChange} accept="audio/*" />
         </label>
-        <button type="submit">Add Sound</button>
+        <button type="submit">{t('Add Sound')}</button>
       </form>
     </>
   );

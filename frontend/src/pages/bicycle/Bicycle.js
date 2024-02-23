@@ -5,8 +5,11 @@ import logoBicycle from '../../img/bike.png';
 import './Bicycle.css'
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 function Bicycle() {
+    const { t } = useTranslation();
 
     const API = process.env.REACT_APP_LOCALHOST_URL;
 
@@ -19,23 +22,19 @@ function Bicycle() {
     //Location
     const addTrackGeo = async () => {
         try {
-            // Obtener la ubicación utilizando trackGeo
+            console.log("antes de trackGeo")
             const location = await trackGeo();
 
-            const response = await axios.get(`${API}/api/vehicles`);
-            const vehicle = response.data;
-            const lastVehicleId = vehicle[vehicle.length - 1].UID;
-
+            console.log(lastVehicleId)
             const data = {
+                Location: location,
                 Status: 'Stopped',
                 Speed: '0',
-                Extra: '',
+                Extra: 'coche',
                 Vehicle_UID: lastVehicleId,
-                Location: location, // Usar la ubicación obtenida de trackGeo aquí
             };
 
-            // Llamar a axios.post con los datos actualizados
-            await axios.post(`${API}/api/tracks`, data);
+            await axios.post('https://localhost/api/tracks', data);
 
             console.log(data.Location.coordinates)
 
@@ -129,26 +128,30 @@ function Bicycle() {
     const goBack = () => {
         window.location.href = "/home";
     }
+
     return (
         <>
             <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+            <div>
+                <LanguageSwitcher />
+            </div>
             <div className="bike-title">
-                <h1>SmartRoad</h1>
+                <h1>{t('SmartRoad')}</h1>
             </div>
             <div className="logged">
-                <h2>You are now logged as a...</h2>
+                <h2>{t('You are now logged as a...')}</h2>
             </div>
 
             <div className="bicycle-container">
                 <div className="vehicle-box bicycle-box">
-                    <img src={logoBicycle} alt="Logo de bicicleta" />
+                    <img src={logoBicycle} alt={t('Logo de bicicleta')} />
                 </div>
-                <p className='bicycle'>Bicycle</p>
+                <p className='bicycle'>{t('Bicycle')}</p>
 
-                <h3 className='warn'>Now every car user will be warned in case that they are near you.</h3>
+                <h3 className='warn'>{t('Now every car user will be warned in case that they are near you.')}</h3>
             </div>
         </>
-    )
+    );
 }
 
 export default Bicycle;

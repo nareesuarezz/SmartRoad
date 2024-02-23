@@ -5,10 +5,13 @@ import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 function Home() {
+  const { t } = useTranslation();
   const [subscription, setSubscription] = useState(null);
   const [availableSounds, setAvailableSounds] = useState([]);
   const [selectedSound, setSelectedSound] = useState('');
@@ -133,24 +136,27 @@ function Home() {
       <div className="title">
         <h1>SmartRoad</h1>
       </div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <div className="question">
-        <h2>What are you driving?</h2>
+        <h2>{t('What are you driving?')}</h2>
       </div>
 
       <div className="vehicle-container">
         <div className="vehicle-box bicycle-box" onClick={() => handleClick('bicycle')}>
           <img src={logoBicycle} alt="Logo de bicicleta" />
-          <p className='bicycle'>Bicycle</p>
+          <p className='bicycle'>{t('Bicycle')}</p>
         </div>
 
         <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
           <img src={logoCar} alt="Logo de coche" />
-          <p className='car'>Car</p>
+          <p className='car'>{t('Car')}</p>
         </div>
       </div>
 
       <div className="sound-selector">
-        <label htmlFor="notification-sound">Select a notification sound:</label>
+        <label htmlFor="notification-sound">{t('Select a notification sound:')}</label>
         <select onChange={handleSoundChange}>
           {availableSounds.map((sound, index) => (
             <option key={index} value={sound.id}>
@@ -160,10 +166,10 @@ function Home() {
         </select>
       </div>
       <div className='admin'>
-        <p>Are you an admin?</p>
-        <p className='log' onClick={goLogin}>Log in here</p>
+        <p>{t('Are you an admin?')}</p>
+        <p className='log' onClick={goLogin}>{t('Log in here')}</p>
       </div>
-      <a className='help' href='/html/Introduction.html'>Need help?</a>
+      <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
     </>
   );
 }
