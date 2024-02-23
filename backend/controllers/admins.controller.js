@@ -15,7 +15,7 @@ exports.create = (req, res, next) => {
   req.body.Password ||= req.bodyb.Password;
 
   if (!req.body.Password || !req.body.Username) {
-    res.status(400).send({
+    res.status(500).send({
       message: "Content can not be empty!"
     });
     return;

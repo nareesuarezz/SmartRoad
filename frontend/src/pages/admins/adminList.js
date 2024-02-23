@@ -1,72 +1,80 @@
-    import React, { useState, useEffect } from 'react';
-    import axios from 'axios';
-    import { Link } from 'react-router-dom';
-    import { ArrowLeftOutlined } from '@ant-design/icons';
-    import Header from '../../components/header/header';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import Header from '../../components/header/header';
+import { useTranslation } from 'react-i18next'; import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
-    const AdminList = () => {
-        const [admins, setAdmins] = useState([]);
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
-        useEffect(() => {
-            getAdmins();
-        }, []);
+const AdminList = () => {
+    const { t } = useTranslation();
 
-        const getAdmins = async () => {
-            try {
-                const response = await axios.get('http://localhost:8080/api/admins');
-                setAdmins(response.data);
-            } catch (error) {
-                console.error('Error fetching admins:', error);
-            }
-        };
+    const [admins, setAdmins] = useState([]);
 
-        const deleteAdmin = async (id) => {
-            try {
-                await axios.delete(`http://localhost:8080/api/admins/${id}`);
-                getAdmins();
-            } catch (error) {
-                console.error(`Error deleting admin with id=${id}:`, error);
-            }
-        };
+    useEffect(() => {
+        getAdmins();
+    }, []);
 
-        const goBack = () => {
-            window.location.href = "/login";
+    const getAdmins = async () => {
+        try {
+            const response = await axios.get(`${URL}/api/admins`);
+            setAdmins(response.data);
+        } catch (error) {
+            console.error('Error fetching admins:', error);
         }
-
-        return (
-            <div>
-                <Header />
-                <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-                <Link to="/admin-add" className="add">
-                    Add New Admin
-                </Link>
-
-                <table className="table is-striped is-fullwidth">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Username</th>
-                            <th>Image</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {admins.map((admin) => (
-                            <tr key={admin.UID}>
-                                <td>{admin.UID}</td>
-                                <td>{admin.Username}</td>
-                                <td><img src={`http://localhost:8080/images/${admin.filename}`} alt="Admin Avatar" width="60" /></td>
-                                <td>
-                                    <Link to="#" onClick={() => deleteAdmin(admin.UID)} className="delete">
-                                        Delete
-                                    </Link>
-                                </td>
-                            </tr>
-                        ))}
-                    </tbody>
-                </table>
-            </div>
-        );
     };
 
-    export default AdminList;
+    const deleteAdmin = async (id) => {
+        try {
+            await axios.delete(`${URL}/api/admins/${id}`);
+            getAdmins();
+        } catch (error) {
+            console.error(`Error deleting admin with id=${id}:`, error);
+        }
+    };
+
+    const goBack = () => {
+        window.location.href = "/login";
+    }
+
+    return (
+        <div>
+            <Header />
+            <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+            <div>
+                <LanguageSwitcher />
+            </div>
+            <Link to="/admin-add" className="add">
+                {t('Add New Admin')}
+            </Link>
+
+            <table className="table is-striped is-fullwidth">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>{t('Username')}</th>
+                        <th>{t('Image')}</th>
+                        <th>{t('Actions')}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {admins.map((admin) => (
+                        <tr key={admin.UID}>
+                            <td>{admin.UID}</td>
+                            <td>{admin.Username}</td>
+                            <td><img src={`${URL}/images/${admin.filename}`} alt="Admin Avatar" width="60" /></td>
+                            <td>
+                                <Link to="#" onClick={() => deleteAdmin(admin.UID)} className="delete">
+                                    {t('Delete')}
+                                </Link>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+        </div>
+    );
+};
+
+export default AdminList;

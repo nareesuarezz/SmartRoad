@@ -1,40 +1,60 @@
 const express = require("express");
 const cors = require("cors");
 const path = require('path');
+const fs = require('fs');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const http = require('http');
+const https = require('https');
 const socketIo = require('socket.io');
 const dbConfig = require("./config/db.config");
 
-const app = express();
+const USING_HTTPS = process.env.USING_HTTPS == "true" ? true : false;
+const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || 443;
 
+
+const HTTP = express();
+
+if (USING_HTTPS && PORT != 443) {
+  HTTP.get("*", (req, res) =>
+    res.redirect("https://" + process.env.HOST + ":" + process.env.PORT)
+  );
+
+  HTTP.listen(PORT);
+}
+
+const app = express();
 
 // Sequelize setup
 const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  pool: dbConfig.pool
+  pool: dbConfig.pool,
+  operatorsAliases: false 
 });
-
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
+app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
+
 
 var corsOptions = {
-  origin: "*"
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  credentials: true,
+  optionsSuccessStatus: 204,
+  preflightContinue: true,
 };
 
 app.use(cors(corsOptions));
-
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 const db = require("./models");
-// db.sequelize.sync();
 
 // Database sync and setup
 db.sequelize.sync({ force: true }).then(async () => {
@@ -51,16 +71,29 @@ db.sequelize.sync({ force: true }).then(async () => {
       filename: 'user.jpg'
     });
 
+    const createdSound1 = await db.Sounds.create({
+      filename: 'sound1.mp3'
+    });
+    const createdSound2 = await db.Sounds.create({
+      filename: 'sound2.mp3'
+    });
+    const createdSound3 = await db.Sounds.create({
+      filename: 'sound3.mp3'
+    });
+
     console.log('Admin predeterminado creado con éxito.');
     console.log('Admin Details:', createdAdmin.toJSON());
+    console.log('Sound1 Details:', createdSound1.toJSON());
+    console.log('Sound2 Details:', createdSound2.toJSON());
+    console.log('Sound3 Details:', createdSound3.toJSON());
+
+
   }
 });
 
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
 
-  // // Imprime el encabezado de autorización
-  // console.log('Authorization Header:', token);
 
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];
@@ -97,8 +130,27 @@ app.use(function (req, res, next) {
   }
 });
 
-const server = http.createServer(app);
-const io = socketIo(server, {
+let SERVER = null;
+
+if (USING_HTTPS) {
+  const CERTS = () => {
+    try {
+      return {
+        key: fs.readFileSync(path.join(__dirname, ".cert/cert.key")),
+        cert: fs.readFileSync(path.join(__dirname, ".cert/cert.crt")),
+      };
+    } catch (err) {
+      console.log("No certificates found: " + err);
+    }
+  };
+  SERVER = https.createServer(CERTS(), app);
+} else {
+  SERVER = http.createServer(app);
+}
+
+
+
+const io = socketIo(SERVER, {
   cors: {
     origin: "*", // Adjust according to your needs
     methods: ["GET", "POST"]
@@ -140,17 +192,16 @@ app.post('/send-notification', (req, res) => {
   }
 });
 
-
+require("./routes/sounds.routes")(app);
 require("./routes/logs.routes")(app);
 require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
+(USING_HTTPS ? SERVER : app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
-module.exports = { app, io }; // Exporting app and io for use in other modules
+module.exports = { app, io }; 

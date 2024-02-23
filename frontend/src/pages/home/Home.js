@@ -1,19 +1,41 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import logoBicycle from '../../img/bike.png';
 import logoCar from '../../img/car.png';
 import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
+import { Puff } from 'react-loader-spinner';
+import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import UserNotification from '../../components/websocketTest/UserNotification';
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 function Home() {
+  const { t } = useTranslation();
   const [subscription, setSubscription] = useState(null);
+  const [availableSounds, setAvailableSounds] = useState([]);
+  const [selectedSound, setSelectedSound] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    axios.get(`${URL}/api/sounds`)
+      .then(response => {
+        setAvailableSounds(response.data);
+        setSelectedSound(response.data[0].id);
+      })
+      .catch(error => console.error('Error retrieving sounds:', error));
+  }, []);
 
   const handleClick = async (vehicle) => {
+    setIsLoading(true); // Inicia la carga
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
-
+      localStorage.setItem('selectedSound', selectedSound);
+      navigate(`/${vehicle}`, { state: { selectedSound } });
       if (position && Notification.permission === 'granted') {
         await createVehicleAndTrack(vehicle, position.coords);
 
@@ -27,8 +49,10 @@ function Home() {
     } catch (error) {
       console.error('Error al solicitar permisos:', error);
     }
+    finally {
+      setIsLoading(false);
+    }
   };
-
 
   const askForLocationPermission = () => {
     return new Promise((resolve, reject) => {
@@ -72,7 +96,7 @@ function Home() {
 
   const createVehicle = async (vehicle) => {
     try {
-      const response = await axios.post(`http://localhost:8080/api/vehicles`, {
+      const response = await axios.post(`${URL}/api/vehicles`, {
         Vehicle: vehicle,
       });
 
@@ -90,9 +114,9 @@ function Home() {
       coordinates: [parseFloat(coords.latitude), parseFloat(coords.longitude)],
     };
     try {
-      const response = await axios.post(`http://localhost:8080/api/tracks`, {
+      const response = await axios.post(`${URL}/api/tracks`, {
         Location: location,
-        Status: 'stopped',
+        Status: 'Moving',
         Speed: 0,
         Extra: null,
         Vehicle_UID: vehicleId,
@@ -110,32 +134,54 @@ function Home() {
     window.location.href = "/login";
   };
 
+  const handleSoundChange = (event) => {
+    setSelectedSound(event.target.value);
+  };
+
   return (
     <>
       <div className="title">
         <h1>SmartRoad</h1>
       </div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <div className="question">
-        <h2>What are you driving?</h2>
+        <h2>{t('What are you driving?')}</h2>
       </div>
 
       <div className="vehicle-container">
         <div className="vehicle-box bicycle-box" onClick={() => handleClick('bicycle')}>
           <img src={logoBicycle} alt="Logo de bicicleta" />
-          <p className='bicycle'>Bicycle</p>
+          <p className='bicycle'>{t('Bicycle')}</p>
         </div>
 
         <div className="vehicle-box car-box" onClick={() => handleClick('car')}>
           <img src={logoCar} alt="Logo de coche" />
-          <p className='car'>Car</p>
+          <p className='car'>{t('Car')}</p>
         </div>
-
+      </div>
+      {isLoading && (
+        <div className="overlay">
+          <Puff className="spinner" height={100} width={100} />
+        </div>
+      )}
+      <div className="sound-selector">
+        <label htmlFor="notification-sound">{t('Select a notification sound:')}</label>
+        <select onChange={handleSoundChange}>
+          {availableSounds.map((sound, index) => (
+            <option key={index} value={sound.id}>
+              {sound.filename}
+            </option>
+          ))}
+        </select>
       </div>
       <div className='admin'>
-        <p>Are you an admin?</p>
-        <p className='log' onClick={goLogin}>Log in here</p>
+        <p>{t('Are you an admin?')}</p>
+        <p className='log' onClick={goLogin}>{t('Log in here')}</p>
       </div>
-      <a className='help' href='/html/Introduction.html'>Need help?</a>
+      <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
+      <UserNotification/>
     </>
   );
 }

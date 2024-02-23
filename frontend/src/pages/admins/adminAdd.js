@@ -1,8 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const AdminAdd = ({ getAdmins }) => {
+
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     Username: '',
     Password: '',
@@ -17,12 +24,17 @@ const AdminAdd = ({ getAdmins }) => {
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
-      setFormData({
-        ...formData,
-        Image: e.target.files[0],
-      });
+      const file = e.target.files[0];
 
-      setPreviewImage(URL.createObjectURL(e.target.files[0]));
+      if (file) {
+        setFormData({
+          ...formData,
+          Image: file,
+        });
+
+        const imageUrl = window.URL.createObjectURL(file);
+        setPreviewImage(imageUrl);
+      }
     } else {
       setFormData({
         ...formData,
@@ -30,6 +42,7 @@ const AdminAdd = ({ getAdmins }) => {
       });
     }
   };
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -56,7 +69,7 @@ const AdminAdd = ({ getAdmins }) => {
       formDataForUpload.append('Password', formData.Password);
       formDataForUpload.append('filename', formData.Image);
 
-      await axios.post('http://localhost:8080/api/admins', formDataForUpload);
+      await axios.post(`${URL}/api/admins`, formDataForUpload);
       goBack();
     } catch (error) {
       console.error('Error adding admin:', error);
@@ -66,17 +79,20 @@ const AdminAdd = ({ getAdmins }) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <form onSubmit={handleSubmit}>
         <label>
-          Username:
+          {t('Username')}:
           <input type="text" name="Username" value={formData.Username} onChange={handleChange} />
         </label>
         <label>
-          Password:
+          {t('Password')}:
           <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
         </label>
         <label>
-          Image:
+          {t('Image')}:
           <input type="file" name="Image" onChange={handleChange} accept="image/*" />
           {previewImage && (
             <div className="image-preview">
@@ -84,7 +100,7 @@ const AdminAdd = ({ getAdmins }) => {
             </div>
           )}
         </label>
-        <button type="submit">Add Admin</button>
+        <button type="submit">{t('Add Admin')}</button>
       </form>
     </>
   );

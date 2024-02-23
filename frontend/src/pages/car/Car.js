@@ -1,196 +1,282 @@
 import React, { useState, useEffect } from 'react';
 import logoCar from '../../img/car.png';
 import './Car.css';
-import bikeWarningSound from '../../sounds/sound3.mp3';
-import { ArrowLeftOutlined, ConsoleSqlOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { regSw, subscribe } from '../../services/subscriptionService';
 import axios from 'axios';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import UserNotification from '../../components/websocketTest/UserNotification';
 
 function Car() {
-    const API = process.env.REACT_APP_API_URL;
-    const [showModal, setShowModal] = useState(false);
-    const [subscription, setSubscription] = useState(null);
+  const { t } = useTranslation();
+  const API = process.env.REACT_APP_API_URL;
+  const URL = process.env.REACT_APP_LOCALHOST_URL;
+  const [showModal, setShowModal] = useState(false);
+  const [subscription, setSubscription] = useState(null);
+  const selectedSound = localStorage.getItem("selectedSound");
+  const [lastVehicleId, setLastVehicleId] = useState(null);
 
+  const time = 5000;
 
-    // Location
-    const addTrackGeo = async () => {
-        try {
-            // Obtener la ubicación utilizando trackGeo
-            const location = await trackGeo();
+  let postsT = 0;
 
-            const response = await axios.get('http://localhost:8080/api/vehicles');
-            const vehicle = response.data;
-            const lastVehicleId = vehicle[vehicle.length - 1].UID;
+  // Agrega un estado para el elemento de audio
+  const [audioElement, setAudioElement] = useState(null);
+  const SOUND_API = `${URL}/api`;
 
-            const data = {
-                Latitude: '',
-                Longitude: '',
-                Status: 'Stopped',
-                Speed: '0',
-                Extra: '',
-                Vehicle_UID: lastVehicleId,
-                Location: location, // Usar la ubicación obtenida de trackGeo aquí
-            };
+  useEffect(() => {
+    const audio = new Audio();
+    setAudioElement(audio);
 
-            // Imprimir la ubicación para verificar
-            // console.log('Ubicación obtenida:', location);
-
-            // Llamar a axios.post con los datos actualizados
-            await axios.post('http://localhost:8080/api/tracks', data);
-
-        } catch (err) {
-            console.error(err.response);
-        }
-    };
-
-    //Función para recoger la localización y devolverla
-    const trackGeo = () => {
-        return new Promise((resolve, reject) => {
-            try {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const location = {
-                        type: 'Point',
-                        coordinates: [position.coords.latitude, position.coords.longitude],
-                    };
-                    // console.log("Latitude: " + position.coords.latitude + "\nLongitude: " + position.coords.longitude);
-                    resolve(location);  //Devuelve la localización recogida
-                });
-            } catch (error) {
-                console.error(error);
-                reject(error);
-            }
-        });
-    };
-
-    useEffect(() => {
-        // Call the function here to start tracking
-        addTrackGeo();
-    }, 1); // Empty dependency array to run it only once
-
-    useEffect(() => {
-        const locationUpdateInterval = setInterval(() => {
-            // Call the trackAddGeo function every 5 seconds
-            addTrackGeo();
-        }, 5000);
-
-        return () => clearInterval(locationUpdateInterval);
-    }, []);
-
-    //Notification
-    useEffect(() => {
-        const notificationInterval = setInterval(() => {
-            if (showModal) {
-                setShowModal(false);
-            } else {
-                setShowModal(true);
-                playWarningSound();
-
-                const subscriptionName = 'car';
-                const notificationMessage = 'WARNING: THERE IS A BICYCLE NEAR YOU';
-                sendNotification(subscriptionName, notificationMessage);
-            }
-        }, 10000);
-
-        return () => clearInterval(notificationInterval);
-    }, [showModal]);
-
-    const playWarningSound = () => {
-        const audio = new Audio(bikeWarningSound);
+    if (selectedSound) {
+      audio.volume = 1.0; // Establece el volumen al máximo
+      const soundUrl = `${SOUND_API}/sounds/${selectedSound}`; // Asume que selectedSound es el nombre del archivo sin la extensión
+      audio.src = soundUrl;
+      audio.oncanplay = () => {
         audio.play();
-    };
+      };
+      audio.onerror = () => {
+        console.log('Error loading sound');
+      };
+    }
+  }, [selectedSound]);
 
-    const sendNotification = async (subscriptionName, notificationMessage) => {
-        try {
-            await axios.post(`${API}/sendCustomNotification`, {
-                subscriptionName,
-                notificationMessage,
-            });
 
-            console.log(`Sending notification to ${subscriptionName}: ${notificationMessage}`);
-        } catch (error) {
-            console.error('Error al enviar notificación al backend:', error);
+
+
+  // Location
+  const addTrackGeo = async (lastVehicleId) => {
+    try {
+      const location = await trackGeo();
+
+      console.log(lastVehicleId)
+      const data = {
+        Location: location,
+        Status: 'Stopped',
+        Speed: '0',
+        Extra: 'coche',
+        Vehicle_UID: lastVehicleId,
+      };
+
+      // Llamar a axios.post con los datos actualizados
+      await axios.post(`${URL}/api/tracks`, data);
+
+      console.log(data.Location.coordinates)
+      const recentTracks = await axios.get(`${URL}/api/tracks/recent-within-radius`, {
+        params: {
+          lat: [data.Location.coordinates[0]],
+          lng: [data.Location.coordinates[1]]
         }
+      })
+
+      if (recentTracks.data.recentTracks.length > 0) {
+        setShowModal(true);
+        sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
+      }
+
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  //Función para recoger la localización y devolverla
+  const trackGeo = () => {
+    return new Promise((resolve, reject) => {
+      try {
+        navigator.geolocation.getCurrentPosition((position) => {
+          const location = {
+            type: 'Point',
+            coordinates: [position.coords.latitude, position.coords.longitude],
+          };
+          resolve(location);  //Devuelve la localización recogida
+        });
+      } catch (error) {
+        console.error(error);
+        reject(error);
+      }
+    });
+  };
+
+  //Status UseEffect
+  useEffect(() => {
+    let consecutiveStoppedCount = 0;
+
+    const checkStatus = async () => {
+      try {
+        const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+        const lastTrackStatus = response.data[postsT]?.Status;
+
+        if (lastTrackStatus === 'Stopped') {
+          consecutiveStoppedCount++;
+        } else {
+          consecutiveStoppedCount = 0;
+        }
+
+        if (consecutiveStoppedCount === 6) {
+          goBack();
+          return;
+        }
+
+        // Esperar 1 minuto (60 segundos) antes de la siguiente verificación
+        setTimeout(checkStatus, 60 * 1000); // Convertir minutos a milisegundos
+      } catch (error) {
+        console.error('Error checking status:', error);
+      }
     };
 
-    const goBack = () => {
-        window.location.href = '/home';
+    // Comenzar el monitoreo cuando haya un último vehículo ID
+    if (lastVehicleId) {
+      checkStatus();
+    }
+
+    // Limpiar intervalo cuando se desmonte el componente
+    return () => {
+      consecutiveStoppedCount = 0; // Reiniciar el contador al desmontar el componente
+    };
+  }, [lastVehicleId]);
+
+
+
+  //Location UseEffect
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log("Recogiendo ID del vehiculo");
+      const response = await axios.get('https://localhost/api/vehicles?_sort=createdAt:desc&_limit=1');
+      const vehicles = response.data;
+      const lastId = vehicles[vehicles.length - 1].UID;
+      setLastVehicleId(lastId);
+      console.log("ID del vehiculo: ", lastId);
     };
 
-    useEffect(() => {
-        const handleMount = async () => {
-            try {
-                const serviceWorkerReg = await regSw();
-                const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
+    fetchData(); // Llamada inicial para recoger el ID del vehículo
 
-                if (existingSubscription) {
-                    console.log('Suscripción ya existe:', existingSubscription);
-                    setSubscription(existingSubscription);
-                } else {
-                    const newSubscription = await subscribe(serviceWorkerReg, 'car');
-                    setSubscription(newSubscription);
-                }
-            } catch (error) {
-                console.error('Error al obtener suscripción:', error);
-            }
-        };
+    const locationUpdateInterval = setInterval(() => {
+      if (lastVehicleId) {
+        postsT++;
+        console.log(postsT);
+        addTrackGeo(lastVehicleId);
+      }
+    }, time);
 
-        handleMount();
-    }, []);
+    return () => clearInterval(locationUpdateInterval);
+  }, [lastVehicleId]); // Agregar lastVehicleId como dependencia
 
-    useEffect(() => {
-        return () => {
-            const handleUnmount = async () => {
-                try {
-                    const serviceWorkerReg = await regSw();
-                    if (subscription) {
-                        console.log('Unsubscribing from:', subscription.endpoint);
-                        await axios.post(`${API}/deleteByEndpoint`, { endpoint: subscription.endpoint });
-                        const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
-                        if (existingSubscription) {
-                            await existingSubscription.unsubscribe();
-                            console.log('Unsubscription successful');
-                        }
-                        setSubscription(null);
-                    }
-                } catch (error) {
-                    console.error('Error during unsubscription:', error);
-                }
-            };
+  //Notification
+  useEffect(() => {
+    let hideModalTimer = null;
 
-            handleUnmount();
-        };
-    }, [subscription]);
+    if (showModal) {
+      // Establece un temporizador para ocultar el modal después de 30 segundos
+      hideModalTimer = setTimeout(() => {
+        setShowModal(false);
+        // Aquí puedes detener el sonido si es necesario
+        if (audioElement) {
+          audioElement.pause();
+          audioElement.currentTime = 0;
+        }
+      }, 3000); // 30000 milisegundos = 30 segundos
+    }
 
-    return (
-        <>
-            <div className='arrow' onClick={() => goBack()}>
-                <ArrowLeftOutlined />
-            </div>
-            <div className='car-title'>
-                <h1>SmartRoad</h1>
-            </div>
-            <div className='logged'>
-                <h2>You are now logged as a...</h2>
-            </div>
+    return () => {
+      // Limpia el temporizador al desmontar o si showModal cambia antes de que el tiempo se agote
+      if (hideModalTimer) {
+        clearTimeout(hideModalTimer);
+      }
+    };
+  }, [showModal, audioElement, setShowModal]);
 
-            <div className='car-container'>
-                <div className='vehicle-box car-box'>
-                    <img src={logoCar} alt='Logo de Coche' />
-                </div>
-                <p className='car'>Car</p>
 
-                <h3 className='warn'>Now you will be warned in case that a bike passes near you.</h3>
-            </div>
+  const sendNotification = async (subscriptionName, notificationMessage) => {
+    try {
+      await axios.post(`${API}/sendCustomNotification`, {
+        subscriptionName,
+        notificationMessage,
+      });
 
-            {showModal && (
-                <div className='modal-overlay'>
-                    <div className='modal'>
-                        <p>WARNING: THERE IS A BICYCLE NEAR YOU</p>
-                    </div>
-                </div>
-            )}
-        </>
-    );
+      console.log(`Sending notification to ${subscriptionName}: ${notificationMessage}`);
+    } catch (error) {
+      console.error('Error al enviar notificación al backend:', error.response);
+    }
+  };
+
+  const goBack = () => {
+    window.location.href = '/home';
+  };
+
+  useEffect(() => {
+    const handleMount = async () => {
+      try {
+        const serviceWorkerReg = await regSw();
+        const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
+
+        if (existingSubscription) {
+          console.log('Suscripción ya existe:', existingSubscription);
+          setSubscription(existingSubscription);
+        } else {
+          const newSubscription = await subscribe(serviceWorkerReg, 'car');
+          setSubscription(newSubscription);
+        }
+      } catch (error) {
+        console.error('Error al obtener suscripción:', error);
+      }
+    };
+
+    handleMount();
+  }, []);
+
+  useEffect(() => {
+    // Esta función se llamará cuando el componente se desmonte
+    return async () => {
+      try {
+        const serviceWorkerReg = await regSw();
+        const existingSubscription = await serviceWorkerReg.pushManager.getSubscription();
+        if (existingSubscription) {
+          console.log('Unsubscribing from:', existingSubscription.endpoint);
+          await axios.post(`${API}/deleteByEndpoint`, { endpoint: existingSubscription.endpoint });
+          await existingSubscription.unsubscribe();
+          console.log('Unsubscription successful');
+          // Aquí asumimos que `setSubscription` actualiza el estado del componente, si es aplicable
+          setSubscription(null);
+        }
+      } catch (error) {
+        console.error('Error during unsubscription:', error);
+      }
+    };
+  }, []);
+
+  return (
+    <>
+      <div className='arrow' onClick={() => goBack()}>
+        <ArrowLeftOutlined />
+      </div>
+      <div>
+        <LanguageSwitcher />
+      </div>
+      <div className='car-title'>
+        <h1>{t('SmartRoad')}</h1>
+      </div>
+      <div className='logged'>
+        <h2>{t('You are now logged as a...')}</h2>
+      </div>
+
+      <div className='car-container'>
+        <div className='vehicle-box car-box'>
+          <img src={logoCar} alt={t('Logo de Coche')} />
+        </div>
+        <p className='car'>{t('Car')}</p>
+
+        <h3 className='warn'>{t('Now you will be warned in case that a bike passes near you.')}</h3>
+      </div>
+      {showModal && (
+        <div className='modal-overlay'>
+          <div className='modal'>
+            <p>{t('WARNING: THERE IS A BICYCLE NEAR YOU')}</p>
+          </div>
+        </div>
+      )}
+            <UserNotification/>
+    </>
+  );
 }
-
-export default Car; 
+export default Car;

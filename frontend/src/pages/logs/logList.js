@@ -3,8 +3,14 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const LogList = () => {
+  const { t } = useTranslation();
+
   const [logs, setLogs] = useState([]);
 
   useEffect(() => {
@@ -13,7 +19,7 @@ const LogList = () => {
 
   const getLogs = async () => {
     try {
-      const response = await axios.get('http://localhost:8080/api/logs');
+      const response = await axios.get(`${URL}/api/logs`);
       setLogs(response.data);
     } catch (error) {
       console.error('Error fetching logs:', error);
@@ -26,15 +32,18 @@ const LogList = () => {
 
   return (
     <div>
-      <Header/>
+      <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
       <table className="table is-striped is-fullwidth">
         <thead>
           <tr>
             <th>ID</th>
-            <th>Track ID</th>
-            <th>Admin ID</th>
-            <th>Action</th>
+            <th>{t('Track ID')}</th>
+            <th>{t('Admin ID')}</th>
+            <th>{t('Action')}</th>
           </tr>
         </thead>
         <tbody>

@@ -2,6 +2,65 @@ const db = require("../models");
 const Tracks = db.Track;
 const Logs = db.Log;
 const Op = db.Sequelize.Op;
+const Sequelize = db.Sequelize;
+
+// Variables para ajustes de desarrollo
+const MINUTES_AGO = 10; // Encuentra tracks subidos en los últimos 10 minutos
+const RADIUS_IN_METERS = 500; // Encuentra tracks dentro de un radio de 500 metros
+
+exports.findRecentTracksWithinRadius = async (req, res) => {
+    // Calcula el tiempo mínimo (hace X minutos desde ahora)
+    const timeAgo = new Date(new Date() - MINUTES_AGO * 60000);
+
+    const clientLocation = {
+        lat: parseFloat(req.query.lat), // Asume que recibes la latitud como query param
+        lng: parseFloat(req.query.lng), // Asume que recibes la longitud como query param
+    };
+
+    // Convierte las coordenadas en un punto geográfico para la consulta
+    const locationPoint = Sequelize.fn('ST_GeomFromText', `POINT(${clientLocation.lat} ${clientLocation.lng})`);
+
+    // Calcula la distancia desde la ubicación del cliente hasta la ubicación de cada track
+    const distance = Sequelize.fn(
+        'ST_Distance_Sphere',
+        Sequelize.col('Location'),
+        locationPoint
+    );
+
+    console.log("SOCORROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",distance.args)
+
+    try {
+        const recentTracks = await db.Track.findAll({
+            attributes: {
+                include: [[distance, 'distance']]
+            },
+            include: [{
+                model: db.Vehicle,
+                as: 'Vehicles', // Coincide con el alias utilizado en la definición de la asociación
+                where: { Vehicle: 'bicycle' },
+                required: true
+            }],
+            where: {
+                Date: {
+                    [Op.gt]: timeAgo // Mayor que el tiempo calculado para 'hace X minutos'
+                },
+                [Op.and]: Sequelize.where(distance, { [Op.lte]: RADIUS_IN_METERS }) // Menor o igual al radio especificado
+            },
+            order: [[Sequelize.col('distance')]], // Ordena los resultados por distancia
+            logging: console.log
+        });
+
+        console.log("LKFHBJDFHNKSJDHn", recentTracks)
+        res.status(200).send({
+            recentTracks: recentTracks
+        })
+    } catch (error) {
+        console.error('Error al buscar tracks recientes dentro del radio:', error);
+        res.status(500).send({
+            message: "Error al recuperar tracks recientes dentro del radio especificado."
+        });
+    }
+};
 
 const createLogEntry = async (action, trackId, adminId) => {
     try {
@@ -18,6 +77,7 @@ const createLogEntry = async (action, trackId, adminId) => {
 
 exports.create = async (req, res) => {
     try {
+
         const track = {
             Location: req.body.Location,
             Status: req.body.Status,

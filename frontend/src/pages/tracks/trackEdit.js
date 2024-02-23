@@ -3,8 +3,15 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import AuthService from '../../services/authService';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+
+
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackEdit = ({ getTracks }) => {
+    const { t } = useTranslation();
+
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -26,7 +33,7 @@ const TrackEdit = ({ getTracks }) => {
     useEffect(() => {
         const fetchTrackData = async () => {
             try {
-                const response = await axios.get(`http://localhost:8080/api/tracks/${id}`);
+                const response = await axios.get(`${URL}/api/tracks/${id}`);
                 const trackData = response.data;
 
                 if (trackData.Location && trackData.Location.coordinates) {
@@ -66,76 +73,79 @@ const TrackEdit = ({ getTracks }) => {
         const authToken = AuthService.getAuthToken();
 
         const config = {
-          headers: {
-            'Authorization': `Bearer ${authToken}`,
-          }
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+            }
         };
 
         if (!formData.Latitude || !formData.Longitude || !formData.Status || (!formData.Speed && formData.Status !== 'stopped') || !formData.Vehicle_UID) {
-          const missingFields = Object.entries(formData)
-            .filter(([key, value]) => !value)
-            .map(([key]) => key);
+            const missingFields = Object.entries(formData)
+                .filter(([key, value]) => !value)
+                .map(([key]) => key);
 
-          alert(`Please complete the following fields: ${missingFields.join(', ')}`);
-          return;
+            alert(`Please complete the following fields: ${missingFields.join(', ')}`);
+            return;
         }
 
         if (formData.Status === 'moving' && Number(formData.Speed) === 0) {
-          alert("Error: You can't put 0 speed on a moving vehicle.");
-          return;
+            alert("Error: You can't put 0 speed on a moving vehicle.");
+            return;
         }
 
         const location = {
-          type: 'Point',
-          coordinates: [parseFloat(formData.Longitude), parseFloat(formData.Latitude)],
+            type: 'Point',
+            coordinates: [parseFloat(formData.Longitude), parseFloat(formData.Latitude)],
         };
 
         try {
-            await axios.put(`http://localhost:8080/api/tracks/${id}`, {
-            ...formData,
-            Location: location,
-            Admin_UID: adminId,
-            Speed: formData.Status === 'stopped' ? 0 : formData.Speed,
-          }, config);
-          goBack();
+            await axios.put(`${URL}/api/tracks/${id}`, {
+                ...formData,
+                Location: location,
+                Admin_UID: adminId,
+                Speed: formData.Status === 'stopped' ? 0 : formData.Speed,
+            }, config);
+            goBack();
         } catch (error) {
-          console.error('Error updating track:', error);
+            console.error('Error updating track:', error);
         }
     };
 
     return (
         <>
             <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+            <div>
+                <LanguageSwitcher />
+            </div>
             <form onSubmit={handleSubmit}>
                 <label>
-                    Latitude:
+                    {t('Latitude')}:
                     <input type="text" name="Latitude" value={formData.Latitude} onChange={(e) => handleLocationChange('Latitude', e.target.value)} />
                 </label>
                 <label>
-                    Longitude:
+                    {t('Longitude')}:
                     <input type="text" name="Longitude" value={formData.Longitude} onChange={(e) => handleLocationChange('Longitude', e.target.value)} />
                 </label>
                 <label>
-                    Status:
+                    {t('Status')}:
                     <select name="Status" value={formData.Status} onChange={handleChange}>
-                        <option value="">Select</option>
-                        <option value="stopped">Stopped</option>
-                        <option value="moving">Moving</option>
+                        <option value="">{t('Select')}</option>
+                        <option value="stopped">{t('Stopped')}</option>
+                        <option value="moving">{t('Moving')}</option>
                     </select>
                 </label>
                 <label>
-                    Speed:
+                    {t('Speed')}:
                     <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} disabled={formData.Status === 'stopped'} />
                 </label>
                 <label>
-                    Extra:
+                    {t('Extra')}:
                     <input type="text" name="Extra" value={formData.Extra} onChange={handleChange} />
                 </label>
                 <label>
-                    Vehicle UID:
+                    {t('Vehicle_UID')}:
                     <input type="text" name="Vehicle_UID" value={formData.Vehicle_UID} onChange={handleChange} />
                 </label>
-                <button type="submit">Update Track</button>
+                <button type="submit">{t('Update Track')}</button>
             </form>
         </>
     );

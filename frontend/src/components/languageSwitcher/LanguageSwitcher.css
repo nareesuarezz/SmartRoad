@@ -1,0 +1,12 @@
+.LanguageSwitcher {
+    position: fixed;
+    top: 133px;
+    right: 10px;
+    z-index: 1000;
+  }
+  
+  .LanguageSwitcher button {
+    margin-right: -5px;
+    margin-top: 5px;
+  }
+  

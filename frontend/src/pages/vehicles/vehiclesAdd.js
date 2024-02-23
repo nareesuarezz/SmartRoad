@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const VehicleAdd = ({ getVehicles }) => {
+  const { t } = useTranslation();
+
   const [formData, setFormData] = useState({
     Vehicle: '',
   });
@@ -17,13 +23,13 @@ const VehicleAdd = ({ getVehicles }) => {
   const goBack = () => {
     window.location.href = "/vehicle-list";
   }
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
 
     try {
-      await axios.post('http://localhost:8080/api/vehicles', {
+      await axios.post(`${URL}/api/vehicles`, {
         ...formData,
       });
       goBack();
@@ -34,18 +40,21 @@ const VehicleAdd = ({ getVehicles }) => {
 
   return (
     <>
-    <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-    <form onSubmit={handleSubmit}>
-      <label>
-          Vehicle:
+      <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      <div>
+        <LanguageSwitcher />
+      </div>
+      <form onSubmit={handleSubmit}>
+        <label>
+          {t('Vehicle')}:
           <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
-            <option value="">Select</option>
-            <option value="Car">Car</option>
-            <option value="Bike">Bike</option>
+            <option value="">{t('Select')}</option>
+            <option value="car">{t('Car')}</option>
+            <option value="bicycle">{t('Bike')}</option>
           </select>
         </label>
-      <button type="submit" className="submit">Add Vehicle</button>
-    </form>
+        <button type="submit" className="submit">{t('Add Vehicle')}</button>
+      </form>
     </>
   );
 };
