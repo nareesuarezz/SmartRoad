@@ -141,6 +141,30 @@ imagen
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2d71aa8c-34f0-4f30-97d7-5162f29fd300)
 
 
+8. Instant Feedback:
+
+    _Justification:_ Add instant confirmation for the actions of the user.
+
+   _Example:_ At the begining of the API we have a spring that show us the action of uploading the API data, when it finish we can see the API.
+
+   imagen
+
+
+9. Multilingual support
+
+    _Justification:_ Multilingual support in an API improves accessibility by removing language barriers and enhances usability by allowing interaction in the user’s preferred language.
+
+   _Example:_ An API for a global e-commerce platform could accept requests and return responses in multiple languages, making it more accessible and user-friendly.
+
+   English option allowed
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/fbec981b-8be1-480b-904a-ef08a7d1a682)
+
+   Spanish option allowed
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/37bb9814-fed6-4feb-9070-2f36aee8d261)
+
+
+
+
 ## Accessibility Aspects:
 
 1. Keyboard Navigation:
@@ -159,6 +183,27 @@ imagen
    _Example:_ The admin view is a good example of this aspect, since it has a contrast between all the features
    
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/2a584642-f412-4f9c-9850-2d96b05ec1cd)
+
+
+3. Alternative Text on images:
+
+    _Justification:_ Add a alternative text fot the images for the people whit visual disability.
+
+   _Example:_ Using the "alt" on the image for describe on short phrase whats the image.
+
+   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/de81ffe1-efbc-4d51-a75b-8397e7aa0eb5)
+
+
+4. Descriptive Links:
+
+   _Justification:_
+
+   _Example:_
+
+    <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
+
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/702a6329-4e2e-47da-b949-150f5a09b996)
+
 
 
 ## Manuals of installation
