@@ -134,7 +134,12 @@ imagen
 
 7. Help and Documentation:
 
-    _Justification_: The API don't need additional explation.
+    _Justification_: The API don't need additional explation and the documentation to help users its easy to find.
+
+   _Example:_ The API is very intuitive and if you need a user manual it is easy to find. It is on the main page of the API and is an option that says "Need help?"
+
+   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2d71aa8c-34f0-4f30-97d7-5162f29fd300)
+
 
 ## Accessibility Aspects:
 
