@@ -120,7 +120,8 @@ imagen
 
    _Example:_ A left arrow on the top left of the screen that allow the user going back on the instruction
 
-   imagen
+   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/173c8699-ad64-4da3-a6fb-c7160315c47a)
+
 
 
 6. Aesthetic and Minimalist Desing
@@ -196,7 +197,7 @@ imagen
 
 4. Descriptive Links:
 
-   _Justification:_
+   _Justification:_ They provide clear information about the link destination, aiding users of screen readers to navigate more easily and comprehend content without confusion.
 
    _Example:_
 
