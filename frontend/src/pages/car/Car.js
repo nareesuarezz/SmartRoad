@@ -65,7 +65,7 @@ function Car() {
         }
       })
 
-      if (recentTracks) {
+      if (recentTracks.data.recentTracks.length > 0) {
         setShowModal(true);
         sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
       }
