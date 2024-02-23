@@ -60,12 +60,43 @@ If you log as a car it appears this interface:
 And if you log as a bike it appears this interface:
 ![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/c27904d9-aef0-4aa3-b377-d4cb369f4914)
 
+We also added a sound selector, where you can select a notification sound in case that you are a
+car driver:
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/d5015c81-4701-459f-8608-78f4413528fc)
+
+Another new feature is that we added a multilanguage support (we just added english and spanish for now), which allows you to change the language between spanish and english in every page of the API:
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/65f5a197-3db6-4a84-8f12-6e7600b189f6)
+
+That's how it looks like if you change it to spanish:
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/e3e5278e-656e-471f-95a9-d21fbf3bf037)
+
+
+
 ### Admin interface:
 When you try to enter as an admin, it will apear a login page as the following:
 ![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/e941ab32-a5cc-4986-9030-3b57b2cd987b)
 
-Then if you enter succesfully, you will have access to every table of the database (only the track table as an example is shown)
-![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/6856b48a-823b-49d2-9c86-eb845d9ea061)
+Then if you enter succesfully, you will have access to every table of the database (only the Admin table as an example is shown)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/d2914af9-1763-48d4-b039-9e5982f72a5f)
+
+Also we added a map on the tracks where you can difference a bicycle from a car by looking at their marks (bicycles are marked in blue and cars in red)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/8707c522-225b-44d8-b22a-0c759e4076bc)
+
+Apart of that, if you make 2 tracks with the same vehicle, the app will recognise it and will mark it 
+with a blue line:
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/11174a73-d2d5-4aaa-ab72-a6f4e99c84ca)
+
+
+We added some reports using JsReport, below, you have a pdf with a installation manual to use this feature in your device:
+![PDF](frontend/public/images/JSREPORT.pdf)
+
+Also we added websockets with the idea of warn every user in broadcast from an admin. That's how it 
+looks like in the admin and user interface:
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/44b4c12b-1075-4d89-9ff3-bf6c4f0a6962)
+
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/97b81d7d-fa95-4a51-9f88-a1ef070aefc9)
+
+
 
 ## Initial Design
 
