@@ -207,6 +207,19 @@ imagen
     ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/702a6329-4e2e-47da-b949-150f5a09b996)
 
 
+5. Multilingual support
+
+    _Justification:_ Multilingual support in an API improves accessibility by removing language barriers and enhances usability by allowing interaction in the user’s preferred language.
+
+   _Example:_ An API for a global e-commerce platform could accept requests and return responses in multiple languages, making it more accessible and user-friendly.
+
+   English option allowed
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/fbec981b-8be1-480b-904a-ef08a7d1a682)
+
+   Spanish option allowed
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/37bb9814-fed6-4feb-9070-2f36aee8d261)
+
+
 
 ## Manuals of installation
 The steps for installing this app are the following:
