@@ -83,8 +83,8 @@ Also we added a map on the tracks where you can difference a bicycle from a car 
 
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/8707c522-225b-44d8-b22a-0c759e4076bc)
 
-Apart of that, if you make 2 tracks with the same vehicle, the app will recognise it and will mark it 
-with a blue line:
+Apart of that, if you make 2 tracks with the same vehicle, the app will recognise it and will mark it with a blue line:
+
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/11174a73-d2d5-4aaa-ab72-a6f4e99c84ca)
 
 
