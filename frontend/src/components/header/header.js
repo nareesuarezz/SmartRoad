@@ -28,6 +28,9 @@ function Header() {
             <Link to="/sound-list" className="nav-link">Sounds</Link>
           </li>
           <li className="nav-item">
+            <Link to="/admin-notification" className="nav-link" target='blank'>Global Notification</Link>
+          </li>
+          <li className="nav-item">
             <Link to="http://localhost:5488/templates/mcAB7HS" className="nav-link" target='blank'>Reports</Link>
           </li>
           {isAuthenticated && (

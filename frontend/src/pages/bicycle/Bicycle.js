@@ -7,6 +7,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import UserNotification from '../../components/websocketTest/UserNotification';
 
 function Bicycle() {
     const { t } = useTranslation();
@@ -150,6 +151,7 @@ function Bicycle() {
 
                 <h3 className='warn'>{t('Now every car user will be warned in case that they are near you.')}</h3>
             </div>
+            <UserNotification/>
         </>
     );
 }

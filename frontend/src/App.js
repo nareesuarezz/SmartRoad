@@ -19,7 +19,8 @@ import AdminList from './pages/admins/adminList';
 import AdminAdd from './pages/admins/adminAdd';
 import AdminEdit from './pages/admins/adminEdit';
 import LogList from './pages/logs/logList';
-import NotificationsComponent from './components/websocketTest/NotificationsComponent';
+import UserNotification from './components/websocketTest/UserNotification';
+import AdminNotification from './components/websocketTest/AdminNotification';
 import SoundList from './pages/sounds/soundList';
 import SoundAdd from './pages/sounds/soundsAdd';
 import SoundEdit from './pages/sounds/soundsEdit';
@@ -174,7 +175,8 @@ function App() {
           <Route path="/admin-add" element={<AdminAdd />} />
           <Route path="/admin-edit/:id" element={<AdminEdit />} />
           <Route path="/log-list" element={<LogList />} />
-          <Route path="/websocketTest" element={<NotificationsComponent />} />
+          <Route path="/admin-notification" element={<AdminNotification />} />
+          <Route path="/user-notification" element={<UserNotification />} />
           <Route path="/sound-list" element={<SoundList />} />
           <Route path="/sound-add" element={<SoundAdd />} />
           <Route path="/sound-edit/:id" element={<SoundEdit />} />

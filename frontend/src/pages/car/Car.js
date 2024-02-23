@@ -6,6 +6,7 @@ import { regSw, subscribe } from '../../services/subscriptionService';
 import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import UserNotification from '../../components/websocketTest/UserNotification';
 
 function Car() {
   const { t } = useTranslation();
@@ -274,6 +275,7 @@ function Car() {
           </div>
         </div>
       )}
+            <UserNotification/>
     </>
   );
 }
