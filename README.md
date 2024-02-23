@@ -179,7 +179,7 @@ gonna happen
 
    _Example:_ At the begining of the API we have a spring that show us the action of uploading the API data, when it finish we can see the API.
 
-   imagen
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/ae297df6-4b2d-4b1f-aa23-fa9fb8150a70)
 
 
 9. Multilingual support
