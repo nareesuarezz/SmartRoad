@@ -129,7 +129,8 @@ imagen
 
    _Example_: The principal view of the API use a limited color palette, and efficient use of space. It presents only the necessary elements 
 
-imagen
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/02971a55-8eff-4b74-b002-d5b2fafa5970)
+
 
 7. Help and Documentation:
 
