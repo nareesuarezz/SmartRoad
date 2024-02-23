@@ -80,6 +80,7 @@ Then if you enter succesfully, you will have access to every table of the databa
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/d2914af9-1763-48d4-b039-9e5982f72a5f)
 
 Also we added a map on the tracks where you can difference a bicycle from a car by looking at their marks (bicycles are marked in blue and cars in red)
+
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/8707c522-225b-44d8-b22a-0c759e4076bc)
 
 Apart of that, if you make 2 tracks with the same vehicle, the app will recognise it and will mark it 
