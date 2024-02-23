@@ -95,8 +95,6 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/7ec111b7-d9c4-444a-b0a9-38c628bdaeff)
 
     
-   
-
 3. Readability:
 
     _Justification:_ Legible fonts, appropriate font sizes, and a well-chosen color scheme enhance readability, catering to users with visual impairments or reading difficulties.
@@ -105,6 +103,37 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
    
    ![290362307-931ec42f-f85d-4903-8cb6-01339b27a259](https://github.com/nareesuarezz/SmartRoad/assets/131177598/a4dd3d9e-fdad-454f-8d69-1bbbce11332b)
 
+
+4. Match Between the System and the Real World
+
+    _Justification:_ The desing uses words, phrases and concepts familiar for the user.
+
+    _Example:_ We use a common and simply use of the jargon for tell about what happening, and whats
+gonna happen
+
+imagen
+
+
+5. User Control and Freedom
+
+   _Justification:_ We make a clearly marked botton for cancel or go back on the transaction, to leave the unwanted action.
+
+   _Example:_ A left arrow on the top left of the screen that allow the user going back on the instruction
+
+   imagen
+
+
+6. Aesthetic and Minimalist Desing
+
+   _Justification:_ The interface abstent of irrelevant information and content all the necesary information on it.
+
+   _Example_: The principal view of the API use a limited color palette, and efficient use of space. It presents only the necessary elements 
+
+imagen
+
+7. Help and Documentation:
+
+    _Justification_: The API don't need additional explation.
 
 ## Accessibility Aspects:
 
