@@ -33,7 +33,8 @@ const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  pool: dbConfig.pool
+  pool: dbConfig.pool,
+  operatorsAliases: false 
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -203,4 +204,4 @@ require("./routes/subscription.routes")(app);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
-module.exports = { app, io }; // Exporting app and io for use in other modules
+module.exports = { app, io }; 

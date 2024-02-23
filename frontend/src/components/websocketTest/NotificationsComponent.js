@@ -35,6 +35,7 @@ const NotificationsComponent = () => {
     audio.volume = 0.4;
     audio.play();
   };
+  
 
   const sendNotification = async () => {
     const qs = require('qs');

@@ -4,6 +4,7 @@ import logoCar from '../../img/car.png';
 import './Home.css';
 import axios from 'axios';
 import { regSw, subscribe } from '../../services/subscriptionService';
+import { Puff } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
@@ -15,6 +16,7 @@ function Home() {
   const [subscription, setSubscription] = useState(null);
   const [availableSounds, setAvailableSounds] = useState([]);
   const [selectedSound, setSelectedSound] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,6 +29,7 @@ function Home() {
   }, []);
 
   const handleClick = async (vehicle) => {
+    setIsLoading(true); // Inicia la carga
     try {
       await askForNotificationPermission();
       const position = await askForLocationPermission();
@@ -44,6 +47,9 @@ function Home() {
       }
     } catch (error) {
       console.error('Error al solicitar permisos:', error);
+    }
+    finally {
+      setIsLoading(false);
     }
   };
 
@@ -154,7 +160,11 @@ function Home() {
           <p className='car'>{t('Car')}</p>
         </div>
       </div>
-
+      {isLoading && (
+        <div className="overlay">
+          <Puff className="spinner" height={100} width={100} />
+        </div>
+      )}
       <div className="sound-selector">
         <label htmlFor="notification-sound">{t('Select a notification sound:')}</label>
         <select onChange={handleSoundChange}>

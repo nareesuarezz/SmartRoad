@@ -6,16 +6,23 @@ exports.create = (req, res) => {
         Vehicle: req.body.Vehicle
     };
 
+    if (vehicle.Vehicle !== 'car' && vehicle.Vehicle !== 'bicycle') {
+        return res.status(400).send({
+            message: "El tipo de vehículo debe ser 'car' o 'bicycle'."
+        });
+    }
+
     Vehicles.create(vehicle)
         .then(data => {
             res.send(data);
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while creating the vehicle."
+                message: err.message || "Ocurrió un error al crear el vehículo."
             });
         });
 };
+
 
 exports.findAll = (req, res) => {
     Vehicles.findAll()
