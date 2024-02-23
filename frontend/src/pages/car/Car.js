@@ -58,13 +58,10 @@ function Car() {
         Vehicle_UID: lastVehicleId,
       };
 
-      await axios.post('https://localhost/api/tracks', data);
-
-      // Imprimir la ubicación para verificar
-      // console.log('Ubicación obtenida:', location);
-
       // Llamar a axios.post con los datos actualizados
       await axios.post(`${URL}/api/tracks`, data);
+
+      console.log(data.Location.coordinates)
       const recentTracks = await axios.get(`${URL}/api/tracks/recent-within-radius`, {
         params: {
           lat: [data.Location.coordinates[0]],
@@ -72,7 +69,10 @@ function Car() {
         }
       })
 
-      console.log(recentTracks.data.recentTracks)
+      if (recentTracks.data.recentTracks.length > 0) {
+        setShowModal(true);
+        sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
+      }
 
     } catch (err) {
       console.error(err);
@@ -162,28 +162,29 @@ function Car() {
   }, [lastVehicleId]); // Agregar lastVehicleId como dependencia
 
   //Notification
-  // useEffect(() => {
-  //   const notificationInterval = setInterval(() => {
-  //     if (showModal) {
-  //       setShowModal(false);
-  //       // Reproduce el sonido cuando se muestra el modal
-  //       if (audioElement) {
-  //       }
-  //     } else {
-  //       setShowModal(true);
-  //       sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
-  //     }
-  //   }, 10000);
+  useEffect(() => {
+    let hideModalTimer = null;
 
-  //   return () => {
-  //     clearInterval(notificationInterval);
-  //     // Detén la reproducción del sonido al desmontar el componente
-  //     if (audioElement) {
-  //       audioElement.pause();
-  //       audioElement.currentTime = 0;
-  //     }
-  //   };
-  // }, [showModal, audioElement]);
+    if (showModal) {
+      // Establece un temporizador para ocultar el modal después de 30 segundos
+      hideModalTimer = setTimeout(() => {
+        setShowModal(false);
+        // Aquí puedes detener el sonido si es necesario
+        if (audioElement) {
+          audioElement.pause();
+          audioElement.currentTime = 0;
+        }
+      }, 3000); // 30000 milisegundos = 30 segundos
+    }
+
+    return () => {
+      // Limpia el temporizador al desmontar o si showModal cambia antes de que el tiempo se agote
+      if (hideModalTimer) {
+        clearTimeout(hideModalTimer);
+      }
+    };
+  }, [showModal, audioElement, setShowModal]);
+
 
   const sendNotification = async (subscriptionName, notificationMessage) => {
     try {

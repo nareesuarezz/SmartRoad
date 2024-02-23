@@ -34,7 +34,9 @@ function Bicycle() {
                 Vehicle_UID: lastVehicleId,
             };
 
-            await axios.post('https://localhost/api/tracks', data).then(console.log('post'));
+            await axios.post('https://localhost/api/tracks', data);
+
+            console.log(data.Location.coordinates)
 
         } catch (err) {
             console.error(err.response);
