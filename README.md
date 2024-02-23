@@ -111,7 +111,7 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
     _Example:_ We use a common and simply use of the jargon for tell about what happening, and whats
 gonna happen
 
-imagen
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/fa7a6565-2f18-4cd6-9cdc-2a05cf56f34c)
 
 
 5. User Control and Freedom
@@ -121,7 +121,6 @@ imagen
    _Example:_ A left arrow on the top left of the screen that allow the user going back on the instruction
 
    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/173c8699-ad64-4da3-a6fb-c7160315c47a)
-
 
 
 6. Aesthetic and Minimalist Desing
