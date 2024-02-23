@@ -200,7 +200,11 @@ imagen
 
    _Example:_
 
-    <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
+   ```sh
+<a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
+```
+
+    
 
     ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/702a6329-4e2e-47da-b949-150f5a09b996)
 
