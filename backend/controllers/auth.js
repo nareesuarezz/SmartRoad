@@ -36,6 +36,9 @@ exports.signin = async (req, res) => {
     const token = utils.generateToken(admin);
     const adminDetails = utils.getCleanUser(admin);
 
+    // Añade el rol al objeto adminDetails
+    adminDetails.Role = admin.Role;
+
     res.json({ admin: adminDetails, access_token: token });
   } catch (error) {
     console.error("Error during sign-in:", error);
@@ -45,6 +48,7 @@ exports.signin = async (req, res) => {
     });
   }
 };
+
 
 exports.isAuthenticated = (req, res, next) => {
   const token = req.headers.authorization;

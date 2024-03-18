@@ -13,6 +13,9 @@ module.exports = (sequelize, Sequelize) => {
       },
       filename: {
         type: Sequelize.STRING
+      },
+      Role:{
+        type: Sequelize.ENUM('Admin', 'User')
       }
     });
   

@@ -24,7 +24,8 @@ exports.create = (req, res, next) => {
   let admin = {
     Username: req.body.Username,
     Password: req.body.Password,
-    filename: req.file ? req.file.filename : ""
+    filename: req.file ? req.file.filename : "",
+    Role: req.body.Role
   };
 
   Admin.findOne({ where: { Username: admin.Username } })
@@ -106,6 +107,10 @@ exports.update = async (req, res) => {
 
     if (req.body.Password) {
       admin.Password = bcrypt.hashSync(req.body.Password);
+    }
+
+    if (req.body.Role) {
+      admin.Role = req.body.Role;
     }
 
     if (req.file) {
