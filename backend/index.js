@@ -68,7 +68,8 @@ db.sequelize.sync({ force: true }).then(async () => {
     const createdAdmin = await db.Admin.create({
       Username: 'prueba',
       Password: hashedPassword,
-      filename: 'user.jpg'
+      filename: 'user.jpg',
+      Role: 'Admin'
     });
 
     const createdSound1 = await db.Sounds.create({
