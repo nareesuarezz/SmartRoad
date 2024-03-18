@@ -1,11 +1,9 @@
 function LoginUser() {
-
     return (
         <>
-            <h1>pepe</h1>
-            <p>dasffaf</p>
+            <h1>PEPE BENAVENTE</h1>
         </>
     )
 }
 
-export default LoginUser();
+export default LoginUser

@@ -181,7 +181,7 @@ function App() {
           <Route path="/sound-list" element={<SoundList />} />
           <Route path="/sound-add" element={<SoundAdd />} />
           <Route path="/sound-edit/:id" element={<SoundEdit />} />
-          <Route path='/login-user' element={<LoginUser />} />
+          <Route path="login-user" element={<LoginUser />} />
           {/* <Route path="/userProfile" element={<MenuUserInfo />} /> */}
         </Routes>
       </BrowserRouter>
