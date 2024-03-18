@@ -55,6 +55,7 @@ const AdminList = () => {
                         <th>ID</th>
                         <th>{t('Username')}</th>
                         <th>{t('Image')}</th>
+                        <th>{t('Role')}</th>
                         <th>{t('Actions')}</th>
                     </tr>
                 </thead>
@@ -64,6 +65,7 @@ const AdminList = () => {
                             <td>{admin.UID}</td>
                             <td>{admin.Username}</td>
                             <td><img src={`${URL}/images/${admin.filename}`} alt="Admin Avatar" width="60" /></td>
+                            <td>{admin.Role}</td>
                             <td>
                                 <Link to="#" onClick={() => deleteAdmin(admin.UID)} className="delete">
                                     {t('Delete')}

@@ -5,10 +5,12 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import { use } from 'i18next';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
 
@@ -16,11 +18,15 @@ const Login = () => {
 
   const goTracks = async () => {
     try {
-      const response = await AuthService.signIn(username, password);
+      const response = await AuthService.signIn(username, password, role);
 
-      console.log('Respuesta del backend:', response);
+      console.log('Respuesta del backend:', response.admin.role);
 
       localStorage.setItem('adminInfo', JSON.stringify(response.admin));
+      if (response.admin.Role !== 'Admin') {
+        setError('Acceso denegado. Solo los administradores pueden iniciar sesión.');
+        return;
+      }
 
       window.location.href = "/track-list";
     } catch (error) {
