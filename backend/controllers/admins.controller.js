@@ -24,8 +24,10 @@ exports.create = (req, res, next) => {
   let admin = {
     Username: req.body.Username,
     Password: req.body.Password,
+    Role: req.body.Role,
     filename: req.file ? req.file.filename : ""
   };
+  
 
   Admin.findOne({ where: { Username: admin.Username } })
     .then(data => {
@@ -108,6 +110,10 @@ exports.update = async (req, res) => {
       admin.Password = bcrypt.hashSync(req.body.Password);
     }
 
+    if (req.body.Role) {
+      admin.Role = req.body.Role;
+    }
+    
     if (req.file) {
       if (admin.filename) {
         const imagePath = path.join(__dirname, '../public/images/', admin.filename);
