@@ -9,6 +9,8 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import UserNotification from '../../components/websocketTest/UserNotification';
+import MenuUserInfo from '../../components/menuUserInfo/MenuUserInfo';
+import ProfilePicture from '../../components/profilePicture/profilePicture';
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
@@ -143,6 +145,7 @@ function Home() {
       <div className="title">
         <h1>SmartRoad</h1>
       </div>
+      
       <div>
         <LanguageSwitcher />
       </div>
@@ -181,7 +184,7 @@ function Home() {
         <p className='log' onClick={goLogin}>{t('Log in here')}</p>
       </div>
       <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
-      <UserNotification/>
+      <UserNotification />
     </>
   );
 }
