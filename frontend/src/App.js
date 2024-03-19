@@ -25,7 +25,7 @@ import SoundList from './pages/sounds/soundList';
 import SoundAdd from './pages/sounds/soundsAdd';
 import SoundEdit from './pages/sounds/soundsEdit';
 import LoginUser from './pages/loginUser/LoginUser';
-import UserProfile from './pages/userProfile/UserProfile'
+import UserProfile from './pages/userProfile/userProfile'
 
 // Initialize i18n
 i18n

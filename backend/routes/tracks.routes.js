@@ -28,5 +28,8 @@ module.exports = app => {
   // Delete all Cars
   router.delete("/", tracks.deleteAll);
 
+  // Retrieve a single Car with type and id
+  router.get("/:type/:id", tracks.timeCar);
+
   app.use("/api/tracks", router);
 }

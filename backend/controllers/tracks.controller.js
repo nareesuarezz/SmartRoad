@@ -223,3 +223,56 @@ exports.deleteAll = async (req, res) => {
         });
     }
 };
+
+exports.timeCar = async (req, res) => {
+    try {
+        const vehicleType = req.params.type; // Asegúrate de que 'type' sea el nombre correcto del parámetro
+        const vehicleId = req.params.id; // Asegúrate de que 'id' sea el nombre correcto del parámetro
+
+        const vehicle = await db.Vehicle.findOne({
+            where: { UID: vehicleId }
+        });
+        if (!vehicle) {
+            return res.status(404).send({
+                message: `No se encontró un vehículo con el tipo ${vehicleType} y el ID ${vehicleId}`
+            });
+        }
+
+        // Busca los tracks asociados a este vehículo
+        const tracks = await Tracks.findAll({
+            where: {
+                Vehicle_UID: vehicleId
+            },
+            attributes: ['Date'] // Solo devuelve el campo 'Date'
+        });
+        // Envía los datos del vehículo y los tracks como respuesta
+        res.send({ vehicle, tracks });
+    }
+    catch (err) {
+        res.status(500).send({
+            message: `Ocurrió un error al buscar el vehículo y sus tracks: ${err.message}`
+        });
+    }
+};
+
+exports.timeBicycle = async (req, res) => {
+    try {
+
+    }
+    catch (err) {
+        res.status(500).send({
+            message: `Some error occurred while removing all Tracks: ${err.message}`
+        })
+    }
+}
+
+exports.totalHoursVehicles = async (req, res) => {
+    try {
+        let time;
+    }
+    catch (err) {
+        res.status(500).send({
+            message: `Some error occurred while removing all Tracks: ${err.message}`
+        })
+    }
+}

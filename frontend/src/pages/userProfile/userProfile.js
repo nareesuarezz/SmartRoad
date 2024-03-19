@@ -2,11 +2,11 @@ import { ArrowLeftOutlined, MenuFoldOutlined, EditOutlined } from "@ant-design/i
 import MenuUserInfo from "../../components/menuUserInfo/MenuUserInfo.js"
 import ProfilePictureUser from "../../components/profilePictureUser/profilePictureUser.js"
 import axios from 'axios';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
-function UserProfile() {
+async function UserProfile() {
 
   const [showEditUsername, setShowEditUsername] = useState(false);
   const [showEditImage, setShowEditImage] = useState(false);
@@ -17,6 +17,23 @@ function UserProfile() {
   const [previewImage, setPreviewImage] = useState('');
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+  const dataTracks = await axios.get(`${URL}/api/tracks`)
+
+
+  const [carTime, setCarTime] = useState(null);
+
+  useEffect(() => {
+    const fetchCarTime = async () => {
+      try {
+        const response = await axios.get(`http://localhost:8080/api/tracks/car/${userInfo.UID}`);
+        setCarTime(response.data);
+      } catch (error) {
+        console.error(`Error fetching car time: ${error}`);
+      }
+    };
+
+    fetchCarTime();
+  }, [userInfo.UID]);
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
@@ -84,7 +101,7 @@ function UserProfile() {
       </header>
       <body>
         <h2>Here you will see you stats:</h2>
-        <p>Car Time = </p>
+        <p>Car Time = {carTime ? carTime : 'Loading...'}</p>
         <p>Bicycle Time = </p>
         <p>Car Km = </p>
         <p>Bicycle Km = </p>
@@ -118,4 +135,3 @@ function UserProfile() {
 }
 
 export default UserProfile
-    
