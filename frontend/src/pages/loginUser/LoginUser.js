@@ -10,6 +10,7 @@ function LoginUser() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
+    const [isSignUp, setIsSignUp] = useState(false);
 
     const { t } = useTranslation();
 
@@ -33,6 +34,27 @@ function LoginUser() {
         }
     }
 
+    const createAccount = async () => {
+        try {
+            const response = await AuthService.signUp(username, password, 'User', 'public/images/user.png');
+
+            console.log('Respuesta del backend:', response);
+
+            localStorage.setItem('userInfo', JSON.stringify(response.admin));
+
+            window.location.href = "/home";
+        } catch (error) {
+            console.error('Error al crear la cuenta:', error);
+            setError('El nombre de usuario ya está en uso');
+        }
+    }
+
+    const handleSignUpClick = () => {
+        setIsSignUp(true);
+        setUsername('');
+        setPassword('');
+    }
+
     return (
         <>
             <div>
@@ -41,7 +63,7 @@ function LoginUser() {
             <div className="container-wrapper">
                 <div className="container">
                     <div className="left">
-                        <h2 className="heading">{t('Login')}</h2>
+                        <h2 className="heading">{isSignUp ? t('Sign Up') : t('Login')}</h2>
                     </div>
                     <form className="form">
                         <div className="formGroup">
@@ -71,9 +93,18 @@ function LoginUser() {
                             <a href="#">{t('Did you forget your password?')}</a>
                         </div>
                         {error && <div className="error-message">{error}</div>}
-                        <button type="button" onClick={goHome}>
-                            {t('Login')}
-                        </button>
+                        {isSignUp ? (
+                            <button type="button" onClick={createAccount}>
+                                {t('Create Account')}
+                            </button>
+                        ) : (
+                            <>
+                                <button type="button" onClick={goHome}>
+                                    {t('Login')}
+                                </button>
+                                <p onClick={handleSignUpClick}>{t('Create Account')}</p>
+                            </>
+                        )}
                     </form>
                 </div>
             </div>

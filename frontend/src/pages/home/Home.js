@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import UserNotification from '../../components/websocketTest/UserNotification';
 import ProfilePictureUser from '../../components/profilePictureUser/profilePictureUser';
+import { UserDeleteOutlined } from '@ant-design/icons';
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
@@ -135,6 +136,10 @@ function Home() {
     window.location.href = "/login";
   };
 
+  const goBack = () => {
+    window.location.href = "/login-user";
+  };
+
   const handleSoundChange = (event) => {
     setSelectedSound(event.target.value);
   };
@@ -146,7 +151,10 @@ function Home() {
       <div className="title">
         <h1>SmartRoad</h1>
       </div>
-      <div><ProfilePictureUser/></div>
+      <div className='arrow' onClick={() => goBack()}>
+        <UserDeleteOutlined />
+      </div>
+      <div><ProfilePictureUser /></div>
       <div>
         <LanguageSwitcher />
       </div>
@@ -185,7 +193,7 @@ function Home() {
         <p className='log' onClick={goLogin}>{t('Log in here')}</p>
       </div>
       <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
-      <UserNotification/>
+      <UserNotification />
     </>
   );
 }
