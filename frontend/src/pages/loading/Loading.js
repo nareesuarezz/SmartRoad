@@ -13,7 +13,7 @@ function Loading() {
 
   useEffect(() => {
     const timeoutId = setTimeout(() => {
-      navigate('/home');
+      navigate('login-user');
     }, 3000);
 
     
