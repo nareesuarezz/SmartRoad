@@ -24,9 +24,10 @@ exports.create = (req, res, next) => {
   let admin = {
     Username: req.body.Username,
     Password: req.body.Password,
-    filename: req.file ? req.file.filename : "",
-    Role: req.body.Role
+    Role: req.body.Role,
+    filename: req.file ? req.file.filename : ""
   };
+  
 
   Admin.findOne({ where: { Username: admin.Username } })
     .then(data => {
@@ -112,7 +113,7 @@ exports.update = async (req, res) => {
     if (req.body.Role) {
       admin.Role = req.body.Role;
     }
-
+    
     if (req.file) {
       if (admin.filename) {
         const imagePath = path.join(__dirname, '../public/images/', admin.filename);
