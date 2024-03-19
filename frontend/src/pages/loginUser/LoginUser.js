@@ -19,7 +19,12 @@ function LoginUser() {
 
             console.log('Respuesta del backend:', response);
 
-            localStorage.setItem('adminInfo', JSON.stringify(response.admin));
+            localStorage.setItem('userInfo', JSON.stringify(response.admin));
+
+            if (response.admin.Role !== 'User') {
+                setError('Acceso denegado. Solo los usuarios pueden iniciar sesión.');
+                return;
+              }
 
             window.location.href = "/home";
         } catch (error) {

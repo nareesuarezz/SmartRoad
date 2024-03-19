@@ -9,6 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import UserNotification from '../../components/websocketTest/UserNotification';
+import ProfilePictureUser from '../../components/profilePictureUser/profilePictureUser';
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
@@ -138,11 +139,14 @@ function Home() {
     setSelectedSound(event.target.value);
   };
 
+
+
   return (
     <>
       <div className="title">
         <h1>SmartRoad</h1>
       </div>
+      <div><ProfilePictureUser/></div>
       <div>
         <LanguageSwitcher />
       </div>
