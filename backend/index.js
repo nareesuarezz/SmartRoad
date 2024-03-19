@@ -34,7 +34,7 @@ const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
   pool: dbConfig.pool,
-  operatorsAliases: false 
+  operatorsAliases: false
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
@@ -68,7 +68,8 @@ db.sequelize.sync({ force: true }).then(async () => {
     const createdAdmin = await db.Admin.create({
       Username: 'prueba',
       Password: hashedPassword,
-      filename: 'user.jpg'
+      filename: 'user.png',
+      Role: 'Admin'
     });
 
     const createdSound1 = await db.Sounds.create({
@@ -98,18 +99,21 @@ app.use(function (req, res, next) {
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];
     const credentials = Buffer.from(base64Credentials, 'base64').toString('ascii');
-    const [username, password] = credentials.split(':');
+    const [username, password, role] = credentials.split(':');
 
-    console.log('Decoded Credentials:', username, password);
+    console.log('Decoded Credentials:', username, password, role);
 
     req.body.Username = username;
     req.body.Password = password;
+    req.body.Role = role;
     req.bodyb = {};
     req.bodyb.Username = username;
     req.bodyb.Password = password;
+    req.bodyb.Role = role;
 
     return next();
   }
+
 
   if (token) {
     token = token.replace('Bearer ', '');

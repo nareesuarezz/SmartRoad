@@ -13,6 +13,7 @@ const AdminAdd = ({ getAdmins }) => {
   const [formData, setFormData] = useState({
     Username: '',
     Password: '',
+    Role: '',
     Image: null,
   });
 
@@ -55,6 +56,9 @@ const AdminAdd = ({ getAdmins }) => {
       if (!formData.Password) {
         missingFields.push('Password');
       }
+      if (!formData.Role) {
+        missingFields.push('Role');
+      }
       if (!formData.Image) {
         missingFields.push('Image');
       }
@@ -67,6 +71,7 @@ const AdminAdd = ({ getAdmins }) => {
       const formDataForUpload = new FormData();
       formDataForUpload.append('Username', formData.Username);
       formDataForUpload.append('Password', formData.Password);
+      formDataForUpload.append('Role', formData.Role);
       formDataForUpload.append('filename', formData.Image);
 
       await axios.post(`${URL}/api/admins`, formDataForUpload);
@@ -90,6 +95,14 @@ const AdminAdd = ({ getAdmins }) => {
         <label>
           {t('Password')}:
           <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
+        </label>
+        <label>
+          {t('Role')}:
+          <select name="Role" value={formData.Role} onChange={handleChange}>
+            <option value="">{t('Select')}</option>
+            <option value="Admin">{t('Admin')}</option>
+            <option value="User">{t('User')}</option>
+          </select>
         </label>
         <label>
           {t('Image')}:

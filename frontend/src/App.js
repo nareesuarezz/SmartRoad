@@ -25,6 +25,7 @@ import SoundList from './pages/sounds/soundList';
 import SoundAdd from './pages/sounds/soundsAdd';
 import SoundEdit from './pages/sounds/soundsEdit';
 import LoginUser from './pages/loginUser/LoginUser';
+import UserProfile from './pages/userProfile/UserProfile'
 
 // Initialize i18n
 i18n
@@ -182,7 +183,7 @@ function App() {
           <Route path="/sound-add" element={<SoundAdd />} />
           <Route path="/sound-edit/:id" element={<SoundEdit />} />
           <Route path="login-user" element={<LoginUser />} />
-          {/* <Route path="/userProfile" element={<MenuUserInfo />} /> */}
+          <Route path="/user-profile/:id" element={<UserProfile />} />
         </Routes>
       </BrowserRouter>
     </>
