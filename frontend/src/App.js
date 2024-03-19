@@ -24,6 +24,7 @@ import AdminNotification from './components/websocketTest/AdminNotification';
 import SoundList from './pages/sounds/soundList';
 import SoundAdd from './pages/sounds/soundsAdd';
 import SoundEdit from './pages/sounds/soundsEdit';
+import LoginUser from './pages/loginUser/LoginUser';
 
 // Initialize i18n
 i18n
@@ -180,6 +181,8 @@ function App() {
           <Route path="/sound-list" element={<SoundList />} />
           <Route path="/sound-add" element={<SoundAdd />} />
           <Route path="/sound-edit/:id" element={<SoundEdit />} />
+          <Route path="login-user" element={<LoginUser />} />
+          {/* <Route path="/userProfile" element={<MenuUserInfo />} /> */}
         </Routes>
       </BrowserRouter>
     </>
