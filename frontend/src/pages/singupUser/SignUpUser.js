@@ -1,35 +1,35 @@
 import React, { useState } from 'react';
-import './LoginUser.css';
+import './SignUpUser.css';
 import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
 import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
-function LoginUser() {
+function SignUpUser() {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
-
+    const URL = process.env.REACT_APP_LOCALHOST_URL;
     const { t } = useTranslation();
 
-    const goHome = async () => {
+    const createUser = async () => {
         try {
-            const response = await AuthService.signIn(username, password);
+            const pfp = `${URL}/images/user.png`
+            const response = await AuthService.signUp(username, password, 'User', pfp);
+
 
             console.log('Respuesta del backend:', response);
 
-            localStorage.setItem('userInfo', JSON.stringify(response.admin));
-
-            if (response.admin.Role !== 'User') {
-                setError('Acceso denegado. Solo los usuarios pueden iniciar sesión.');
+            if (response.error) {
+                setError(response.error);
                 return;
-              }
+            }
 
-            window.location.href = "/home";
+            window.location.href = "/login-user";
         } catch (error) {
-            console.error('Error de inicio de sesión:', error);
-            setError('Usuario o contraseña incorrectos');
+            console.error('Error de registro:', error);
+            setError('No puedes crear el usuario con este nombre, ya existe');
         }
     }
 
@@ -41,7 +41,7 @@ function LoginUser() {
             <div className="container-wrapper">
                 <div className="container">
                     <div className="left">
-                        <h2 className="heading">{t('Login')}</h2>
+                        <h2 className="heading">{t('Sign Up')}</h2>
                     </div>
                     <form className="form">
                         <div className="formGroup">
@@ -67,12 +67,9 @@ function LoginUser() {
                                 </div>
                             </div>
                         </div>
-                        <div className="formGroup forgot-password">
-                            <a href="/sign-up">{t(`Don't you have an account? Create one!`)}</a>
-                        </div>
                         {error && <div className="error-message">{error}</div>}
-                        <button type="button" onClick={goHome}>
-                            {t('Login')}
+                        <button type="button" onClick={createUser}>
+                            {t('Create Account')}
                         </button>
                     </form>
                 </div>
@@ -81,4 +78,4 @@ function LoginUser() {
     );
 };
 
-export default LoginUser;
+export default SignUpUser;

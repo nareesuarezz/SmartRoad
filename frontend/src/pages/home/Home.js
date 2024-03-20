@@ -144,8 +144,8 @@ function Home() {
     setSelectedSound(event.target.value);
   };
 
-
-
+  const user = JSON.parse(localStorage.getItem('userInfo'))
+  console.log(user)
   return (
     <>
       <div className="title">
