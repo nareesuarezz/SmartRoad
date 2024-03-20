@@ -27,7 +27,7 @@ exports.findRecentTracksWithinRadius = async (req, res) => {
         locationPoint
     );
 
-    console.log("SOCORROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",distance.args)
+    console.log("SOCORROOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", distance.args)
 
     try {
         const recentTracks = await db.Track.findAll({
@@ -84,7 +84,7 @@ exports.create = async (req, res) => {
             Speed: req.body.Speed,
             Extra: req.body.Extra,
             Vehicle_UID: req.body.Vehicle_UID,
-            Date: req.body.Date
+            Date: req.body.Date,
         };
 
         const createdTrack = await Tracks.create(track);
@@ -140,7 +140,7 @@ exports.update = async (req, res) => {
             Status: req.body.Status,
             Speed: req.body.Speed,
             Extra: req.body.Extra,
-            Vehicle_UID: req.body.Vehicle_UID
+            Vehicle_UID: req.body.Vehicle_UID,
         };
 
         const track = await Tracks.findByPk(id);
@@ -150,8 +150,6 @@ exports.update = async (req, res) => {
                 message: `Cannot update Track with id=${id}. Track not found!`
             });
         }
-
-
 
         if (!adminId) {
             console.error(`Admin ID is undefined. Request user: ${JSON.stringify(req.user)}`);
@@ -226,15 +224,14 @@ exports.deleteAll = async (req, res) => {
 
 exports.timeCar = async (req, res) => {
     try {
-        const vehicleType = req.params.type; // Asegúrate de que 'type' sea el nombre correcto del parámetro
-        const vehicleId = req.params.id; // Asegúrate de que 'id' sea el nombre correcto del parámetro
+        const vehicleId = req.params.Vehicle_UID;
 
         const vehicle = await db.Vehicle.findOne({
             where: { UID: vehicleId }
         });
         if (!vehicle) {
             return res.status(404).send({
-                message: `No se encontró un vehículo con el tipo ${vehicleType} y el ID ${vehicleId}`
+                message: `No se encontró un vehículo ID ${vehicleId}`
             });
         }
 
@@ -245,8 +242,21 @@ exports.timeCar = async (req, res) => {
             },
             attributes: ['Date'] // Solo devuelve el campo 'Date'
         });
-        // Envía los datos del vehículo y los tracks como respuesta
-        res.send({ vehicle, tracks });
+
+        // Calcula el total de horas y minutos
+        let totalMinutes = 0;
+        if (tracks.length > 1) {
+            const sortedTracks = tracks.sort((a, b) => a.Date - b.Date);
+            const firstTrack = sortedTracks[0].Date;
+            const lastTrack = sortedTracks[sortedTracks.length - 1].Date;
+            totalMinutes = Math.floor((lastTrack - firstTrack) / 60000);
+        }
+
+        const hours = Math.floor(totalMinutes / 60);
+        const minutes = totalMinutes % 60;
+
+        // Envía los datos del vehículo, los tracks y el total de horas y minutos como respuesta
+        res.send({ vehicle, tracks, total_time: { hours, minutes } });
     }
     catch (err) {
         res.status(500).send({
@@ -254,6 +264,7 @@ exports.timeCar = async (req, res) => {
         });
     }
 };
+
 
 exports.timeBicycle = async (req, res) => {
     try {

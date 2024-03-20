@@ -17,8 +17,6 @@ async function UserProfile() {
   const [previewImage, setPreviewImage] = useState('');
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'))
-  const dataTracks = await axios.get(`${URL}/api/tracks`)
-
 
   const [carTime, setCarTime] = useState(null);
 
