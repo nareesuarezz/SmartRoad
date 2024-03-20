@@ -19,6 +19,7 @@ const AuthService = {
       throw error;
     }
   },
+  
   signUp: async (username, password, role, profilePicture) => {
     try {
       const profilePicture = 'images/user.png'; 
