@@ -70,6 +70,9 @@ function LoginUser() {
                         <div className="formGroup forgot-password">
                             <a href="/sign-up">{t(`Don't you have an account? Create one!`)}</a>
                         </div>
+                        <div className="formGroup forgot-password">
+                            <a href="/home">{t(`Continue as a guest`)}</a>
+                        </div>
                         {error && <div className="error-message">{error}</div>}
                         <button type="button" onClick={goHome}>
                             {t('Login')}

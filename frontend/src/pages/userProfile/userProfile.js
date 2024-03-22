@@ -6,7 +6,7 @@ import { useState, useEffect } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
-async function UserProfile() {
+function UserProfile() {
 
   const [showEditUsername, setShowEditUsername] = useState(false);
   const [showEditImage, setShowEditImage] = useState(false);
