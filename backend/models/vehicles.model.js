@@ -10,12 +10,15 @@ module.exports = (sequelize, Sequelize, models) => {
     }
   });
 
-  Vehicles.belongsTo(models.Admins, {
-    foreignKey: 'Admin_UID',
-    targetKey: 'UID',
-    onDelete: 'CASCADE',
-    onUpdate: 'CASCADE',
-  });
+  Vehicles.associate = models => {
+    Vehicles.belongsTo(models.Admin, {
+      foreignKey: 'Admin_UID',
+      targetKey: 'UID',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    });
+  };
+
 
   return Vehicles;
 };

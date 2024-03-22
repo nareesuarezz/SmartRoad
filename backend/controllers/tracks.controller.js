@@ -222,49 +222,65 @@ exports.deleteAll = async (req, res) => {
     }
 };
 
+// exports.timeCar = async (req, res) => {
+//     try {
+//         const vehicleId = req.params.Vehicle_UID;
+
+//         const vehicle = await db.Vehicle.findOne({
+//             where: { UID: vehicleId }
+//         });
+//         if (!vehicle) {
+//             return res.status(404).send({
+//                 message: `No se encontró un vehículo ID ${vehicleId}`
+//             });
+//         }
+
+//         // Busca los tracks asociados a este vehículo
+//         debugger
+//         const tracks = await Tracks.findAll({
+//             where: {
+//                 UID: vehicleId
+//             },
+//             attributes: ['Date'] // Solo devuelve el campo 'Date'
+//         });
+
+//         // Calcula el total de horas y minutos
+//         let totalMinutes = 0;
+//         if (tracks.length > 1) {
+//             const sortedTracks = tracks.sort((a, b) => a.Date - b.Date);
+//             const firstTrack = sortedTracks[0].Date;
+//             const lastTrack = sortedTracks[sortedTracks.length - 1].Date;
+//             totalMinutes = Math.floor((lastTrack - firstTrack) / 60000);
+//         }
+
+//         const hours = Math.floor(totalMinutes / 60);
+//         const minutes = totalMinutes % 60;
+
+//         // Envía los datos del vehículo, los tracks y el total de horas y minutos como respuesta
+//         res.send({ vehicle, tracks, total_time: { hours, minutes } });
+//     }
+//     catch (err) {
+//         res.status(500).send({
+//             message: `Ocurrió un error al buscar el vehículo y sus tracks: ${err.message}`
+//         });
+//     }
+// };
+
 exports.timeCar = async (req, res) => {
     try {
-        const vehicleId = req.params.Vehicle_UID;
-
-        const vehicle = await db.Vehicle.findOne({
-            where: { UID: vehicleId }
-        });
-        if (!vehicle) {
-            return res.status(404).send({
-                message: `No se encontró un vehículo ID ${vehicleId}`
-            });
-        }
-
-        // Busca los tracks asociados a este vehículo
-        debugger
-        const tracks = await Tracks.findAll({
-            where: {
-                UID: vehicleId
-            },
-            attributes: ['Date'] // Solo devuelve el campo 'Date'
-        });
-
-        // Calcula el total de horas y minutos
-        let totalMinutes = 0;
-        if (tracks.length > 1) {
-            const sortedTracks = tracks.sort((a, b) => a.Date - b.Date);
-            const firstTrack = sortedTracks[0].Date;
-            const lastTrack = sortedTracks[sortedTracks.length - 1].Date;
-            totalMinutes = Math.floor((lastTrack - firstTrack) / 60000);
-        }
-
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-
-        // Envía los datos del vehículo, los tracks y el total de horas y minutos como respuesta
-        res.send({ vehicle, tracks, total_time: { hours, minutes } });
+        const vehicleId = await db.Vehicle.findByPk()
+        const result = await Tracks.findByPk(vehicleId)
+        res.send({
+            message: `Resultado: ${result}`
+        })
     }
     catch (err) {
         res.status(500).send({
             message: `Ocurrió un error al buscar el vehículo y sus tracks: ${err.message}`
-        });
+        })
     }
-};
+}
+
 
 
 exports.timeBicycle = async (req, res) => {

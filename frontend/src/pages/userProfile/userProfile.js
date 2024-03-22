@@ -6,11 +6,8 @@ import { useState, useEffect, useDebugValue } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
-<<<<<<< HEAD
 console.log(URL)
 
-=======
->>>>>>> b2a72293864c69335adfe107b2329131e28732e8
 function UserProfile() {
 
   const [showEditUsername, setShowEditUsername] = useState(false);
@@ -36,8 +33,8 @@ function UserProfile() {
     })
       .then(response => response.json())
       .then(data => {
-        console.log(data); // Aquí está tu console.log
-        setCarTime(data.total_time);
+        console.log(data);
+        setCarTime(data);
       })
       .catch(error => console.error('Error:', error));
   }, []);
