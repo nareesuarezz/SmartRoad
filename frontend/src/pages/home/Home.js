@@ -22,6 +22,9 @@ function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
+  const user = JSON.parse(localStorage.getItem('userInfo'))
+  console.log(user)
+
   useEffect(() => {
     axios.get(`${URL}/api/sounds`)
       .then(response => {
@@ -100,6 +103,7 @@ function Home() {
     try {
       const response = await axios.post(`${URL}/api/vehicles`, {
         Vehicle: vehicle,
+        Admin_UID: user.UID,
       });
 
       console.log(`Vehicle created successfully`);
@@ -144,8 +148,8 @@ function Home() {
     setSelectedSound(event.target.value);
   };
 
-  const user = JSON.parse(localStorage.getItem('userInfo'))
-  console.log(user)
+
+
   return (
     <>
       <div className="title">

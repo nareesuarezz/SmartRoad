@@ -5,7 +5,7 @@ import axios from 'axios';
 import { useState, useEffect } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
-
+console.log(URL)
 function UserProfile() {
 
   const [showEditUsername, setShowEditUsername] = useState(false);
@@ -23,7 +23,8 @@ function UserProfile() {
   useEffect(() => {
     const fetchCarTime = async () => {
       try {
-        const response = await axios.get(`http://localhost:8080/api/tracks/car/${userInfo.UID}`);
+        const response = await axios.get(`${URL}/api/tracks/car/${userInfo.UID}`);
+        console.log(response.data)
         setCarTime(response.data);
       } catch (error) {
         console.error(`Error fetching car time: ${error}`);
