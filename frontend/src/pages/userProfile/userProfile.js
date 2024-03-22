@@ -2,7 +2,7 @@ import { ArrowLeftOutlined, MenuFoldOutlined, EditOutlined } from "@ant-design/i
 import MenuUserInfo from "../../components/menuUserInfo/MenuUserInfo.js"
 import ProfilePictureUser from "../../components/profilePictureUser/profilePictureUser.js"
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useDebugValue } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 console.log(URL)
@@ -100,8 +100,7 @@ function UserProfile() {
       </header>
       <body>
         <h2>Here you will see you stats:</h2>
-        <p>Car Time = {carTime ? carTime : 'Loading...'}</p>
-        <p>Bicycle Time = </p>
+        <p>Car Time = {carTime ? `${carTime.hours} horas, ${carTime.minutes} minutos` : 'Cargando...'}</p>        <p>Bicycle Time = </p>
         <p>Car Km = </p>
         <p>Bicycle Km = </p>
         <p>Total Km = </p>

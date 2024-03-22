@@ -59,13 +59,6 @@ module.exports = (sequelize, Sequelize) => {
       onDelete: 'CASCADE',
       onUpdate: 'CASCADE',
     });
-    //Relación con la tabla Admins
-    // Tracks.belongsTo(models.Admins, {
-    //   foreignKey: 'Admin_UID',
-    //   targetKey: 'UID',
-    //   onDelete: 'CASCADE',
-    //   onUpdate: 'CASCADE',
-    // });
   };
 
   return Tracks;
