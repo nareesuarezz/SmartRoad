@@ -66,6 +66,9 @@ function SignUpUser() {
                                     {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
                                 </div>
                             </div>
+                            <div className="formGroup forgot-password">
+                                <a href="/login-user">{t(`Do you have an account? Log In!`)}</a>
+                            </div>
                         </div>
                         {error && <div className="error-message">{error}</div>}
                         <button type="button" onClick={createUser}>

@@ -6,8 +6,11 @@ import { useState, useEffect, useDebugValue } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
+<<<<<<< HEAD
 console.log(URL)
 
+=======
+>>>>>>> b2a72293864c69335adfe107b2329131e28732e8
 function UserProfile() {
 
   const [showEditUsername, setShowEditUsername] = useState(false);
