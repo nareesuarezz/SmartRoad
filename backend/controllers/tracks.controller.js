@@ -236,9 +236,10 @@ exports.timeCar = async (req, res) => {
         }
 
         // Busca los tracks asociados a este vehículo
+        debugger
         const tracks = await Tracks.findAll({
             where: {
-                Vehicle_UID: vehicleId
+                UID: vehicleId
             },
             attributes: ['Date'] // Solo devuelve el campo 'Date'
         });

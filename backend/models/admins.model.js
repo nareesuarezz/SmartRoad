@@ -19,14 +19,15 @@ module.exports = (sequelize, Sequelize) => {
     }
   });
 
-  // Admins.associate = models => {
-  //   Admins.hasMany(models.Tracks, {
-  //     foreignKey: 'Admin_UID',
-  //     sourceKey: 'UID',
-  //     onDelete: 'CASCADE',
-  //     onUpdate: 'CASCADE',
-  //   });
-  // };
+  // Relación con la tabla Vehicles
+  Admins.associate = models => {
+    Admins.hasMany(models.Vehicles, {
+      foreignKey: 'Admin_UID',
+      sourceKey: 'UID',
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    })
+  };
 
   return Admins;
 };

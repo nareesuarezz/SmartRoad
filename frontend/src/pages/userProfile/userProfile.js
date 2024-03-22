@@ -2,11 +2,13 @@ import { ArrowLeftOutlined, MenuFoldOutlined, EditOutlined } from "@ant-design/i
 import MenuUserInfo from "../../components/menuUserInfo/MenuUserInfo.js"
 import ProfilePictureUser from "../../components/profilePictureUser/profilePictureUser.js"
 import axios from 'axios';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useDebugValue } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
-async function UserProfile() {
+console.log(URL)
+
+function UserProfile() {
 
   const [showEditUsername, setShowEditUsername] = useState(false);
   const [showEditImage, setShowEditImage] = useState(false);
@@ -21,17 +23,21 @@ async function UserProfile() {
   const [carTime, setCarTime] = useState(null);
 
   useEffect(() => {
-    const fetchCarTime = async () => {
-      try {
-        const response = await axios.get(`http://localhost:8080/api/tracks/car/${userInfo.UID}`);
-        setCarTime(response.data);
-      } catch (error) {
-        console.error(`Error fetching car time: ${error}`);
-      }
-    };
-
-    fetchCarTime();
-  }, [userInfo.UID]);
+    let response;
+    fetch(`${URL}/api/tracks/timeCar/2`, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+        // Aquí puedes añadir otros headers que necesites, como tokens de autenticación
+      },
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log(data); // Aquí está tu console.log
+        setCarTime(data.total_time);
+      })
+      .catch(error => console.error('Error:', error));
+  }, []);
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
@@ -99,8 +105,7 @@ async function UserProfile() {
       </header>
       <body>
         <h2>Here you will see you stats:</h2>
-        <p>Car Time = {carTime ? carTime : 'Loading...'}</p>
-        <p>Bicycle Time = </p>
+        <p>Car Time = {carTime ? `${carTime.hours} horas, ${carTime.minutes} minutos` : 'Cargando...'}</p>        <p>Bicycle Time = </p>
         <p>Car Km = </p>
         <p>Bicycle Km = </p>
         <p>Total Km = </p>
