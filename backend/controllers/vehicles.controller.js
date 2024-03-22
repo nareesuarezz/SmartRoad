@@ -3,7 +3,8 @@ const Vehicles = db.Vehicle;
 
 exports.create = (req, res) => {
     const vehicle = {
-        Vehicle: req.body.Vehicle
+        Vehicle: req.body.Vehicle,
+        Admin_UID: req.body.Admin_UID,
     };
 
     if (vehicle.Vehicle !== 'car' && vehicle.Vehicle !== 'bicycle') {
@@ -59,7 +60,8 @@ exports.findOne = (req, res) => {
 exports.update = (req, res) => {
     const id = req.params.id;
     const updateVehicle = {
-        Vehicle: req.body.Vehicle
+        Vehicle: req.body.Vehicle,
+        Admin_UID: req.body.Admin_UID,
     };
 
     Vehicles.findByPk(id)

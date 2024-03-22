@@ -5,9 +5,7 @@ import axios from 'axios';
 import { useState, useEffect, useDebugValue } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
-
 console.log(URL)
-
 function UserProfile() {
 
   const [showEditUsername, setShowEditUsername] = useState(false);
@@ -23,21 +21,18 @@ function UserProfile() {
   const [carTime, setCarTime] = useState(null);
 
   useEffect(() => {
-    let response;
-    fetch(`${URL}/api/tracks/timeCar/2`, {
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-        // Aquí puedes añadir otros headers que necesites, como tokens de autenticación
-      },
-    })
-      .then(response => response.json())
-      .then(data => {
-        console.log(data);
-        setCarTime(data);
-      })
-      .catch(error => console.error('Error:', error));
-  }, []);
+    const fetchCarTime = async () => {
+      try {
+        const response = await axios.get(`${URL}/api/tracks/car/${userInfo.UID}`);
+        console.log(response.data)
+        setCarTime(response.data);
+      } catch (error) {
+        console.error(`Error fetching car time: ${error}`);
+      }
+    };
+
+    fetchCarTime();
+  }, [userInfo.UID]);
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {

@@ -28,6 +28,8 @@ db.Subscription = require("./subscription.model.js")(sequelize, Sequelize);
 
 db.Log.belongsTo(db.Admin, { foreignKey: 'Admin_UID' });
 db.Log.belongsTo(db.Track, { foreignKey: 'Track_ID' });
+db.Admin.hasMany(db.Vehicle, { foreignKey: 'Admin_UID' });
+db.Vehicle.belongsTo(db.Admin, { foreignKey: 'Admin_UID' });
 db.Track.belongsTo(db.Vehicle, {
   foreignKey: 'Vehicle_UID',
   as: 'Vehicles' // Asegúrate de que este alias sea correcto y consistente
