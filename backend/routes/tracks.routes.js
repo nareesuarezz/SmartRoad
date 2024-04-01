@@ -24,11 +24,14 @@ module.exports = app => {
   // Delete all Cars
   router.delete("/", tracks.deleteAll);
 
-  // Retrieve a single Car with type and id
-  router.get("/:type/:id", tracks.timeCar);
+  // Retrieve the total time for the vehicles
+  router.get("/totalTime/:Admin_UID", tracks.calculateTotalTime);
 
-  // Nuevo endpoint para obtener el tiempo del coche
-  router.get("/timeCar/:Vehicle_UID", tracks.timeCar);
+  // Retrieve the time for the car
+  router.get("/carTime/:Admin_UID", tracks.calculateCarTime);
+
+  // Retrieve the time fot the bicycle
+  router.get("/bicycleTime/:Admin_UID", tracks.calculateBicycleTime);
 
   app.use("/api/tracks", router);
 }
