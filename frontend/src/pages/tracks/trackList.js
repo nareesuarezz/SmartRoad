@@ -141,6 +141,7 @@ const TrackList = () => {
                   <p>{`Track ID: ${track.ID}`}</p>
                   <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
                   <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
+                  <p>{`Status: ${track.Status}`}</p>
                 </Popup>
               </Marker>
             );

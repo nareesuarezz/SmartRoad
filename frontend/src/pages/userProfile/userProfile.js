@@ -102,11 +102,11 @@ function UserProfile() {
       try {
         // Realiza una solicitud GET a la API para obtener el último viaje
         const response = await axios.get(`${URL}/api/tracks/lastJourney/admin/${userInfo.UID}`);
-  
+    
         // Actualiza el estado con el último viaje obtenido
         const lastJourney = response.data;
         setLastJourney(lastJourney);
-  
+    
         if (lastJourney) {
           const startPlaceName = await getPlaceName(
             lastJourney.firstTrack.Location.coordinates[0],
@@ -116,7 +116,7 @@ function UserProfile() {
             lastJourney.lastTrack.Location.coordinates[0],
             lastJourney.lastTrack.Location.coordinates[1]
           );
-  
+    
           setStartPlaceName(startPlaceName);
           setEndPlaceName(endPlaceName);
         }
@@ -124,6 +124,7 @@ function UserProfile() {
         console.error(`Error fetching last journey: ${error}`);
       }
     };
+  
     fetchLastJourney();
     fetchTotalDistance();
   }, []); // El array vacío significa que este efecto se ejecutará solo una vez, cuando se monte el componente

@@ -1,6 +1,0 @@
-{
-  "dependencies": {
-    "leaflet-routing-machine": "^3.2.12",
-    "wkx": "^0.5.0"
-  }
-}
