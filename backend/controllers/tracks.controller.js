@@ -1,5 +1,6 @@
 const db = require("../models");
 const Tracks = db.Track;
+const Vehicles = db.Vehicle
 const Logs = db.Log;
 const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
@@ -288,3 +289,73 @@ exports.totalHoursVehicles = async (req, res) => {
         })
     }
 }
+
+function calculateDistance(location1, location2) {
+    const R = 6371e3; // radio medio de la Tierra en metros
+    const lat1 = location1[0] * Math.PI/180; // convertir a radianes
+    const lat2 = location2[0] * Math.PI/180;
+    const deltaLat = (location2[0]-location1[0]) * Math.PI/180;
+    const deltaLng = (location2[1]-location1[1]) * Math.PI/180;
+
+    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+              Math.cos(lat1) * Math.cos(lat2) *
+              Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    const distance = R * c; // en metros
+    return distance;
+}
+
+exports.calculateTotalDistance = async (req, res) => {
+    const adminId = req.params.Admin_UID; // Asume que recibes el ID del administrador como parámetro
+
+    try {
+        // Encuentra todos los vehículos para el administrador dado
+        const vehicles = await Vehicles.findAll({
+            where: { Admin_UID: adminId }
+        });
+
+        let totalDistance = 0;
+        let carDistance = 0;
+        let bicycleDistance = 0;
+
+        // Itera sobre los vehículos
+        for (let vehicle of vehicles) {
+            // Encuentra todos los tracks para el vehículo dado, ordenados por fecha
+            const tracks = await Tracks.findAll({
+                where: { Vehicle_UID: vehicle.UID },
+                order: [['Date', 'ASC']]
+            });
+
+            // Itera sobre los tracks y suma la distancia entre cada par de tracks consecutivos
+            for (let i = 0; i < tracks.length - 1; i++) {
+                const location1 = tracks[i].Location.coordinates;
+                const location2 = tracks[i + 1].Location.coordinates;
+                const distance = calculateDistance(location1, location2);
+                totalDistance += distance;
+
+                // Suma la distancia al total de 'car' o 'bicycle' dependiendo del tipo de vehículo
+                if (vehicle.Vehicle === 'car') {
+                    carDistance += distance;
+                } else if (vehicle.Vehicle === 'bicycle') {
+                    bicycleDistance += distance;
+                }
+            }
+        }
+
+        res.status(200).send({
+            totalDistance: totalDistance,
+            carDistance: carDistance,
+            bicycleDistance: bicycleDistance
+        });
+    } catch (error) {
+        console.error(`Error al calcular la distancia total: ${error.message}`);
+        res.status(500).send({
+            message: `Error al calcular la distancia total: ${error.message}`
+        });
+    }
+};
+
+
+
+

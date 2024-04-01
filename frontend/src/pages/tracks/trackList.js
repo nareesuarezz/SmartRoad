@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, Polyline } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
-import 'leaflet/dist/leaflet.css'; // Importa los estilos de Leaflet
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
@@ -30,8 +31,7 @@ const TrackList = () => {
   const { t } = useTranslation();
 
   const [tracks, setTracks] = useState([]);
-  const [adminId, setAdminId] = useState(null);
-  const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]); // Coordenadas de Gran Canaria
+  const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]);
 
   useEffect(() => {
     getTracks();
@@ -45,7 +45,7 @@ const TrackList = () => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-
+  
       // Asegúrate de que cada track tenga la información del vehículo
       const tracksWithVehicleInfo = await Promise.all(response.data.map(async (track) => {
         const vehicleResponse = await axios.get(`${URL}/api/vehicles/${track.Vehicle_UID}`, {
@@ -55,13 +55,13 @@ const TrackList = () => {
         });
         return { ...track, vehicleType: vehicleResponse.data.Vehicle };
       }));
-
+  
       setTracks(tracksWithVehicleInfo);
     } catch (error) {
       console.error('Error fetching tracks:', error);
     }
   };
-
+  
 
   const groupTracksByVehicle = () => {
     const groupedTracks = {};
@@ -79,11 +79,54 @@ const TrackList = () => {
     window.location.href = '/login';
   };
 
+  const RoutingMachine = ({ trackCoordinates }) => {
+    const map = useMap();
+  
+    useEffect(() => {
+  if (trackCoordinates.length > 1) {
+    let routingControl = L.Routing.control({
+      waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+      routeWhileDragging: true,
+      addWaypoints: false,
+      draggableWaypoints: false,
+      fitSelectedRoutes: true,
+      showAlternatives: false,
+      router: new L.Routing.osrmv1({
+        language: 'es',
+        profile: 'driving',
+      }),
+      lineOptions: {
+        styles: [{color: 'blue', opacity: 1, weight: 5}]
+      },
+      show: false, // Esta opción oculta las direcciones para llegar
+      routeLine: function(route, options) { // Esta función oculta la línea de la ruta
+        return L.polyline(route.coordinates, options);
+      },
+      createMarker: function() { return null; }, // Esta función oculta los marcadores de inicio y fin
+    }).addTo(map);
+
+    // Oculta el panel de instrucciones de ruta después de que se haya creado
+    routingControl.on('routeselected', function(e) {
+      let routesContainer = document.querySelector('.leaflet-routing-container-hide');
+      if (routesContainer) {
+        routesContainer.style.display = 'none';
+      }
+    });
+  }
+}, [map, trackCoordinates]);
+
+  
+    return null;
+  };
+  
+  
+  
   const renderTracksOnMap = () => {
     const groupedTracks = groupTracksByVehicle();
-
+  
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
       const trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
+  
       return (
         <React.Fragment key={index}>
           {vehicleTracks.map((track, trackIndex) => {
@@ -102,8 +145,7 @@ const TrackList = () => {
               </Marker>
             );
           })}
-
-          <Polyline positions={trackCoordinates} color="blue" />
+          <RoutingMachine trackCoordinates={trackCoordinates} />
         </React.Fragment>
       );
     });
@@ -116,9 +158,11 @@ const TrackList = () => {
       <div>
         <LanguageSwitcher />
       </div>
-      <Link to="/track-add" className="add">
-        {t('Add Track')}
-      </Link>
+      <div>
+        <Link to="/track-add" className="add">
+          {t('Add Track')}
+        </Link>
+      </div>
 
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
         <MapContainer center={mapCenter} zoom={12} style={{ height: '500px', width: '700px' }}>
@@ -129,8 +173,6 @@ const TrackList = () => {
           {renderTracksOnMap()}
         </MapContainer>
       </div>
-
-
     </div>
   );
 };

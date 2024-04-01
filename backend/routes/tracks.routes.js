@@ -24,11 +24,17 @@ module.exports = app => {
   // Delete all Cars
   router.delete("/", tracks.deleteAll);
 
+  // Nuevo endpoint para calcular la distancia total recorrida por los vehículos de un administrador
+  router.get("/distance/admin/:Admin_UID", tracks.calculateTotalDistance);
+
   // Retrieve a single Car with type and id
   router.get("/:type/:id", tracks.timeCar);
 
   // Nuevo endpoint para obtener el tiempo del coche
   router.get("/timeCar/:Vehicle_UID", tracks.timeCar);
+
+
+
 
   app.use("/api/tracks", router);
 }

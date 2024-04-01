@@ -1,38 +1,27 @@
-import { ArrowLeftOutlined, MenuFoldOutlined, EditOutlined } from "@ant-design/icons"
-import MenuUserInfo from "../../components/menuUserInfo/MenuUserInfo.js"
-import ProfilePictureUser from "../../components/profilePictureUser/profilePictureUser.js"
+import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import MenuUserInfo from "../../components/menuUserInfo/MenuUserInfo.js";
+import ProfilePictureUser from "../../components/profilePictureUser/profilePictureUser.js";
 import axios from 'axios';
-import { useState, useEffect, useDebugValue } from 'react';
+import { useState, useEffect } from 'react';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
-console.log(URL)
-function UserProfile() {
 
+function UserProfile() {
   const [showEditUsername, setShowEditUsername] = useState(false);
   const [showEditImage, setShowEditImage] = useState(false);
+  const [totalDistance, setTotalDistance] = useState(0);
   const [formData, setFormData] = useState({
     Image: null,
     Username: '',
   });
   const [previewImage, setPreviewImage] = useState('');
-
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'))
-
   const [carTime, setCarTime] = useState(null);
+  const [carDistance, setCarDistance] = useState(0);
+  const [bicycleDistance, setBicycleDistance] = useState(0);
 
-  useEffect(() => {
-    const fetchCarTime = async () => {
-      try {
-        const response = await axios.get(`${URL}/api/tracks/car/${userInfo.UID}`);
-        console.log(response.data)
-        setCarTime(response.data);
-      } catch (error) {
-        console.error(`Error fetching car time: ${error}`);
-      }
-    };
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
-    fetchCarTime();
-  }, [userInfo.UID]);
+
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
@@ -82,6 +71,27 @@ function UserProfile() {
     window.location.href = '/home';
   };
 
+  useEffect(() => {
+    // Define una función asincrónica que realiza la solicitud a la API
+    const fetchTotalDistance = async () => {
+      try {
+        // Realiza una solicitud GET a la API para obtener la distancia total
+        const response = await axios.get(`${URL}/api/tracks/distance/admin/${userInfo.UID}`);
+
+        // Actualiza el estado con la distancia total obtenida
+        setTotalDistance(response.data.totalDistance);
+        setCarDistance(response.data.carDistance);
+        setBicycleDistance(response.data.bicycleDistance);
+      } catch (error) {
+        console.error(`Error fetching total distance: ${error}`);
+      }
+    };
+
+    // Llama a la función que acabas de definir
+    fetchTotalDistance();
+  }, []); // El array vacío significa que este efecto se ejecutará solo una vez, cuando se monte el componente
+
+
   return (
     <>
       <header>
@@ -98,12 +108,12 @@ function UserProfile() {
         </div>
         <MenuUserInfo />
       </header>
-      <body>
+      <div>
         <h2>Here you will see you stats:</h2>
-        <p>Car Time = {carTime ? `${carTime.hours} horas, ${carTime.minutes} minutos` : 'Cargando...'}</p>        <p>Bicycle Time = </p>
-        <p>Car Km = </p>
-        <p>Bicycle Km = </p>
-        <p>Total Km = </p>
+        <p>Car Time = {carTime ? `${carTime.hours} horas, ${carTime.minutes} minutos` : 'Cargando...'}</p>
+        <p>Car Km = {(carDistance / 1000).toFixed(2)}</p> 
+        <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)}</p> 
+        <p>Total Km = {(totalDistance / 1000).toFixed(2)}</p>
         {showEditUsername && (
           <form onSubmit={handleSubmit}>
             <label>
@@ -127,9 +137,9 @@ function UserProfile() {
             <button type="submit">Actualizar imagen de perfil</button>
           </form>
         )}
-      </body>
+      </div>
     </>
-  )
+  );
 }
 
-export default UserProfile
+export default UserProfile;
