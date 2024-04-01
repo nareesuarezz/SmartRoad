@@ -24,6 +24,9 @@ module.exports = app => {
   // Delete all Cars
   router.delete("/", tracks.deleteAll);
 
+  // Nuevo endpoint para obtener el último viaje de un administrador
+  router.get("/lastJourney/admin/:Admin_UID", tracks.getLastJourney);
+
   // Nuevo endpoint para calcular la distancia total recorrida por los vehículos de un administrador
   router.get("/distance/admin/:Admin_UID", tracks.calculateTotalDistance);
 
@@ -32,7 +35,6 @@ module.exports = app => {
 
   // Nuevo endpoint para obtener el tiempo del coche
   router.get("/timeCar/:Vehicle_UID", tracks.timeCar);
-
 
 
 

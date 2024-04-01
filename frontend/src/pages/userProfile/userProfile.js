@@ -4,7 +4,15 @@ import ProfilePictureUser from "../../components/profilePictureUser/profilePictu
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
+
 const URL = process.env.REACT_APP_LOCALHOST_URL;
+
+const getPlaceName = async (lat, lon) => {
+  const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+  const data = await response.json();
+  const shortAddress = data.display_name.split(',').slice(0, 4).join(',');
+  return shortAddress;
+};
 
 function UserProfile() {
   const [showEditUsername, setShowEditUsername] = useState(false);
@@ -18,6 +26,9 @@ function UserProfile() {
   const [carTime, setCarTime] = useState(null);
   const [carDistance, setCarDistance] = useState(0);
   const [bicycleDistance, setBicycleDistance] = useState(0);
+  const [lastJourney, setLastJourney] = useState(null);
+  const [startPlaceName, setStartPlaceName] = useState('');
+  const [endPlaceName, setEndPlaceName] = useState('');
 
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
@@ -87,7 +98,33 @@ function UserProfile() {
       }
     };
 
-    // Llama a la función que acabas de definir
+    const fetchLastJourney = async () => {
+      try {
+        // Realiza una solicitud GET a la API para obtener el último viaje
+        const response = await axios.get(`${URL}/api/tracks/lastJourney/admin/${userInfo.UID}`);
+  
+        // Actualiza el estado con el último viaje obtenido
+        const lastJourney = response.data;
+        setLastJourney(lastJourney);
+  
+        if (lastJourney) {
+          const startPlaceName = await getPlaceName(
+            lastJourney.firstTrack.Location.coordinates[0],
+            lastJourney.firstTrack.Location.coordinates[1]
+          );
+          const endPlaceName = await getPlaceName(
+            lastJourney.lastTrack.Location.coordinates[0],
+            lastJourney.lastTrack.Location.coordinates[1]
+          );
+  
+          setStartPlaceName(startPlaceName);
+          setEndPlaceName(endPlaceName);
+        }
+      } catch (error) {
+        console.error(`Error fetching last journey: ${error}`);
+      }
+    };
+    fetchLastJourney();
     fetchTotalDistance();
   }, []); // El array vacío significa que este efecto se ejecutará solo una vez, cuando se monte el componente
 
@@ -111,9 +148,18 @@ function UserProfile() {
       <div>
         <h2>Here you will see you stats:</h2>
         <p>Car Time = {carTime ? `${carTime.hours} horas, ${carTime.minutes} minutos` : 'Cargando...'}</p>
-        <p>Car Km = {(carDistance / 1000).toFixed(2)}</p> 
-        <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)}</p> 
-        <p>Total Km = {(totalDistance / 1000).toFixed(2)}</p>
+        <p>Car Km = {(carDistance / 1000).toFixed(2)} Km</p>
+        <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)} Km</p>
+        <p>Total Km = {(totalDistance / 1000).toFixed(2)} Km</p>
+        {lastJourney ? (
+          <>
+            <h3>Last Journey:</h3>
+            <p>Start: {new Date(lastJourney.firstTrack.Date).toLocaleString()} at {startPlaceName}</p>
+            <p>End: {new Date(lastJourney.lastTrack.Date).toLocaleString()} at {endPlaceName}</p>
+          </>
+        ) : (
+          <p>Loading last journey...</p>
+        )}
         {showEditUsername && (
           <form onSubmit={handleSubmit}>
             <label>
