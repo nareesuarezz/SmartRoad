@@ -40,7 +40,7 @@ module.exports = (sequelize, Sequelize) => {
     //       // Verifica el tipo de vehículo
     //       if (vehicle.Vehicle === 'car') {
     //         // Si es un Car o un Bicycle, ejecuta tu función
-            
+
     //         findTrackByDistance(track, vehicle.Vehicle);
     //       }
     //     } catch (error) {
@@ -48,10 +48,11 @@ module.exports = (sequelize, Sequelize) => {
     //     }
     //   }
     // }
-    
+
   });
 
   Tracks.associate = models => {
+    //Relación con la tabla vehicle
     Tracks.belongsTo(models.Vehicles, {
       foreignKey: 'Vehicle_UID',
       targetKey: 'UID',

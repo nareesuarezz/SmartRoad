@@ -119,7 +119,7 @@ function Car() {
         }
 
         // Esperar 1 minuto (60 segundos) antes de la siguiente verificación
-        setTimeout(checkStatus, 60 * 1000); // Convertir minutos a milisegundos
+        setTimeout(checkStatus, 10 * 1000); // Convertir minutos a milisegundos
       } catch (error) {
         console.error('Error checking status:', error);
       }

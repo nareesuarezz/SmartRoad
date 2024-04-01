@@ -20,5 +20,7 @@ module.exports = app => {
 
   router.post("/signin", auth.signin);
 
+  router.post("/signup", upload, auth.signup);
+
   app.use("/api/admins", router);
 };

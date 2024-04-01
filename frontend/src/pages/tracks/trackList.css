@@ -9,6 +9,10 @@
   margin-top: 20px;
 }
 
+.leaflet-routing-container {
+  display: none !important;
+}
+
 .arrow {
   margin-bottom: 5vh;
 }

@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const db = require("../models");
 const Admin = db.Admin;
 const utils = require('../utils');
+const path = require('path');
+const fs = require('fs')
 
 exports.signin = async (req, res) => {
   const { Username, Password } = req.body;
@@ -36,6 +38,9 @@ exports.signin = async (req, res) => {
     const token = utils.generateToken(admin);
     const adminDetails = utils.getCleanUser(admin);
 
+    // Añade el rol al objeto adminDetails
+    adminDetails.Role = admin.Role;
+
     res.json({ admin: adminDetails, access_token: token });
   } catch (error) {
     console.error("Error during sign-in:", error);
@@ -45,6 +50,55 @@ exports.signin = async (req, res) => {
     });
   }
 };
+
+
+exports.signup = async (req, res) => {
+  const { Username, Password, Role, filename } = req.body;
+
+  if (!Username || !Password || !Role) {
+    return res.status(400).json({
+      error: true,
+      message: "Username, Password, and Role are required."
+    });
+  }
+
+  try {
+    const existingAdmin = await Admin.findOne({ where: { Username } });
+
+    if (existingAdmin) {
+      return res.status(400).json({
+        error: true,
+        message: "Username already exists."
+      });
+    }
+
+    const hashedPassword = bcrypt.hashSync(Password, 8);
+
+    let finalProfilePicture = 'user.png';
+
+    const admin = await Admin.create({ Username, Password: hashedPassword, Role, filename: finalProfilePicture });
+
+    const token = utils.generateToken(admin);
+    const adminDetails = utils.getCleanUser(admin);
+
+    // Añade el rol y la foto de perfil al objeto adminDetails
+    adminDetails.Role = admin.Role;
+    adminDetails.filename = admin.filename;
+
+    res.json({ admin: adminDetails, access_token: token });
+  } catch (error) {
+    console.error("Error during sign-up:", error);
+    res.status(500).json({
+      error: true,
+      message: "Internal Server Error."
+    });
+  }
+};
+
+
+
+
+
 
 exports.isAuthenticated = (req, res, next) => {
   const token = req.headers.authorization;

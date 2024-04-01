@@ -55,6 +55,7 @@ const VehicleList = () => {
           <tr>
             <th>ID</th>
             <th>{t('Vehicle')}</th>
+            <th>{t('Admin_UID')}</th>
             <th>{t('Actions')}</th>
           </tr>
         </thead>
@@ -63,6 +64,7 @@ const VehicleList = () => {
             <tr key={vehicle.UID}>
               <td>{vehicle.UID}</td>
               <td>{vehicle.Vehicle}</td>
+              <td>{vehicle.Admin_UID}</td>
               <td>
                 <Link to={`/vehicle-edit/${vehicle.UID}`} className="edit">
                   {t('Edit')}
