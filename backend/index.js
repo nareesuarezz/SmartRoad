@@ -217,4 +217,11 @@ require("./routes/subscription.routes")(app);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
-module.exports = { app, io }; 
+module.exports = (req, res) => {
+  const { method, url } = req;
+  if (url.startsWith('/socket.io/')) {
+    io.attach(req, res);
+  } else {
+    app.handle(req, res);
+  }
+};
