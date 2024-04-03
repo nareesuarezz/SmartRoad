@@ -4,7 +4,6 @@ import ProfilePictureUser from "../../components/profilePictureUser/profilePictu
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
-
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const getPlaceName = async (lat, lon) => {
@@ -23,16 +22,45 @@ function UserProfile() {
     Username: '',
   });
   const [previewImage, setPreviewImage] = useState('');
-  const [carTime, setCarTime] = useState(null);
   const [carDistance, setCarDistance] = useState(0);
   const [bicycleDistance, setBicycleDistance] = useState(0);
   const [lastJourney, setLastJourney] = useState(null);
   const [startPlaceName, setStartPlaceName] = useState('');
   const [endPlaceName, setEndPlaceName] = useState('');
 
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
+  const [totalTime, setTotalTime] = useState('');
+  const [carTime, setCarTime] = useState(null);
+  const [bicycleTime, setBicycleTime] = useState(null);
 
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+
+  useEffect(() => {
+    //Total Time
+    axios.get(`${URL}/api/tracks/totalTime/${userInfo.UID}`)
+      .then(response => {
+        setTotalTime(response.data);
+      })
+      .catch(error => {
+        console.error('Error getting total time:', error);
+      });
+    //Car Time
+    axios.get(`${URL}/api/tracks/carTime/${userInfo.UID}`)
+      .then(response => {
+        setCarTime(response.data);
+      })
+      .catch(error => {
+        console.error('Error getting car time:', error);
+      });
+    //Bicycle Time
+    axios.get(`${URL}/api/tracks/bicycleTime/${userInfo.UID}`)
+      .then(response => {
+        setBicycleTime(response.data);
+      })
+      .catch(error => {
+        console.error('Error getting bicycle time:', error);
+      });
+  }, []);
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
@@ -148,7 +176,9 @@ function UserProfile() {
       </header>
       <div>
         <h2>Here you will see you stats:</h2>
-        <p>Car Time = {carTime ? `${carTime.hours} horas, ${carTime.minutes} minutos` : 'Cargando...'}</p>
+        <p>Car Time = {carTime}</p>
+        <p>Bicycle Time = {bicycleTime}</p>
+        <p>Total Time = {totalTime}</p>
         <p>Car Km = {(carDistance / 1000).toFixed(2)} Km</p>
         <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)} Km</p>
         <p>Total Km = {(totalDistance / 1000).toFixed(2)} Km</p>
@@ -161,6 +191,8 @@ function UserProfile() {
         ) : (
           <p>Loading last journey...</p>
         )}
+        
+
         {showEditUsername && (
           <form onSubmit={handleSubmit}>
             <label>
