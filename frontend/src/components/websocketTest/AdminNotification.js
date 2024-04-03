@@ -4,7 +4,7 @@ import axios from 'axios';
 import './NotificationTest.css'
 import Header from '../header/header';
 
-const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
+const SOCKET_SERVER_URL = process.env.REACT_APP_URL;
 const AdminNotification = () => {
   const [showModal, setShowModal] = useState(false);
   const [currentNotification, setCurrentNotification] = useState('');

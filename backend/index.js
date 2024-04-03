@@ -10,7 +10,6 @@ const http = require('http');
 const socketIo = require('socket.io');
 const dbConfig = require("./config/db.config");
 
-const HOST = process.env.HOST || "localhost";
 const PORT = process.env.PORT || 3000;
 
 const app = express();

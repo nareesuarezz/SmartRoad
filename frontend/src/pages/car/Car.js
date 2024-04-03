@@ -11,7 +11,7 @@ import UserNotification from '../../components/websocketTest/UserNotification';
 function Car() {
   const { t } = useTranslation();
   const API = process.env.REACT_APP_API_URL;
-  const URL = process.env.REACT_APP_LOCALHOST_URL;
+  const URL = process.env.REACT_APP_URL;
   const [showModal, setShowModal] = useState(false);
   const [subscription, setSubscription] = useState(null);
   const selectedSound = localStorage.getItem("selectedSound");

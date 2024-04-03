@@ -25,7 +25,7 @@ const bicycleIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
-const URL = process.env.REACT_APP_LOCALHOST_URL;
+const URL = process.env.REACT_APP_URL;
 
 const TrackList = () => {
   const { t } = useTranslation();

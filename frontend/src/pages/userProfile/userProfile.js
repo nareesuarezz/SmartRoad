@@ -4,7 +4,7 @@ import ProfilePictureUser from "../../components/profilePictureUser/profilePictu
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
-const URL = process.env.REACT_APP_LOCALHOST_URL;
+const URL = process.env.REACT_APP_URL;
 
 const getPlaceName = async (lat, lon) => {
   const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);

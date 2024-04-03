@@ -10,7 +10,7 @@ function SignUpUser() {
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
     const [error, setError] = useState('');
-    const URL = process.env.REACT_APP_LOCALHOST_URL;
+    const URL = process.env.REACT_APP_URL;
     const { t } = useTranslation();
 
     const createUser = async () => {

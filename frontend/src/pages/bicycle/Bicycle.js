@@ -10,8 +10,6 @@ import UserNotification from '../../components/websocketTest/UserNotification';
 function Bicycle() {
     const { t } = useTranslation();
 
-    const API = process.env.REACT_APP_LOCALHOST_URL;
-
     const [lastVehicleId, setLastVehicleId] = useState(null);
 
     const time = 5000;

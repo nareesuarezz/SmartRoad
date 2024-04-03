@@ -2,7 +2,7 @@ import React from 'react';
 import './profilePictureUser.css'
 import { Link } from 'react-router-dom';
 
-const URL = process.env.REACT_APP_LOCALHOST_URL;
+const URL = process.env.REACT_APP_URL;
 
 const ProfilePictureUser = () => {
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
