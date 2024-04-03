@@ -7,24 +7,11 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const http = require('http');
-const https = require('https');
 const socketIo = require('socket.io');
 const dbConfig = require("./config/db.config");
 
-const USING_HTTPS = process.env.USING_HTTPS == "true" ? true : false;
 const HOST = process.env.HOST || "localhost";
-const PORT = process.env.PORT || 443;
-
-
-const HTTP = express();
-
-if (USING_HTTPS && PORT != 443) {
-  HTTP.get("*", (req, res) =>
-    res.redirect("https://" + process.env.HOST + ":" + process.env.PORT)
-  );
-
-  HTTP.listen(PORT);
-}
+const PORT = process.env.PORT || 3000;
 
 const app = express();
 
@@ -33,13 +20,12 @@ const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  pool: dbConfig.pool,
+  pool: dbConfig.pool
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
-
 
 var corsOptions = {
   origin: "*",
@@ -95,14 +81,11 @@ db.sequelize.sync({ force: true }).then(async () => {
     console.log('Sound1 Details:', createdSound1.toJSON());
     console.log('Sound2 Details:', createdSound2.toJSON());
     console.log('Sound3 Details:', createdSound3.toJSON());
-
-
   }
 });
 
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
-
 
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];
@@ -121,7 +104,6 @@ app.use(function (req, res, next) {
 
     return next();
   }
-
 
   if (token) {
     token = token.replace('Bearer ', '');
@@ -142,25 +124,7 @@ app.use(function (req, res, next) {
   }
 });
 
-let SERVER = null;
-
-if (USING_HTTPS) {
-  const CERTS = () => {
-    try {
-      return {
-        key: fs.readFileSync(path.join(__dirname, ".cert/cert.key")),
-        cert: fs.readFileSync(path.join(__dirname, ".cert/cert.crt")),
-      };
-    } catch (err) {
-      console.log("No certificates found: " + err);
-    }
-  };
-  SERVER = https.createServer(CERTS(), app);
-} else {
-  SERVER = http.createServer(app);
-}
-
-
+const SERVER = http.createServer(app);
 
 const io = socketIo(SERVER, {
   cors: {
@@ -211,7 +175,7 @@ require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
 
-(USING_HTTPS ? SERVER : app).listen(PORT, () => {
+SERVER.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
