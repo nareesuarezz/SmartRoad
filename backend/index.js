@@ -64,6 +64,7 @@ db.sequelize.sync({ force: true }).then(async () => {
 
   if (!existingAdmin) {
     const hashedPassword = await bcrypt.hash('prueba', 10);
+    const hashedPasswordUs = await bcrypt.hash('carmelo', 10);
 
     const createdAdmin = await db.Admin.create({
       Username: 'prueba',
@@ -71,6 +72,13 @@ db.sequelize.sync({ force: true }).then(async () => {
       filename: 'user.png',
       Role: 'Admin'
     });
+
+    const createdUser = await db.Admin.create({
+      Username: 'carmelo',
+      Password: hashedPasswordUs,
+      filename: 'user.png',
+      Role: 'User'
+    })
 
     const createdSound1 = await db.Sounds.create({
       filename: 'sound1.mp3'
@@ -84,6 +92,7 @@ db.sequelize.sync({ force: true }).then(async () => {
 
     console.log('Admin predeterminado creado con éxito.');
     console.log('Admin Details:', createdAdmin.toJSON());
+    console.log('User Details:', createdUser.toJSON());
     console.log('Sound1 Details:', createdSound1.toJSON());
     console.log('Sound2 Details:', createdSound2.toJSON());
     console.log('Sound3 Details:', createdSound3.toJSON());

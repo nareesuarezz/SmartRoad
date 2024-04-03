@@ -30,13 +30,15 @@ module.exports = app => {
   // Nuevo endpoint para calcular la distancia total recorrida por los vehículos de un administrador
   router.get("/distance/admin/:Admin_UID", tracks.calculateTotalDistance);
 
-  // Retrieve a single Car with type and id
-  router.get("/:type/:id", tracks.timeCar);
+  // Retrieve the total time for the vehicles
+  router.get("/totalTime/:Admin_UID", tracks.calculateTotalTime);
 
-  // Nuevo endpoint para obtener el tiempo del coche
-  router.get("/timeCar/:Vehicle_UID", tracks.timeCar);
+  // Retrieve the time for the car
+  router.get("/carTime/:Admin_UID", tracks.calculateCarTime);
 
-
+  // Retrieve the time fot the bicycle
+  router.get("/bicycleTime/:Admin_UID", tracks.calculateBicycleTime);
 
   app.use("/api/tracks", router);
 }
+
