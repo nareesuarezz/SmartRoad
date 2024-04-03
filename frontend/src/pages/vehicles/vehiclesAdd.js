@@ -11,6 +11,7 @@ const VehicleAdd = ({ getVehicles }) => {
 
   const [formData, setFormData] = useState({
     Vehicle: '',
+    Admin_UID: '',
   });
 
   const handleChange = (e) => {
@@ -52,6 +53,10 @@ const VehicleAdd = ({ getVehicles }) => {
             <option value="car">{t('Car')}</option>
             <option value="bicycle">{t('Bike')}</option>
           </select>
+        </label>
+        <label>
+          {t('Admin_UID')}:
+          <input type="text" name="Admin_UID" value={formData.Admin_UID} onChange={handleChange} />
         </label>
         <button type="submit" className="submit">{t('Add Vehicle')}</button>
       </form>

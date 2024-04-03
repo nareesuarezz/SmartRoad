@@ -352,3 +352,131 @@ exports.calculateBicycleTime = async (req, res) => {
     }
 }
 
+function calculateDistance(location1, location2) {
+    const R = 6371e3; // radio medio de la Tierra en metros
+    const lat1 = location1[0] * Math.PI/180; // convertir a radianes
+    const lat2 = location2[0] * Math.PI/180;
+    const deltaLat = (location2[0]-location1[0]) * Math.PI/180;
+    const deltaLng = (location2[1]-location1[1]) * Math.PI/180;
+
+    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
+              Math.cos(lat1) * Math.cos(lat2) *
+              Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+
+    const distance = R * c; // en metros
+    return distance;
+}
+
+exports.calculateTotalDistance = async (req, res) => {
+    const adminId = req.params.Admin_UID; // Asume que recibes el ID del administrador como parámetro
+
+    try {
+        // Encuentra todos los vehículos para el administrador dado
+        const vehicles = await Vehicles.findAll({
+            where: { Admin_UID: adminId }
+        });
+
+        let totalDistance = 0;
+        let carDistance = 0;
+        let bicycleDistance = 0;
+
+        // Itera sobre los vehículos
+        for (let vehicle of vehicles) {
+            // Encuentra todos los tracks para el vehículo dado, ordenados por fecha
+            const tracks = await Tracks.findAll({
+                where: { Vehicle_UID: vehicle.UID },
+                order: [['Date', 'ASC']]
+            });
+
+            // Itera sobre los tracks y suma la distancia entre cada par de tracks consecutivos
+            for (let i = 0; i < tracks.length - 1; i++) {
+                const location1 = tracks[i].Location.coordinates;
+                const location2 = tracks[i + 1].Location.coordinates;
+                const distance = calculateDistance(location1, location2);
+                totalDistance += distance;
+
+                // Suma la distancia al total de 'car' o 'bicycle' dependiendo del tipo de vehículo
+                if (vehicle.Vehicle === 'car') {
+                    carDistance += distance;
+                } else if (vehicle.Vehicle === 'bicycle') {
+                    bicycleDistance += distance;
+                }
+            }
+        }
+
+        res.status(200).send({
+            totalDistance: totalDistance,
+            carDistance: carDistance,
+            bicycleDistance: bicycleDistance
+        });
+    } catch (error) {
+        console.error(`Error al calcular la distancia total: ${error.message}`);
+        res.status(500).send({
+            message: `Error al calcular la distancia total: ${error.message}`
+        });
+    }
+};
+
+exports.getLastJourney = async (req, res) => {
+    try {
+        const adminId = req.params.Admin_UID; // Asume que recibes el ID del administrador como parámetro
+  
+      // Busca todos los vehículos del administrador
+      const vehicles = await Vehicles.findAll({
+        where: { Admin_UID: adminId }
+      });
+  
+      if (!vehicles || vehicles.length === 0) {
+        return res.status(404).json({ message: 'No se encontró ningún vehículo para este administrador' });
+      }
+  
+      let allTracks = [];
+  
+      // Itera sobre los vehículos del administrador y busca los tracks para cada uno
+      for (let vehicle of vehicles) {
+        const tracks = await Tracks.findAll({
+          where: { Vehicle_UID: vehicle.UID },
+          order: [['Date', 'ASC']]
+        });
+  
+        allTracks = allTracks.concat(tracks);
+      }
+  
+      let journeys = [];
+      let currentJourney = [allTracks[0]];
+  
+      // Itera sobre los tracks del usuario
+      for (let i = 1; i < allTracks.length; i++) {
+        const currentTrack = allTracks[i];
+        const previousTrack = allTracks[i - 1];
+  
+        // Calcula la diferencia de tiempo entre el track actual y el anterior
+        const timeDifference = (new Date(currentTrack.Date) - new Date(previousTrack.Date)) / 1000;
+  
+        // Si la diferencia de tiempo es mayor a 5 segundos, considera que es un nuevo viaje
+        if (timeDifference > 5) {
+          journeys.push(currentJourney);
+          currentJourney = [currentTrack];
+        } else {
+          currentJourney.push(currentTrack);
+        }
+      }
+  
+      // Asegúrate de agregar el último viaje
+      journeys.push(currentJourney);
+  
+      // Obtiene el último viaje
+      const lastJourney = journeys[journeys.length - 1];
+  
+      // Obtiene el primer y último track del último viaje
+      const firstTrack = lastJourney[0];
+      const lastTrack = lastJourney[lastJourney.length - 1];
+  
+      return res.json({ firstTrack, lastTrack });
+    } catch (error) {
+      console.error(`Error al buscar el último viaje: ${error}`);
+      return res.status(500).json({ message: 'Hubo un error al buscar el último viaje' });
+    }
+  };
+  

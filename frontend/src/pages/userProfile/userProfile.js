@@ -1,51 +1,38 @@
-import { ArrowLeftOutlined, MenuFoldOutlined, EditOutlined } from "@ant-design/icons"
-import MenuUserInfo from "../../components/menuUserInfo/MenuUserInfo.js"
-import ProfilePictureUser from "../../components/profilePictureUser/profilePictureUser.js"
+import { ArrowLeftOutlined, EditOutlined } from "@ant-design/icons";
+import MenuUserInfo from "../../components/menuUserInfo/MenuUserInfo.js";
+import ProfilePictureUser from "../../components/profilePictureUser/profilePictureUser.js";
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
-const URL = process.env.REACT_APP_LOCALHOST_URL;
-function UserProfile() {
 
+const URL = process.env.REACT_APP_LOCALHOST_URL;
+
+const getPlaceName = async (lat, lon) => {
+  const response = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`);
+  const data = await response.json();
+  const shortAddress = data.display_name.split(',').slice(0, 4).join(',');
+  return shortAddress;
+};
+
+function UserProfile() {
   const [showEditUsername, setShowEditUsername] = useState(false);
   const [showEditImage, setShowEditImage] = useState(false);
+  const [totalDistance, setTotalDistance] = useState(0);
   const [formData, setFormData] = useState({
     Image: null,
     Username: '',
   });
   const [previewImage, setPreviewImage] = useState('');
-  const [totalTime, setTotalTime] = useState('');
   const [carTime, setCarTime] = useState(null);
-  const [bicycleTime, setBicycleTime] = useState(null);
+  const [carDistance, setCarDistance] = useState(0);
+  const [bicycleDistance, setBicycleDistance] = useState(0);
+  const [lastJourney, setLastJourney] = useState(null);
+  const [startPlaceName, setStartPlaceName] = useState('');
+  const [endPlaceName, setEndPlaceName] = useState('');
 
-  const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
-  useEffect(() => {
-    //Total Time
-    axios.get(`${URL}/api/tracks/totalTime/${userInfo.UID}`)
-      .then(response => {
-        setTotalTime(response.data);
-      })
-      .catch(error => {
-        console.error('Error getting total time:', error);
-      });
-    //Car Time
-    axios.get(`${URL}/api/tracks/carTime/${userInfo.UID}`)
-      .then(response => {
-        setCarTime(response.data);
-      })
-      .catch(error => {
-        console.error('Error getting car time:', error);
-      });
-    //Bicycle Time
-    axios.get(`${URL}/api/tracks/bicycleTime/${userInfo.UID}`)
-      .then(response => {
-        setBicycleTime(response.data);
-      })
-      .catch(error => {
-        console.error('Error getting bicycle time:', error);
-      });
-  }, []);
+
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
@@ -95,6 +82,54 @@ function UserProfile() {
     window.location.href = '/home';
   };
 
+  useEffect(() => {
+    // Define una función asincrónica que realiza la solicitud a la API
+    const fetchTotalDistance = async () => {
+      try {
+        // Realiza una solicitud GET a la API para obtener la distancia total
+        const response = await axios.get(`${URL}/api/tracks/distance/admin/${userInfo.UID}`);
+
+        // Actualiza el estado con la distancia total obtenida
+        setTotalDistance(response.data.totalDistance);
+        setCarDistance(response.data.carDistance);
+        setBicycleDistance(response.data.bicycleDistance);
+      } catch (error) {
+        console.error(`Error fetching total distance: ${error}`);
+      }
+    };
+
+    const fetchLastJourney = async () => {
+      try {
+        // Realiza una solicitud GET a la API para obtener el último viaje
+        const response = await axios.get(`${URL}/api/tracks/lastJourney/admin/${userInfo.UID}`);
+    
+        // Actualiza el estado con el último viaje obtenido
+        const lastJourney = response.data;
+        setLastJourney(lastJourney);
+    
+        if (lastJourney) {
+          const startPlaceName = await getPlaceName(
+            lastJourney.firstTrack.Location.coordinates[0],
+            lastJourney.firstTrack.Location.coordinates[1]
+          );
+          const endPlaceName = await getPlaceName(
+            lastJourney.lastTrack.Location.coordinates[0],
+            lastJourney.lastTrack.Location.coordinates[1]
+          );
+    
+          setStartPlaceName(startPlaceName);
+          setEndPlaceName(endPlaceName);
+        }
+      } catch (error) {
+        console.error(`Error fetching last journey: ${error}`);
+      }
+    };
+  
+    fetchLastJourney();
+    fetchTotalDistance();
+  }, []); // El array vacío significa que este efecto se ejecutará solo una vez, cuando se monte el componente
+
+
   return (
     <>
       <header>
@@ -111,14 +146,23 @@ function UserProfile() {
         </div>
         <MenuUserInfo />
       </header>
-      <body>
+      <div>
         <h2>Here you will see you stats:</h2>
         <p>Car Time = {carTime}</p>
-        <p>Bicycle Time = {bicycleTime}</p>
+        <p>Car Km = {(carDistance / 1000).toFixed(2)} Km</p>
+
+        <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)} Km{bicycleTime}</p>
         <p>Total Time = {totalTime}</p>
-        <p>Car Km = </p>
-        <p>Bicycle Km = </p>
-        <p>Total Km = </p>
+        <p>Total Km = {(totalDistance / 1000).toFixed(2)} Km</p>
+        {lastJourney ? (
+          <>
+            <h3>Last Journey:</h3>
+            <p>Start: {new Date(lastJourney.firstTrack.Date).toLocaleString()} at {startPlaceName}</p>
+            <p>End: {new Date(lastJourney.lastTrack.Date).toLocaleString()} at {endPlaceName}</p>
+          </>
+        ) : (
+          <p>Loading last journey...</p>
+        )}
         {showEditUsername && (
           <form onSubmit={handleSubmit}>
             <label>
@@ -142,9 +186,9 @@ function UserProfile() {
             <button type="submit">Actualizar imagen de perfil</button>
           </form>
         )}
-      </body>
+      </div>
     </>
-  )
+  );
 }
 
-export default UserProfile
+export default UserProfile;
