@@ -1,6 +1,6 @@
 const db = require("../models");
 const Tracks = db.Track;
-const Vehicles = db.Vehicle
+const Vehicles = db.Vehicle;
 const Logs = db.Log;
 const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
@@ -223,69 +223,131 @@ exports.deleteAll = async (req, res) => {
     }
 };
 
-exports.timeCar = async (req, res) => {
+// Asumiendo que tienes una función que puede calcular la diferencia de tiempo entre dos fechas
+function calculateTimeDifference(startDate, endDate) {
+    // Convertir las fechas a objetos Date de JavaScript
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Calcular la diferencia en milisegundos
+    const differenceInMilliseconds = end.getTime() - start.getTime();
+
+    // Convertir la diferencia a minutos
+    const differenceInMinutes = differenceInMilliseconds / (1000 * 60 * 60);
+
+    return differenceInMinutes;
+}
+
+exports.calculateTotalTime = async (req, res) => {
     try {
-        const vehicleId = req.params.Vehicle_UID;
+        const Admin_UID = req.params.Admin_UID;
+        Vehicles.findAll({ where: { Admin_UID: Admin_UID } })
+            .then(data => {
+                if (data.length > 0) {
+                    // Extraer solo los ID's de los vehículos
+                    const vehicleIDs = data.map(vehicle => vehicle.UID);
 
-        const vehicle = await db.Vehicle.findOne({
-            where: { UID: vehicleId }
-        });
-        if (!vehicle) {
-            return res.status(404).send({
-                message: `No se encontró un vehículo ID ${vehicleId}`
-            });
-        }
+                    // Para cada vehículo, encontrar todos los tracks y calcular el tiempo total
+                    let totalTime = 0;
+                    let promises = vehicleIDs.map(vehicleID => {
+                        return Tracks.findAll({ where: { Vehicle_UID: vehicleID }, order: [['Date', 'ASC']] })
+                            .then(tracks => {
+                                for (let i = 0; i < tracks.length - 1; i++) {
+                                    totalTime += calculateTimeDifference(tracks[i].Date, tracks[i + 1].Date);
+                                }
+                            });
+                    });
 
-        // Busca los tracks asociados a este vehículo
-        debugger
-        const tracks = await Tracks.findAll({
-            where: {
-                UID: vehicleId
-            },
-            attributes: ['Date'] // Solo devuelve el campo 'Date'
-        });
-
-        // Calcula el total de horas y minutos
-        let totalMinutes = 0;
-        if (tracks.length > 1) {
-            const sortedTracks = tracks.sort((a, b) => a.Date - b.Date);
-            const firstTrack = sortedTracks[0].Date;
-            const lastTrack = sortedTracks[sortedTracks.length - 1].Date;
-            totalMinutes = Math.floor((lastTrack - firstTrack) / 60000);
-        }
-
-        const hours = Math.floor(totalMinutes / 60);
-        const minutes = totalMinutes % 60;
-
-        // Envía los datos del vehículo, los tracks y el total de horas y minutos como respuesta
-        res.send({ vehicle, tracks, total_time: { hours, minutes } });
+                    // Esperar a que todas las promesas se resuelvan
+                    Promise.all(promises).then(() => {
+                        res.send(`${totalTime.toFixed(2)} horas`);
+                    });
+                } else {
+                    res.status(404).send({
+                        message: `No se pueden encontrar vehículos con Admin_UID=${Admin_UID}.`
+                    });
+                }
+            })
     }
     catch (err) {
         res.status(500).send({
-            message: `Ocurrió un error al buscar el vehículo y sus tracks: ${err.message}`
-        });
-    }
-};
-
-
-exports.timeBicycle = async (req, res) => {
-    try {
-
-    }
-    catch (err) {
-        res.status(500).send({
-            message: `Some error occurred while removing all Tracks: ${err.message}`
+            message: `Some error occurred while retrieving tracks.`
         })
     }
 }
 
-exports.totalHoursVehicles = async (req, res) => {
+exports.calculateCarTime = async (req, res) => {
     try {
-        let time;
+        const Admin_UID = req.params.Admin_UID;
+        Vehicles.findAll({ where: { Admin_UID: Admin_UID, Vehicle: 'car' } })
+            .then(data => {
+                if (data.length > 0) {
+                    // Extraer solo los ID's de los vehículos
+                    const vehicleIDs = data.map(vehicle => vehicle.UID);
+
+                    // Para cada vehículo, encontrar todos los tracks y calcular el tiempo total
+                    let totalTime = 0;
+                    let promises = vehicleIDs.map(vehicleID => {
+                        return Tracks.findAll({ where: { Vehicle_UID: vehicleID }, order: [['Date', 'ASC']] })
+                            .then(tracks => {
+                                for (let i = 0; i < tracks.length - 1; i++) {
+                                    totalTime += calculateTimeDifference(tracks[i].Date, tracks[i + 1].Date);
+                                }
+                            });
+                    });
+
+                    // Esperar a que todas las promesas se resuelvan
+                    Promise.all(promises).then(() => {
+                        res.send(`${totalTime.toFixed(2)} horas`);
+                    });
+                } else {
+                    res.status(404).send({
+                        message: `No se pueden encontrar vehículos con Admin_UID=${Admin_UID}.`
+                    });
+                }
+            })
     }
     catch (err) {
         res.status(500).send({
-            message: `Some error occurred while removing all Tracks: ${err.message}`
+            message: `Some error occurred while retrieving tracks.`
+        })
+    }
+}
+
+exports.calculateBicycleTime = async (req, res) => {
+    try {
+        const Admin_UID = req.params.Admin_UID;
+        Vehicles.findAll({ where: { Admin_UID: Admin_UID, Vehicle: 'bicycle' } })
+            .then(data => {
+                if (data.length > 0) {
+                    // Extraer solo los ID's de los vehículos
+                    const vehicleIDs = data.map(vehicle => vehicle.UID);
+
+                    // Para cada vehículo, encontrar todos los tracks y calcular el tiempo total
+                    let totalTime = 0;
+                    let promises = vehicleIDs.map(vehicleID => {
+                        return Tracks.findAll({ where: { Vehicle_UID: vehicleID }, order: [['Date', 'ASC']] })
+                            .then(tracks => {
+                                for (let i = 0; i < tracks.length - 1; i++) {
+                                    totalTime += calculateTimeDifference(tracks[i].Date, tracks[i + 1].Date);
+                                }
+                            });
+                    });
+
+                    // Esperar a que todas las promesas se resuelvan
+                    Promise.all(promises).then(() => {
+                        res.send(`${totalTime.toFixed(2)} horas`);
+                    });
+                } else {
+                    res.status(404).send({
+                        message: `No se pueden encontrar vehículos con Admin_UID=${Admin_UID}.`
+                    });
+                }
+            })
+    }
+    catch (err) {
+        res.status(500).send({
+            message: `Some error occurred while retrieving tracks.`
         })
     }
 }
