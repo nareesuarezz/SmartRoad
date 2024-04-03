@@ -104,7 +104,7 @@ function Car() {
 
     const checkStatus = async () => {
       try {
-        const response = await axios.get(`https://smart-road-519r.vercel.app/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+        const response = await axios.get(`https://smart-road-ke3l.vercel.app/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
         const lastTrackStatus = response.data[postsT]?.Status;
 
         if (lastTrackStatus === 'Stopped') {
@@ -142,7 +142,7 @@ function Car() {
   useEffect(() => {
     const fetchData = async () => {
       console.log("Recogiendo ID del vehiculo");
-      const response = await axios.get('https://smart-road-519r.vercel.app/api/vehicles?_sort=createdAt:desc&_limit=1');
+      const response = await axios.get('https://smart-road-ke3l.vercel.app/api/vehicles?_sort=createdAt:desc&_limit=1');
       const vehicles = response.data;
       const lastId = vehicles[vehicles.length - 1].UID;
       setLastVehicleId(lastId);
