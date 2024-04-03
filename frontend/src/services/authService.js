@@ -1,9 +1,11 @@
 import axios from 'axios';
 
-const URL = process.env.REACT_APP_URL;
+const URL = "https://smart-road-519r.vercel.app";
 const API_URL = `${URL}/api`;
 const SIGNIN_URL = `${API_URL}/admins/signin`;
 const SIGNUP_URL = `${API_URL}/admins/signup`;
+
+console.log(SIGNIN_URL)
 
 const AuthService = {
   signIn: async (username, password, role) => {
