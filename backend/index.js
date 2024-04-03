@@ -180,6 +180,11 @@ SERVER.listen(PORT, () => {
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
+app.get('/', (req, res) => {
+  res.send('Bienvenido a mi aplicación!');
+});
+
+
 module.exports = (req, res) => {
   const { method, url } = req;
   if (url.startsWith('/socket.io/')) {
