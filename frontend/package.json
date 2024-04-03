@@ -12,6 +12,7 @@
         "i18next": "^23.9.0",
         "leaflet": "^1.9.4",
         "leaflet-routing-machine": "^3.2.12",
+        "mysql2": "^3.9.3",
         "node-geocoder": "^4.3.0",
         "react": "^18.2.0",
         "react-bootstrap": "^2.9.1",
