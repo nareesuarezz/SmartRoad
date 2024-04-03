@@ -33,7 +33,7 @@ function Bicycle() {
                 Vehicle_UID: lastVehicleId,
             };
 
-            await axios.post('https://localhost/api/tracks', data);
+            await axios.post('https://smart-road-519r.vercel.app/api/tracks', data);
 
             console.log(data.Location.coordinates)
 
@@ -66,7 +66,7 @@ function Bicycle() {
 
         const checkStatus = async () => {
             try {
-                const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+                const response = await axios.get(`https://smart-road-519r.vercel.app/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
                 const lastTrackStatus = response.data[postsT]?.Status;
 
                 if (lastTrackStatus === 'Stopped') {
@@ -104,7 +104,7 @@ function Bicycle() {
     useEffect(() => {
         const fetchData = async () => {
             console.log("Recogiendo ID del vehiculo");
-            const response = await axios.get('https://localhost/api/vehicles');
+            const response = await axios.get('https://smart-road-519r.vercel.app/api/vehicles');
             const vehicles = response.data;
             const lastId = vehicles[vehicles.length - 1].UID;
             setLastVehicleId(lastId);
