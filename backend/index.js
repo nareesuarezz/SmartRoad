@@ -7,7 +7,7 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const http = require('http');
-const socketIo = require('socket.io');
+// const socketIo = require('socket.io');
 const dbConfig = require("./config/db.config");
 
 const PORT = process.env.PORT || 3000;
@@ -125,47 +125,47 @@ app.use(function (req, res, next) {
 
 const SERVER = http.createServer(app);
 
-const io = socketIo(SERVER, {
-  cors: {
-    origin: "*", // Adjust according to your needs
-    methods: ["GET", "POST"]
-  }
-});
+// const io = socketIo(SERVER, {
+//   cors: {
+//     origin: "*", // Adjust according to your needs
+//     methods: ["GET", "POST"]
+//   }
+// });
 
-// Socket.IO setup for global notifications
-io.on('connection', (socket) => {
-  console.log('New WebSocket connection');
+// // Socket.IO setup for global notifications
+// io.on('connection', (socket) => {
+//   console.log('New WebSocket connection');
 
-  socket.on('disconnect', () => {
-    console.log('WebSocket client disconnected');
-  });
-});
+//   socket.on('disconnect', () => {
+//     console.log('WebSocket client disconnected');
+//   });
+// });
 
-// Function to send global notifications
-function sendGlobalNotification(message) {
-  io.emit('globalNotification', message);
-}
+// // Function to send global notifications
+// function sendGlobalNotification(message) {
+//   io.emit('globalNotification', message);
+// }
 
-//Testing notifications /get
-app.get('/test-notification', (req, res) => {
-  sendGlobalNotification('This is a test notification');
-  res.send('Test notification sent');
-});
+// //Testing notifications /get
+// app.get('/test-notification', (req, res) => {
+//   sendGlobalNotification('This is a test notification');
+//   res.send('Test notification sent');
+// });
 
-// Endpoint para enviar una notificación global
-app.post('/send-notification', (req, res) => {
-  try {
-    const message = req.body;
-    console.log("Socorro")
+// // Endpoint para enviar una notificación global
+// app.post('/send-notification', (req, res) => {
+//   try {
+//     const message = req.body;
+//     console.log("Socorro")
 
-    console.log(message)
-    sendGlobalNotification(message);
-    res.send('Notificación enviada');
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).send('Server error');
-  }
-});
+//     console.log(message)
+//     sendGlobalNotification(message);
+//     res.send('Notificación enviada');
+//   } catch (error) {
+//     console.error('Error:', error);
+//     res.status(500).send('Server error');
+//   }
+// });
 
 require("./routes/sounds.routes")(app);
 require("./routes/logs.routes")(app);
@@ -183,12 +183,4 @@ app.get('/', (req, res) => {
   res.send('Bienvenido a mi aplicación!');
 });
 
-
-module.exports = (req, res) => {
-  const { method, url } = req;
-  if (url.startsWith('/socket.io/')) {
-    io.attach(req, res);
-  } else {
-    app.handle(req, res);
-  }
-};
+module.exports = app;

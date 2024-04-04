@@ -8,7 +8,7 @@ import { Puff } from 'react-loader-spinner';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
-import UserNotification from '../../components/websocketTest/UserNotification';
+// import UserNotification from '../../components/websocketTest/UserNotification';
 import ProfilePictureUser from '../../components/profilePictureUser/profilePictureUser';
 import { UserDeleteOutlined } from '@ant-design/icons';
 const URL = process.env.REACT_APP_URL;
@@ -197,7 +197,7 @@ function Home() {
         <p className='log' onClick={goLogin}>{t('Log in here')}</p>
       </div>
       <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
-      <UserNotification />
+      {/* <UserNotification /> */}
     </>
   );
 }
