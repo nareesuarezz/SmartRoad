@@ -28,7 +28,7 @@ app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
 
 var corsOptions = {
   origin: "https://smart-road.vercel.app", 
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE",
   credentials: true,
   optionsSuccessStatus: 204,
   preflightContinue: true,
