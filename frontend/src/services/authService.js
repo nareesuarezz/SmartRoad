@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const URL = "https://smart-road-ke3l.vercel.app";
+const URL = "https://smart-road-pogc.vercel.app";
 const API_URL = `${URL}/api`;
 const SIGNIN_URL = `${API_URL}/admins/signin`;
 const SIGNUP_URL = `${API_URL}/admins/signup`;
