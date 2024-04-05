@@ -27,8 +27,8 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
 
 var corsOptions = {
-  origin: "*",
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS",
+  origin: "https://smart-road.vercel.app", 
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE",
   credentials: true,
   optionsSuccessStatus: 204,
   preflightContinue: true,
@@ -127,7 +127,7 @@ const SERVER = http.createServer(app);
 
 const io = socketIo(SERVER, {
   cors: {
-    origin: "*", // Adjust according to your needs
+    origin: "https://smart-road.vercel.app", 
     methods: ["GET", "POST"]
   }
 });
