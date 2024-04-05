@@ -129,9 +129,11 @@ const SERVER = http.createServer(app);
 const io = socketIo(SERVER, {
   cors: {
     origin: 'https://smartroad.vercel.app', 
-    methods: ["GET", "POST"]
+    methods: ["GET", "POST"],
+    credentials: true
   }
 });
+
 
 
 // Socket.IO setup for global notifications
