@@ -27,12 +27,13 @@ app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
 
 var corsOptions = {
-  origin: "*", 
+  origin: 'https://smartroad.vercel.app', 
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE",
   credentials: true,
   optionsSuccessStatus: 204,
   preflightContinue: true,
 };
+
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -127,10 +128,11 @@ const SERVER = http.createServer(app);
 
 const io = socketIo(SERVER, {
   cors: {
-    origin: "*", 
+    origin: 'https://smartroad.vercel.app', 
     methods: ["GET", "POST"]
   }
 });
+
 
 // Socket.IO setup for global notifications
 io.on('connection', (socket) => {
