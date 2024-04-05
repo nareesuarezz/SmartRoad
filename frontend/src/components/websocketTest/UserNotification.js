@@ -4,6 +4,7 @@ import axios from 'axios';
 import './NotificationTest.css'
 
 const SOCKET_SERVER_URL = process.env.REACT_APP_URL;
+console.log("SOCKET SERVER URL ",SOCKET_SERVER_URL)
 const UserNotification = () => {
   const [showNotificationModal, setshowNotificationModal] = useState(false);
   const [currentNotification, setCurrentNotification] = useState('');
