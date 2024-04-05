@@ -1,3 +1,5 @@
+const Sequelize = require("sequelize");
+
 module.exports = {
   HOST: process.env.MYSQL_ADDON_HOST,
   USER: process.env.MYSQL_ADDON_USER,
@@ -12,6 +14,13 @@ module.exports = {
     idle: 10000
   }
 };
+
+const sequelize = new Sequelize(module.exports.DB, module.exports.USER, module.exports.PASSWORD, {
+  host: module.exports.HOST,
+  dialect: module.exports.dialect,
+  dialectModule: module.exports.dialectModule,
+  pool: module.exports.pool
+});
 
 sequelize.authenticate()
   .then(() => {
