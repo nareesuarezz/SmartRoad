@@ -31,7 +31,7 @@ var corsOptions = {
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE",
   credentials: true,
   optionsSuccessStatus: 204,
-  preflightContinue: true,
+  preflightContinue: false,
 };
 
 
