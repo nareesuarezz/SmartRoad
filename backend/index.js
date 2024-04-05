@@ -128,12 +128,14 @@ const SERVER = http.createServer(app);
 
 const io = socketIo(SERVER, {
   cors: {
+    origin: 'https://smartroad.vercel.app',
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE",
     credentials: true,
     optionsSuccessStatus: 204,
     preflightContinue: true,
   }
 });
+
 
 
 
