@@ -1,58 +1,86 @@
-.hamburger-menu {
-  position: relative;
-}
-
-.menu__icon {
-  cursor: pointer;
-  display: block;
-  width: 30px;
-  height: 20px;
-  position: absolute;
-  top: 0;
-  right: 0;
-}
-
-.menu__icon span,
-.menu__icon span::before,
-.menu__icon span::after {
-  content: '';
-  background-color: #000;
-  position: absolute;
-  width: 100%;
-  height: 2px;
-}
-
-.menu__icon span::before {
-  top: -8px;
-}
-
-.menu__icon span::after {
-  top: 8px;
-}
-
-.menu__right {
-  position: absolute;
-  width: 200px;
-  height: 100vh;
-  top: 0;
-  right: -200px;
-  background-color: #ccc;
-  transition: right 0.3s;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.menu__right ul {
-  list-style: none;
-  padding: 0;
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: sans-serif;
 }
 
-.menu__right a {
-  color: #000;
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 2rem;
+  background-color: #ececec;
+}
+
+.logo {
+  max-width: 5rem;
+}
+
+.nav-list {
+  list-style-type: none;
+  display: flex;
+  gap: 1rem;
+}
+
+.nav-list li a {
   text-decoration: none;
+  color: #1c1c1c;
 }
 
-#menu__toggle:checked~.menu__right {
-  right: 0;
+.abrir-menu,
+.cerrar-menu {
+  display: none;
+}
+
+@media screen and (max-width: 550px) {
+
+  .abrir-menu,
+  .cerrar-menu {
+    display: block;
+    border: 0;
+    font-size: 1.25rem;
+    background-color: transparent;
+    cursor: pointer;
+  }
+
+  .abrir-menu {
+    color: #1c1c1c;
+    border: 1px solid red;
+  }
+
+  .cerrar-menu {
+    color: #ececec;
+    border: 1px solid red
+  }
+
+  .nav {
+    opacity: 0;
+    visibility: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
+    gap: 1rem;
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #1c1c1c;
+    padding: 2rem;
+    box-shadow: 0 0 0 100vmax rgba(0, 0, 0, .5);
+  }
+
+  .nav.visible {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .nav-list {
+    flex-direction: column;
+    align-items: end;
+  }
+
+  .nav-list li a {
+    color: #ecececec;
+  }
 }

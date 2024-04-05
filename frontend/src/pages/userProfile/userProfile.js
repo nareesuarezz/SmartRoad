@@ -162,11 +162,13 @@ function UserProfile() {
   return (
     <>
       <header>
-        <div className='arrow' onClick={() => goBack()}>
-          <ArrowLeftOutlined />
-        </div>
-        <div className="menuUserInfo">
-          <MenuUserInfo />
+        <div className="top-components">
+          <div className='arrow' onClick={() => goBack()}>
+            <ArrowLeftOutlined />
+          </div>
+          <div className="menuUserInfo">
+            <MenuUserInfo />
+          </div>
         </div>
         <div className='profile'>
           <ProfilePictureUser />
