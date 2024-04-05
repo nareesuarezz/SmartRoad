@@ -1,58 +1,30 @@
-.hamburger-menu {
-  position: relative;
+/* Estilos para el menú hamburguesa */
+.bm-burger-button {
+  position: fixed;
+  width: 36px;
+  height: 30px;
+  right: 36px;
+  top: 36px;
 }
 
-.menu__icon {
-  cursor: pointer;
-  display: block;
-  width: 30px;
-  height: 20px;
-  position: absolute;
-  top: 0;
-  right: 0;
+.bm-burger-bars {
+  background: #373a47;
 }
 
-.menu__icon span,
-.menu__icon span::before,
-.menu__icon span::after {
-  content: '';
-  background-color: #000;
-  position: absolute;
-  width: 100%;
-  height: 2px;
+.bm-menu {
+  background: #373a47;
+  padding: 2.5em 1.5em 0;
+  font-size: 1.15em;
 }
 
-.menu__icon span::before {
-  top: -8px;
-}
-
-.menu__icon span::after {
-  top: 8px;
-}
-
-.menu__right {
-  position: absolute;
-  width: 200px;
-  height: 100vh;
-  top: 0;
-  right: -200px;
-  background-color: #ccc;
-  transition: right 0.3s;
-  padding: 20px;
-  box-sizing: border-box;
-}
-
-.menu__right ul {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
-
-.menu__right a {
-  color: #000;
+.bm-item {
+  display: inline-block;
   text-decoration: none;
+  margin-bottom: 10px;
+  color: #d1d1d1;
+  transition: color 0.2s;
 }
 
-#menu__toggle:checked~.menu__right {
-  right: 0;
+.bm-item:hover {
+  color: #ffffff;
 }
