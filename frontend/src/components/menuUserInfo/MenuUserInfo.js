@@ -22,14 +22,20 @@ function MenuUserInfo() {
 
     return (
         <>
-            <div class="dropdown">
-                <button onclick="myFunction()" class="dropbtn">Dropdown</button>
-                <div id="myDropdown" class="dropdown-content">
-                    <a href="#home">Home</a>
-                    <a href="#about">About</a>
-                    <a href="#contact">Contact</a>
+            <div class="hamburger-menu">
+                <input type="checkbox" id="menu__toggle" />
+                <label for="menu__toggle" class="menu__icon">
+                    <span></span>
+                </label>
+                <div class="menu__right">
+                    <ul>
+                        <li><a href="#">Inicio</a></li>
+                        <li><a href="#">Acerca de</a></li>
+                        <li><a href="#">Contacto</a></li>
+                    </ul>
                 </div>
             </div>
+
         </>
     )
 }
