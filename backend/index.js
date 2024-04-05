@@ -41,7 +41,7 @@ app.use(express.urlencoded({ extended: true }));
 const db = require("./models");
 
 // Database sync and setup
-db.sequelize.sync({ force: true }).then(async () => {
+db.sequelize.sync().then(async () => {
   console.log("Database tables dropped and re-synced.");
 
   const existingAdmin = await db.Admin.findOne({ where: { Username: 'prueba' } });
