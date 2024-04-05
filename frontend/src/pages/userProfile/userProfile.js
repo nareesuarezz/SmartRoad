@@ -4,7 +4,10 @@ import ProfilePictureUser from "../../components/profilePictureUser/profilePictu
 import axios from 'axios';
 import { useState, useEffect } from 'react';
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> ba287902620bc279447f8129320b2148ff258909
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const getPlaceName = async (lat, lon) => {
@@ -23,16 +26,55 @@ function UserProfile() {
     Username: '',
   });
   const [previewImage, setPreviewImage] = useState('');
+<<<<<<< HEAD
   const [carTime, setCarTime] = useState(null);
+=======
+>>>>>>> ba287902620bc279447f8129320b2148ff258909
   const [carDistance, setCarDistance] = useState(0);
   const [bicycleDistance, setBicycleDistance] = useState(0);
   const [lastJourney, setLastJourney] = useState(null);
   const [startPlaceName, setStartPlaceName] = useState('');
   const [endPlaceName, setEndPlaceName] = useState('');
 
+<<<<<<< HEAD
   const userInfo = JSON.parse(localStorage.getItem('userInfo'));
 
 
+=======
+
+  const [totalTime, setTotalTime] = useState('');
+  const [carTime, setCarTime] = useState(null);
+  const [bicycleTime, setBicycleTime] = useState(null);
+
+  const userInfo = JSON.parse(localStorage.getItem('userInfo'))
+
+  useEffect(() => {
+    //Total Time
+    axios.get(`${URL}/api/tracks/totalTime/${userInfo.UID}`)
+      .then(response => {
+        setTotalTime(response.data);
+      })
+      .catch(error => {
+        console.error('Error getting total time:', error);
+      });
+    //Car Time
+    axios.get(`${URL}/api/tracks/carTime/${userInfo.UID}`)
+      .then(response => {
+        setCarTime(response.data);
+      })
+      .catch(error => {
+        console.error('Error getting car time:', error);
+      });
+    //Bicycle Time
+    axios.get(`${URL}/api/tracks/bicycleTime/${userInfo.UID}`)
+      .then(response => {
+        setBicycleTime(response.data);
+      })
+      .catch(error => {
+        console.error('Error getting bicycle time:', error);
+      });
+  }, []);
+>>>>>>> ba287902620bc279447f8129320b2148ff258909
 
   const handleChange = (e) => {
     if (e.target.name === 'Image') {
@@ -149,6 +191,11 @@ function UserProfile() {
       <div>
         <h2>Here you will see you stats:</h2>
         <p>Car Time = {carTime}</p>
+<<<<<<< HEAD
+=======
+        <p>Bicycle Time = {bicycleTime}</p>
+        <p>Total Time = {totalTime}</p>
+>>>>>>> ba287902620bc279447f8129320b2148ff258909
         <p>Car Km = {(carDistance / 1000).toFixed(2)} Km</p>
 
         <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)} Km{bicycleTime}</p>
@@ -163,6 +210,11 @@ function UserProfile() {
         ) : (
           <p>Loading last journey...</p>
         )}
+<<<<<<< HEAD
+=======
+        
+
+>>>>>>> ba287902620bc279447f8129320b2148ff258909
         {showEditUsername && (
           <form onSubmit={handleSubmit}>
             <label>
