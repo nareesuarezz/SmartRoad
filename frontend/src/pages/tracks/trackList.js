@@ -5,6 +5,7 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
+import 'lrm-graphhopper'; 
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
@@ -91,9 +92,10 @@ const TrackList = () => {
       draggableWaypoints: false,
       fitSelectedRoutes: true,
       showAlternatives: false,
-      router: new L.Routing.osrmv1({
-        language: 'es',
-        profile: 'driving',
+      router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
+        urlParameters: {
+          vehicle: 'foot',
+        },
       }),
       lineOptions: {
         styles: [{color: 'blue', opacity: 1, weight: 5}]

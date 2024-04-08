@@ -100,11 +100,11 @@ const TrackAdd = ({ getTracks }) => {
       </div>
       <form onSubmit={handleSubmit}>
         <label>
-          {t('Latitude')}:
+          {t('Longitude')}:
           <input type="text" name="Latitude" value={formData.Latitude} onChange={(e) => handleLocationChange('Latitude', e.target.value)} />
         </label>
         <label>
-          {t('Longitude')}:
+          {t('Latitude')}:
           <input type="text" name="Longitude" value={formData.Longitude} onChange={(e) => handleLocationChange('Longitude', e.target.value)} />
         </label>
         <label>
