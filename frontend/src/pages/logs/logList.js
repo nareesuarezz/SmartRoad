@@ -27,8 +27,8 @@ const LogList = () => {
   };
 
   const goBack = () => {
-    window.location.href = "/login";
-  }
+    window.location.href = '/login-user';
+  };
 
   return (
     <div>

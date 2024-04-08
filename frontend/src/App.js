@@ -8,7 +8,6 @@ import Loading from './pages/loading/Loading';
 import Home from './pages/home/Home';
 import Car from './pages/car/Car';
 import Bicycle from './pages/bicycle/Bicycle';
-import Login from './pages/login/Login';
 import TrackList from './pages/tracks/trackList';
 import TrackAdd from './pages/tracks/trackAdd';
 import TrackEdit from './pages/tracks/trackEdit';
@@ -167,7 +166,6 @@ function App() {
           <Route path="/home" element={<Home />} />
           <Route path="/car" element={<Car />} />
           <Route path="/bicycle" element={<Bicycle />} />
-          <Route path="/login" element={<Login />} />
           <Route path="/track-list" element={<TrackList />} />
           <Route path="/track-add" element={<TrackAdd />} />
           <Route path="/track-edit/:id" element={<TrackEdit />} />

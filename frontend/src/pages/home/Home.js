@@ -136,10 +136,6 @@ function Home() {
     }
   };
 
-  const goLogin = () => {
-    window.location.href = "/login";
-  };
-
   const goBack = () => {
     window.location.href = "/login-user";
   };
@@ -191,10 +187,6 @@ function Home() {
             </option>
           ))}
         </select>
-      </div>
-      <div className='admin'>
-        <p>{t('Are you an admin?')}</p>
-        <p className='log' onClick={goLogin}>{t('Log in here')}</p>
       </div>
       <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
       <UserNotification />

@@ -77,7 +77,7 @@ const TrackList = () => {
   };
 
   const goBack = () => {
-    window.location.href = '/login';
+    window.location.href = '/login-user';
   };
 
   const RoutingMachine = ({ trackCoordinates }) => {
@@ -98,7 +98,7 @@ const TrackList = () => {
         },
       }),
       lineOptions: {
-        styles: [{color: 'blue', opacity: 1, weight: 5}]
+        styles: [{color: 'sasa', opacity: 1, weight: 5}]
       },
       show: false, // Esta opción oculta las direcciones para llegar
       routeLine: function(route, options) { // Esta función oculta la línea de la ruta
