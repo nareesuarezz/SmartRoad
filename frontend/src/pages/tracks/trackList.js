@@ -5,12 +5,13 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
-import 'lrm-graphhopper'; 
+import 'lrm-graphhopper';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import { useSelector } from 'react-redux';
 
 const carIcon = new L.Icon({
   iconUrl: process.env.PUBLIC_URL + '/images/car.png',
@@ -26,13 +27,25 @@ const bicycleIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
+const notificationIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/notification.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackList = () => {
+  const notificationLocations = useSelector(state => {
+    console.log('Estado de Redux:', state); // Este console.log muestra todo el estado de Redux
+    return state.notificationLocations; // Devuelve solo la parte de notificationLocations del estado
+  });
+
   const { t } = useTranslation();
 
   const [tracks, setTracks] = useState([]);
   const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]);
+
 
   useEffect(() => {
     getTracks();
@@ -46,7 +59,7 @@ const TrackList = () => {
           Authorization: `Bearer ${authToken}`,
         },
       });
-  
+
       // Asegúrate de que cada track tenga la información del vehículo
       const tracksWithVehicleInfo = await Promise.all(response.data.map(async (track) => {
         const vehicleResponse = await axios.get(`${URL}/api/vehicles/${track.Vehicle_UID}`, {
@@ -56,13 +69,13 @@ const TrackList = () => {
         });
         return { ...track, vehicleType: vehicleResponse.data.Vehicle };
       }));
-  
+
       setTracks(tracksWithVehicleInfo);
     } catch (error) {
       console.error('Error fetching tracks:', error);
     }
   };
-  
+
 
   const groupTracksByVehicle = () => {
     const groupedTracks = {};
@@ -82,55 +95,70 @@ const TrackList = () => {
 
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
-  
+
     useEffect(() => {
-  if (trackCoordinates.length > 1) {
-    let routingControl = L.Routing.control({
-      waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-      routeWhileDragging: true,
-      addWaypoints: false,
-      draggableWaypoints: false,
-      fitSelectedRoutes: true,
-      showAlternatives: false,
-      router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
-        urlParameters: {
-          vehicle: 'foot',
-        },
-      }),
-      lineOptions: {
-        styles: [{color: 'sasa', opacity: 1, weight: 5}]
-      },
-      show: false, // Esta opción oculta las direcciones para llegar
-      routeLine: function(route, options) { // Esta función oculta la línea de la ruta
-        return L.polyline(route.coordinates, options);
-      },
-      createMarker: function() { return null; }, // Esta función oculta los marcadores de inicio y fin
-    }).addTo(map);
+      if (trackCoordinates.length > 1) {
+        let routingControl = L.Routing.control({
+          waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+          routeWhileDragging: true,
+          addWaypoints: false,
+          draggableWaypoints: false,
+          fitSelectedRoutes: true,
+          showAlternatives: false,
+          router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
+            urlParameters: {
+              vehicle: 'foot',
+            },
+          }),
+          lineOptions: {
+            styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
+          },
+          show: false, // Esta opción oculta las direcciones para llegar
+          routeLine: function (route, options) { // Esta función oculta la línea de la ruta
+            return L.polyline(route.coordinates, options);
+          },
+          createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
+        }).addTo(map);
 
-    // Oculta el panel de instrucciones de ruta después de que se haya creado
-    routingControl.on('routeselected', function(e) {
-      let routesContainer = document.querySelector('.leaflet-routing-container-hide');
-      if (routesContainer) {
-        routesContainer.style.display = 'none';
+        // Oculta el panel de instrucciones de ruta después de que se haya creado
+        routingControl.on('routeselected', function (e) {
+          let routesContainer = document.querySelector('.leaflet-routing-container-hide');
+          if (routesContainer) {
+            routesContainer.style.display = 'none';
+          }
+        });
       }
-    });
-  }
-}, [map, trackCoordinates]);
+    }, [map, trackCoordinates]);
 
-  
+
     return null;
   };
-  
-  
-  
+
+
+
   const renderTracksOnMap = () => {
     const groupedTracks = groupTracksByVehicle();
   
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
       const trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
-  
       return (
         <React.Fragment key={index}>
+          {notificationLocations.map((location, index) => {
+            const coordinates = location.coordinates;
+            console.log(coordinates)
+            return (
+              <Marker
+                key={index}
+                position={[coordinates[0], coordinates[1]]}
+                icon={notificationIcon}
+                zIndexOffset={1000} 
+              >
+                <Popup>
+                  <p>Notificación enviada desde aquí</p>
+                </Popup>
+              </Marker>
+            );
+          })}
           {vehicleTracks.map((track, trackIndex) => {
             const icon = track.vehicleType === 'car' ? carIcon : bicycleIcon;
             return (
@@ -138,6 +166,7 @@ const TrackList = () => {
                 key={track.ID}
                 position={track.Location.coordinates.reverse()}
                 icon={icon}
+                zIndexOffset={500} // Ajusta este valor según tus necesidades
               >
                 <Popup>
                   <p>{`Track ID: ${track.ID}`}</p>

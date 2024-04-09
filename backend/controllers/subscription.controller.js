@@ -178,9 +178,9 @@
   
   
 
-  const sendNotification = async (subscriptionRecipient, title, description) => {
+  const sendNotification = async (subscriptionRecipient, title, description, location) => {
     console.log('Sending notification:', subscriptionRecipient, title, description);  
-    
+  
     const options = {
       vapidDetails: {
         subject: 'mailto:myemail@example.com',
@@ -195,11 +195,12 @@
           title,
           description,
           image: 'https://cdn-icons-png.flaticon.com/512/752/752755.png',
+          location, // Agrega la ubicación a los datos de la notificación
         }),
         options
       );
     } catch (error) {
       console.error('Error sending notification:', error);
     }
-    
   }
+  
