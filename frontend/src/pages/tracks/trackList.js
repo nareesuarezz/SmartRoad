@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
@@ -45,6 +45,8 @@ const TrackList = () => {
 
   const [tracks, setTracks] = useState([]);
   const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]);
+  const [showCompleteRoute, setShowCompleteRoute] = useState(true); // Por defecto, mostrar la ruta completa
+
 
 
   useEffect(() => {
@@ -130,35 +132,23 @@ const TrackList = () => {
       }
     }, [map, trackCoordinates]);
 
-
     return null;
   };
 
-
-
-  const renderTracksOnMap = () => {
+  const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle();
   
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
-      const trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
+      if (vehicleTracks[0].vehicleType !== vehicleType) {
+        return null;
+      }
+  
+      const trackCoordinates = showCompleteRoute ? 
+        vehicleTracks.map((track) => track.Location.coordinates.reverse()) :
+        [vehicleTracks[vehicleTracks.length - 1].Location.coordinates.reverse()];
+  
       return (
         <React.Fragment key={index}>
-          {notificationLocations.map((location, index) => {
-            const coordinates = location.coordinates;
-            console.log(coordinates)
-            return (
-              <Marker
-                key={index}
-                position={[coordinates[0], coordinates[1]]}
-                icon={notificationIcon}
-                zIndexOffset={1000} 
-              >
-                <Popup>
-                  <p>Notificación enviada desde aquí</p>
-                </Popup>
-              </Marker>
-            );
-          })}
           {vehicleTracks.map((track, trackIndex) => {
             const icon = track.vehicleType === 'car' ? carIcon : bicycleIcon;
             return (
@@ -182,6 +172,7 @@ const TrackList = () => {
       );
     });
   };
+  
 
   return (
     <div>
@@ -202,7 +193,41 @@ const TrackList = () => {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-          {renderTracksOnMap()}
+
+          <LayersControl position="topright">
+            <LayersControl.Overlay checked name="Bicicletas">
+              <LayerGroup>
+                {renderTracksOnMap('bicycle')}
+              </LayerGroup>
+            </LayersControl.Overlay>
+
+            <LayersControl.Overlay checked name="Coches">
+              <LayerGroup>
+                {renderTracksOnMap('car')}
+              </LayerGroup>
+            </LayersControl.Overlay>
+
+            <LayersControl.Overlay checked name="Notificaciones">
+              <LayerGroup>
+                {notificationLocations.map((location, index) => {
+                  const coordinates = location.coordinates;
+                  console.log(coordinates)
+                  return (
+                    <Marker
+                      key={index}
+                      position={[coordinates[0], coordinates[1]]}
+                      icon={notificationIcon}
+                      zIndexOffset={1000} 
+                    >
+                      <Popup>
+                        <p>Notificación enviada desde aquí</p>
+                      </Popup>
+                    </Marker>
+                  );
+                })}
+              </LayerGroup>
+            </LayersControl.Overlay>
+          </LayersControl>
         </MapContainer>
       </div>
     </div>
