@@ -37,21 +37,52 @@ const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackList = () => {
   const notificationLocations = useSelector(state => {
-    console.log('Estado de Redux:', state); // Este console.log muestra todo el estado de Redux
     return state.notificationLocations; // Devuelve solo la parte de notificationLocations del estado
   });
 
   const { t } = useTranslation();
 
-  const [tracks, setTracks] = useState([]);
+  const [allTracks, setAllTracks] = useState([]);
+  const [displayTracks, setDisplayTracks] = useState([]);
   const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]);
-  const [showCompleteRoute, setShowCompleteRoute] = useState(true); // Por defecto, mostrar la ruta completa
+  const [trackView, setTrackView] = useState('complete');
+  const [selectedLayer, setSelectedLayer] = useState('Todas las rutas');
 
 
 
   useEffect(() => {
     getTracks();
   }, []);
+
+  useEffect(() => {
+    if (trackView === 'complete') {
+      setDisplayTracks(allTracks);
+    } else {
+      const lastTracks = getLastTracks(allTracks);
+      setDisplayTracks(lastTracks);
+    }
+  }, [allTracks, trackView]);
+  
+  const layerToTrackView = {
+    "Todas las rutas": "complete",
+    "Último track": "last"
+  };
+  
+  const handleLayerChange = (layer) => {
+    setTrackView(layerToTrackView[layer]);
+  };
+
+
+  const CustomControl = (props) => {
+    const map = useMap();
+    useEffect(() => {
+      map.on('baselayerchange', (event) => {
+        handleLayerChange(event.name);
+      });
+    }, [map]);
+    return null;
+  };
+
 
   const getTracks = async () => {
     try {
@@ -72,28 +103,37 @@ const TrackList = () => {
         return { ...track, vehicleType: vehicleResponse.data.Vehicle };
       }));
 
-      setTracks(tracksWithVehicleInfo);
+      setAllTracks(tracksWithVehicleInfo);
     } catch (error) {
       console.error('Error fetching tracks:', error);
     }
   };
 
+  const getLastTracks = (tracks) => {
+    const groupedTracks = tracks.reduce((grouped, track) => {
+      (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
+      return grouped;
+    }, {});
 
-  const groupTracksByVehicle = () => {
-    const groupedTracks = {};
-    tracks.forEach((track) => {
-      const vehicleUID = track.Vehicle_UID;
-      if (!groupedTracks[vehicleUID]) {
-        groupedTracks[vehicleUID] = [];
-      }
-      groupedTracks[vehicleUID].push(track);
-    });
+    const lastTracks = Object.values(groupedTracks).map(tracks => tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]);
+    return lastTracks;
+  };
+
+  const groupTracksByVehicle = (tracks) => {
+    const groupedTracks = tracks.reduce((grouped, track) => {
+      (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
+      return grouped;
+    }, {});
     return groupedTracks;
   };
 
   const goBack = () => {
     window.location.href = '/login-user';
   };
+
+  useEffect(() => {
+    console.log(trackView);
+  }, [trackView]);
 
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
@@ -122,6 +162,7 @@ const TrackList = () => {
           createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
         }).addTo(map);
 
+
         // Oculta el panel de instrucciones de ruta después de que se haya creado
         routingControl.on('routeselected', function (e) {
           let routesContainer = document.querySelector('.leaflet-routing-container-hide');
@@ -129,6 +170,7 @@ const TrackList = () => {
             routesContainer.style.display = 'none';
           }
         });
+
       }
     }, [map, trackCoordinates]);
 
@@ -136,17 +178,19 @@ const TrackList = () => {
   };
 
   const renderTracksOnMap = (vehicleType) => {
-    const groupedTracks = groupTracksByVehicle();
-  
+    const groupedTracks = groupTracksByVehicle(displayTracks);
+
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
       if (vehicleTracks[0].vehicleType !== vehicleType) {
         return null;
       }
-  
-      const trackCoordinates = showCompleteRoute ? 
-        vehicleTracks.map((track) => track.Location.coordinates.reverse()) :
-        [vehicleTracks[vehicleTracks.length - 1].Location.coordinates.reverse()];
-  
+
+      let trackCoordinates;
+      if (trackView === 'complete') {
+        trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
+      } else {
+        trackCoordinates = [vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0].Location.coordinates.reverse()];
+      }
       return (
         <React.Fragment key={index}>
           {vehicleTracks.map((track, trackIndex) => {
@@ -172,7 +216,8 @@ const TrackList = () => {
       );
     });
   };
-  
+
+
 
   return (
     <div>
@@ -186,15 +231,24 @@ const TrackList = () => {
           {t('Add Track')}
         </Link>
       </div>
-
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-        <MapContainer center={mapCenter} zoom={12} style={{ height: '500px', width: '700px' }}>
+        <MapContainer key={`${trackView}-${Date.now()}`} center={mapCenter} zoom={12} style={{ height: '500px', width: '700px' }}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
 
+          <CustomControl />
           <LayersControl position="topright">
+            <LayersControl.BaseLayer name="Todas las rutas">
+              <LayerGroup>
+              </LayerGroup>
+            </LayersControl.BaseLayer>
+
+            <LayersControl.BaseLayer name="Último track">
+              <LayerGroup>
+              </LayerGroup>
+            </LayersControl.BaseLayer>
             <LayersControl.Overlay checked name="Bicicletas">
               <LayerGroup>
                 {renderTracksOnMap('bicycle')}
@@ -211,13 +265,12 @@ const TrackList = () => {
               <LayerGroup>
                 {notificationLocations.map((location, index) => {
                   const coordinates = location.coordinates;
-                  console.log(coordinates)
                   return (
                     <Marker
                       key={index}
                       position={[coordinates[0], coordinates[1]]}
                       icon={notificationIcon}
-                      zIndexOffset={1000} 
+                      zIndexOffset={1000}
                     >
                       <Popup>
                         <p>Notificación enviada desde aquí</p>
@@ -232,6 +285,7 @@ const TrackList = () => {
       </div>
     </div>
   );
+
 };
 
 export default TrackList;
