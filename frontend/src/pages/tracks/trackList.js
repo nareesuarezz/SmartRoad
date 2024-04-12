@@ -5,7 +5,6 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
-import 'lrm-graphhopper'; 
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import AuthService from '../../services/authService';
@@ -162,7 +161,7 @@ const TrackList = () => {
         <LanguageSwitcher />
       </div>
       <div>
-        <Link to="/track-add" className="add">
+        <Link to="/track-add" className='add'>
           {t('Add Track')}
         </Link>
       </div>

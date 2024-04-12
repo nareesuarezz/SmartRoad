@@ -156,12 +156,11 @@ function UserProfile() {
 
     fetchLastJourney();
     fetchTotalDistance();
-  }, []); // El array vacío significa que este efecto se ejecutará solo una vez, cuando se monte el componente
+  }, []);
 
 
   return (
     <>
-    
       <header>
         <div className='arrow' onClick={() => goBack()}>
           <ArrowLeftOutlined />
@@ -169,16 +168,17 @@ function UserProfile() {
         <div className="menuUserInfo">
           <MenuUserInfo />
         </div>
-        <div className='profile'>
-          <ProfilePictureUser />
-          <EditOutlined onClick={() => setShowEditImage(!showEditImage)} />
-        </div>
+        {/* <div className='profile'>
+          <ProfilePictureUser onClick={() => setShowEditImage(!showEditImage)} />
+        </div> */}
         <div className='username'>
-          <h1>{userInfo.Username}</h1>
-          <EditOutlined onClick={() => setShowEditUsername(!showEditUsername)} />
+          <h1 onClick={() => setShowEditUsername(!showEditUsername)}>
+            {userInfo.Username}
+          </h1>
+
         </div>
       </header>
-      <div>
+      <div className="userProfileData">
         <h2>Here you will see you stats:</h2>
         <p>Car Time = {carTime}</p>
         <p>Bicycle Time = {bicycleTime}</p>
