@@ -7,8 +7,11 @@ import axios from 'axios';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import UserNotification from '../../components/websocketTest/UserNotification';
+import { useDispatch, useSelector } from 'react-redux';
 
 function Car() {
+
+  const dispatch = useDispatch();
   const { t } = useTranslation();
   const API = process.env.REACT_APP_API_URL;
   const URL = process.env.REACT_APP_LOCALHOST_URL;
@@ -72,7 +75,7 @@ function Car() {
 
       if (recentTracks.data.recentTracks.length > 0) {
         setShowModal(true);
-        sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`);
+        sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`, data.Location);
       }
 
     } catch (err) {
@@ -187,7 +190,7 @@ function Car() {
   }, [showModal, audioElement, setShowModal]);
 
 
-  const sendNotification = async (subscriptionName, notificationMessage) => {
+  const sendNotification = async (subscriptionName, notificationMessage, location) => {
     try {
       await axios.post(`${API}/sendCustomNotification`, {
         subscriptionName,
@@ -195,10 +198,27 @@ function Car() {
       });
 
       console.log(`Sending notification to ${subscriptionName}: ${notificationMessage}`);
+      console.log('location: ', location);
+
+      dispatch({ type: 'ADD_LOCATION', payload: location });
     } catch (error) {
       console.error('Error al enviar notificación al backend:', error.response);
     }
   };
+
+  // Obtener el estado de Redux antes de despachar la acción
+  const notificationLocationslog = useSelector(state => state.notificationLocations);
+
+  useEffect(() => {
+    // Obtener el estado de Redux después de despachar la acción
+
+    console.log('notificationLocations log:', notificationLocationslog);
+  }, [notificationLocationslog]); // Ejecutar el efecto cada vez que beforeNotificationLocations cambie
+
+
+
+
+
 
   const goBack = () => {
     window.location.href = '/home';
@@ -275,7 +295,7 @@ function Car() {
           </div>
         </div>
       )}
-            <UserNotification/>
+      <UserNotification />
     </>
   );
 }

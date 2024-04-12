@@ -16,22 +16,25 @@ function LoginUser() {
     const goHome = async () => {
         try {
             const response = await AuthService.signIn(username, password);
-
-            console.log('Respuesta del backend:', response);
-
+    
+            console.log('Respuesta del backend:', response.admin.Username);
+    
             localStorage.setItem('userInfo', JSON.stringify(response.admin));
-
-            if (response.admin.Role !== 'User') {
-                setError('Acceso denegado. Solo los usuarios pueden iniciar sesión.');
+    
+            if (response.admin.Role === 'User') {
+                window.location.href = "/home";
+            } else if (response.admin.Role === 'Admin') {
+                window.location.href = "/track-list";
+            } else {
+                setError('Acceso denegado. Solo los usuarios y administradores pueden iniciar sesión.');
                 return;
-              }
-
-            window.location.href = "/home";
+            }
         } catch (error) {
             console.error('Error de inicio de sesión:', error);
             setError('Usuario o contraseña incorrectos');
         }
     }
+    
 
     return (
         <>
