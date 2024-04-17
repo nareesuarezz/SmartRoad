@@ -4,6 +4,8 @@ const Vehicles = db.Vehicle;
 const Logs = db.Log;
 const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
+const socket = require('../socket');
+
 
 // Variables para ajustes de desarrollo
 const MINUTES_AGO = 10; // Encuentra tracks subidos en los últimos 10 minutos
@@ -87,8 +89,11 @@ exports.create = async (req, res) => {
             Vehicle_UID: req.body.Vehicle_UID,
             Date: req.body.Date,
         };
-
         const createdTrack = await Tracks.create(track);
+
+        // Emitir el evento 'trackCreated' con el track creado como dato
+        const io = socket.getIo();
+        io.emit('trackCreated', createdTrack);
 
         res.status(201).send({ message: "Track created successfully." });
     } catch (error) {
@@ -354,15 +359,15 @@ exports.calculateBicycleTime = async (req, res) => {
 
 function calculateDistance(location1, location2) {
     const R = 6371e3; // radio medio de la Tierra en metros
-    const lat1 = location1[0] * Math.PI/180; // convertir a radianes
-    const lat2 = location2[0] * Math.PI/180;
-    const deltaLat = (location2[0]-location1[0]) * Math.PI/180;
-    const deltaLng = (location2[1]-location1[1]) * Math.PI/180;
+    const lat1 = location1[0] * Math.PI / 180; // convertir a radianes
+    const lat2 = location2[0] * Math.PI / 180;
+    const deltaLat = (location2[0] - location1[0]) * Math.PI / 180;
+    const deltaLng = (location2[1] - location1[1]) * Math.PI / 180;
 
-    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
-              Math.cos(lat1) * Math.cos(lat2) *
-              Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     const distance = R * c; // en metros
     return distance;
@@ -421,62 +426,61 @@ exports.calculateTotalDistance = async (req, res) => {
 exports.getLastJourney = async (req, res) => {
     try {
         const adminId = req.params.Admin_UID; // Asume que recibes el ID del administrador como parámetro
-  
-      // Busca todos los vehículos del administrador
-      const vehicles = await Vehicles.findAll({
-        where: { Admin_UID: adminId }
-      });
-  
-      if (!vehicles || vehicles.length === 0) {
-        return res.status(404).json({ message: 'No se encontró ningún vehículo para este administrador' });
-      }
-  
-      let allTracks = [];
-  
-      // Itera sobre los vehículos del administrador y busca los tracks para cada uno
-      for (let vehicle of vehicles) {
-        const tracks = await Tracks.findAll({
-          where: { Vehicle_UID: vehicle.UID },
-          order: [['Date', 'ASC']]
+
+        // Busca todos los vehículos del administrador
+        const vehicles = await Vehicles.findAll({
+            where: { Admin_UID: adminId }
         });
-  
-        allTracks = allTracks.concat(tracks);
-      }
-  
-      let journeys = [];
-      let currentJourney = [allTracks[0]];
-  
-      // Itera sobre los tracks del usuario
-      for (let i = 1; i < allTracks.length; i++) {
-        const currentTrack = allTracks[i];
-        const previousTrack = allTracks[i - 1];
-  
-        // Calcula la diferencia de tiempo entre el track actual y el anterior
-        const timeDifference = (new Date(currentTrack.Date) - new Date(previousTrack.Date)) / 1000;
-  
-        // Si la diferencia de tiempo es mayor a 5 segundos, considera que es un nuevo viaje
-        if (timeDifference > 5) {
-          journeys.push(currentJourney);
-          currentJourney = [currentTrack];
-        } else {
-          currentJourney.push(currentTrack);
+
+        if (!vehicles || vehicles.length === 0) {
+            return res.status(404).json({ message: 'No se encontró ningún vehículo para este administrador' });
         }
-      }
-  
-      // Asegúrate de agregar el último viaje
-      journeys.push(currentJourney);
-  
-      // Obtiene el último viaje
-      const lastJourney = journeys[journeys.length - 1];
-  
-      // Obtiene el primer y último track del último viaje
-      const firstTrack = lastJourney[0];
-      const lastTrack = lastJourney[lastJourney.length - 1];
-  
-      return res.json({ firstTrack, lastTrack });
+
+        let allTracks = [];
+
+        // Itera sobre los vehículos del administrador y busca los tracks para cada uno
+        for (let vehicle of vehicles) {
+            const tracks = await Tracks.findAll({
+                where: { Vehicle_UID: vehicle.UID },
+                order: [['Date', 'ASC']]
+            });
+
+            allTracks = allTracks.concat(tracks);
+        }
+
+        let journeys = [];
+        let currentJourney = [allTracks[0]];
+
+        // Itera sobre los tracks del usuario
+        for (let i = 1; i < allTracks.length; i++) {
+            const currentTrack = allTracks[i];
+            const previousTrack = allTracks[i - 1];
+
+            // Calcula la diferencia de tiempo entre el track actual y el anterior
+            const timeDifference = (new Date(currentTrack.Date) - new Date(previousTrack.Date)) / 1000;
+
+            // Si la diferencia de tiempo es mayor a 5 segundos, considera que es un nuevo viaje
+            if (timeDifference > 5) {
+                journeys.push(currentJourney);
+                currentJourney = [currentTrack];
+            } else {
+                currentJourney.push(currentTrack);
+            }
+        }
+
+        // Asegúrate de agregar el último viaje
+        journeys.push(currentJourney);
+
+        // Obtiene el último viaje
+        const lastJourney = journeys[journeys.length - 1];
+
+        // Obtiene el primer y último track del último viaje
+        const firstTrack = lastJourney[0];
+        const lastTrack = lastJourney[lastJourney.length - 1];
+
+        return res.json({ firstTrack, lastTrack });
     } catch (error) {
-      console.error(`Error al buscar el último viaje: ${error}`);
-      return res.status(500).json({ message: 'Hubo un error al buscar el último viaje' });
+        console.error(`Error al buscar el último viaje: ${error}`);
+        return res.status(500).json({ message: 'Hubo un error al buscar el último viaje' });
     }
-  };
-  
+};

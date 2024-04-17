@@ -8,7 +8,7 @@ const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const http = require('http');
 const https = require('https');
-const socketIo = require('socket.io');
+const socket = require('./socket');
 const dbConfig = require("./config/db.config");
 
 const USING_HTTPS = process.env.USING_HTTPS == "true" ? true : false;
@@ -163,12 +163,8 @@ if (USING_HTTPS) {
 
 
 
-const io = socketIo(SERVER, {
-  cors: {
-    origin: "*", // Adjust according to your needs
-    methods: ["GET", "POST"]
-  }
-});
+const io = socket.init(SERVER);
+
 
 // Socket.IO setup for global notifications
 io.on('connection', (socket) => {

@@ -12,6 +12,7 @@ import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import { useSelector } from 'react-redux';
+import io from 'socket.io-client';
 
 const carIcon = new L.Icon({
   iconUrl: process.env.PUBLIC_URL + '/images/car.png',
@@ -47,6 +48,7 @@ const TrackList = () => {
   const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]);
   const [trackView, setTrackView] = useState('complete');
   const [selectedLayer, setSelectedLayer] = useState('Todas las rutas');
+  const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 
@@ -63,6 +65,19 @@ const TrackList = () => {
     }
   }, [allTracks, trackView]);
   
+
+  useEffect(() => {
+    const socket = io(SOCKET_SERVER_URL); 
+
+    socket.on('trackCreated', (newTrack) => {
+      setAllTracks([...allTracks, newTrack]);
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [allTracks]);
+
   const layerToTrackView = {
     "Todas las rutas": "complete",
     "Último track": "last"
@@ -137,46 +152,47 @@ const TrackList = () => {
 
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
-
+  
     useEffect(() => {
       if (trackCoordinates.length > 1) {
-        let routingControl = L.Routing.control({
-          waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-          routeWhileDragging: true,
-          addWaypoints: false,
-          draggableWaypoints: false,
-          fitSelectedRoutes: true,
-          showAlternatives: false,
-          router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
-            urlParameters: {
-              vehicle: 'foot',
+        map.whenReady(() => {
+          let routingControl = L.Routing.control({
+            waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+            routeWhileDragging: true,
+            addWaypoints: false,
+            draggableWaypoints: false,
+            fitSelectedRoutes: true,
+            showAlternatives: false,
+            router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
+              urlParameters: {
+                vehicle: 'foot',
+              },
+            }),
+            lineOptions: {
+              styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
             },
-          }),
-          lineOptions: {
-            styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
-          },
-          show: false, // Esta opción oculta las direcciones para llegar
-          routeLine: function (route, options) { // Esta función oculta la línea de la ruta
-            return L.polyline(route.coordinates, options);
-          },
-          createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
-        }).addTo(map);
-
-
-        // Oculta el panel de instrucciones de ruta después de que se haya creado
-        routingControl.on('routeselected', function (e) {
-          let routesContainer = document.querySelector('.leaflet-routing-container-hide');
-          if (routesContainer) {
-            routesContainer.style.display = 'none';
-          }
+            show: false, // Esta opción oculta las direcciones para llegar
+            routeLine: function (route, options) { // Esta función oculta la línea de la ruta
+              return L.polyline(route.coordinates, options);
+            },
+            createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
+          }).addTo(map);
+  
+          // Oculta el panel de instrucciones de ruta después de que se haya creado
+          routingControl.on('routeselected', function (e) {
+            let routesContainer = document.querySelector('.leaflet-routing-container-hide');
+            if (routesContainer) {
+              routesContainer.style.display = 'none';
+            }
+          });
         });
-
       }
     }, [map, trackCoordinates]);
-
+  
     return null;
   };
-
+  
+  
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(displayTracks);
 
