@@ -64,13 +64,13 @@ const TrackList = () => {
       setDisplayTracks(lastTracks);
     }
   }, [allTracks, trackView]);
-  
+
 
   useEffect(() => {
-    const socket = io(SOCKET_SERVER_URL); 
+    const socket = io(SOCKET_SERVER_URL);
 
     socket.on('trackCreated', (newTrack) => {
-      setAllTracks([...allTracks, newTrack]);
+      getTracks();
     });
 
     return () => {
@@ -82,7 +82,7 @@ const TrackList = () => {
     "Todas las rutas": "complete",
     "Último track": "last"
   };
-  
+
   const handleLayerChange = (layer) => {
     setTrackView(layerToTrackView[layer]);
   };
@@ -152,9 +152,9 @@ const TrackList = () => {
 
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
-  
+
     useEffect(() => {
-      if (trackCoordinates.length > 1) {
+      if (map && trackCoordinates.length > 1) {
         map.whenReady(() => {
           let routingControl = L.Routing.control({
             waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
@@ -177,7 +177,7 @@ const TrackList = () => {
             },
             createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
           }).addTo(map);
-  
+
           // Oculta el panel de instrucciones de ruta después de que se haya creado
           routingControl.on('routeselected', function (e) {
             let routesContainer = document.querySelector('.leaflet-routing-container-hide');
@@ -188,11 +188,12 @@ const TrackList = () => {
         });
       }
     }, [map, trackCoordinates]);
-  
+
     return null;
   };
-  
-  
+
+
+
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(displayTracks);
 
