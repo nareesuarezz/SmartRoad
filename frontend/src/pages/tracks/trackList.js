@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup } from 'react-leaflet';
@@ -66,17 +66,7 @@ const TrackList = () => {
   }, [allTracks, trackView]);
 
 
-  useEffect(() => {
-    const socket = io(SOCKET_SERVER_URL);
 
-    socket.on('trackCreated', (newTrack) => {
-      getTracks();
-    });
-
-    return () => {
-      socket.disconnect();
-    };
-  }, [allTracks]);
 
   const layerToTrackView = {
     "Todas las rutas": "complete",
@@ -150,49 +140,71 @@ const TrackList = () => {
     console.log(trackView);
   }, [trackView]);
 
+  useEffect(() => {
+    const socket = io(SOCKET_SERVER_URL);
+  
+    socket.on('trackCreated', (newTrack) => {
+      getTracks();
+    });
+  
+    return () => {
+      socket.disconnect();
+    };
+  }, [allTracks]);
+  
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
-
+    const isMounted = useRef(false);
+  
     useEffect(() => {
-      if (map && trackCoordinates.length > 1) {
-        map.whenReady(() => {
-          let routingControl = L.Routing.control({
-            waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-            routeWhileDragging: true,
-            addWaypoints: false,
-            draggableWaypoints: false,
-            fitSelectedRoutes: true,
-            showAlternatives: false,
-            router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
-              urlParameters: {
-                vehicle: 'foot',
+      isMounted.current = true;
+      return () => {
+        isMounted.current = false;
+      };
+    }, []);
+  
+    useEffect(() => {
+      if (map && trackCoordinates.length > 1 && isMounted.current) {
+        const whenMapIsReady = new Promise(resolve => map.whenReady(resolve));
+        whenMapIsReady.then(() => {
+          if (map) { // Asegúrate de que el mapa existe
+            let routingControl = L.Routing.control({
+              waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+              routeWhileDragging: true,
+              addWaypoints: false,
+              draggableWaypoints: false,
+              fitSelectedRoutes: true,
+              showAlternatives: false,
+              router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
+                urlParameters: {
+                  vehicle: 'foot',
+                },
+              }),
+              lineOptions: {
+                styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
               },
-            }),
-            lineOptions: {
-              styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
-            },
-            show: false, // Esta opción oculta las direcciones para llegar
-            routeLine: function (route, options) { // Esta función oculta la línea de la ruta
-              return L.polyline(route.coordinates, options);
-            },
-            createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
-          }).addTo(map);
-
-          // Oculta el panel de instrucciones de ruta después de que se haya creado
-          routingControl.on('routeselected', function (e) {
-            let routesContainer = document.querySelector('.leaflet-routing-container-hide');
-            if (routesContainer) {
-              routesContainer.style.display = 'none';
-            }
-          });
+              show: false, // Esta opción oculta las direcciones para llegar
+              routeLine: function (route, options) { // Esta función oculta la línea de la ruta
+                return L.polyline(route.coordinates, options);
+              },
+              createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
+            }).addTo(map);
+  
+            // Oculta el panel de instrucciones de ruta después de que se haya creado
+            routingControl.on('routeselected', function (e) {
+              if (!isMounted.current) return;
+              let routesContainer = document.querySelector('.leaflet-routing-container-hide');
+              if (routesContainer) {
+                routesContainer.style.display = 'none';
+              }
+            });
+          }
         });
       }
     }, [map, trackCoordinates]);
-
+  
     return null;
   };
-
-
 
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(displayTracks);
@@ -256,7 +268,7 @@ const TrackList = () => {
           />
 
           <CustomControl />
-          <LayersControl position="topright">
+          <LayersControl position="topleft">
             <LayersControl.BaseLayer name="Todas las rutas">
               <LayerGroup>
               </LayerGroup>
