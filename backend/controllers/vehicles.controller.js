@@ -140,25 +140,3 @@ exports.deleteAll = (req, res) => {
             });
         });
 };
-
-// exports.findByAdminUID = (req, res) => {
-//     const Admin_UID = req.params.Admin_UID;
-//     Vehicles.findAll({ where: { Admin_UID: Admin_UID } })
-//         .then(data => {
-//             if (data.length > 0) {
-//                 // Extraer solo los ID's de los vehículos
-//                 const vehicleIDs = data.map(vehicle => vehicle.UID);
-//                 res.send(vehicleIDs);
-//             } else {
-//                 res.status(404).send({
-//                     message: `No se pueden encontrar vehículos con Admin_UID=${Admin_UID}.`
-//                 });
-//             }
-//         })
-//         .catch(err => {
-//             console.error(err);
-//             res.status(500).send({
-//                 message: "Error al recuperar vehículos con Admin_UID=" + Admin_UID
-//             });
-//         });
-// };

@@ -11,14 +11,20 @@ const AdminList = () => {
     const { t } = useTranslation();
 
     const [admins, setAdmins] = useState([]);
+    const [role, setRole] = useState('')
 
     useEffect(() => {
-        getAdmins();
-    }, []);
+        getAdmins(role);
+    }, [role]);
 
-    const getAdmins = async () => {
+    const getAdmins = async (role) => {
         try {
-            const response = await axios.get(`${URL}/api/admins`);
+            let response;
+            if (role) {
+                response = await axios.get(`${URL}/api/admins/findAllByRole/${role}`);
+            } else {
+                response = await axios.get(`${URL}/api/admins`);
+            }
             setAdmins(response.data);
         } catch (error) {
             console.error('Error fetching admins:', error);
@@ -38,6 +44,10 @@ const AdminList = () => {
         window.location.href = "/login-user";
     }
 
+    const handleRoleGetter = (e) => {
+        setRole(e.target.value)
+    }
+
     return (
         <div>
             <Header />
@@ -45,10 +55,23 @@ const AdminList = () => {
             <div>
                 <LanguageSwitcher />
             </div>
-            <Link to="/admin-add" className="add">
-                {t('Add New Admin')}
-            </Link>
-
+            <div>
+                <Link to="/admin-add" className="add">
+                    {t('Add New Admin')}
+                </Link>
+            </div>
+            <div className='tracksFilters'>
+                <label> Role
+                    <span> </span>
+                    <select name="Role" value={role} onChange={handleRoleGetter}>
+                        <option value="">Select</option>
+                        <option value="Admin">Admin</option>
+                        <option value="User">User</option>
+                    </select>
+                </label>
+                <br></br>
+                <input type='text' value="Username" />
+            </div>
             <table className="table is-striped is-fullwidth">
                 <thead>
                     <tr>
