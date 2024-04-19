@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup } from 'react-leaflet';
@@ -12,6 +12,7 @@ import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import { useSelector } from 'react-redux';
+import io from 'socket.io-client';
 
 const carIcon = new L.Icon({
   iconUrl: process.env.PUBLIC_URL + '/images/car.png',
@@ -47,6 +48,7 @@ const TrackList = () => {
   const [mapCenter, setMapCenter] = useState([28.1248, -15.4300]);
   const [trackView, setTrackView] = useState('complete');
   const [selectedLayer, setSelectedLayer] = useState('Todas las rutas');
+  const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 
@@ -62,12 +64,15 @@ const TrackList = () => {
       setDisplayTracks(lastTracks);
     }
   }, [allTracks, trackView]);
-  
+
+
+
+
   const layerToTrackView = {
     "Todas las rutas": "complete",
     "Último track": "last"
   };
-  
+
   const handleLayerChange = (layer) => {
     setTrackView(layerToTrackView[layer]);
   };
@@ -135,87 +140,103 @@ const TrackList = () => {
     console.log(trackView);
   }, [trackView]);
 
+  useEffect(() => {
+    const socket = io(SOCKET_SERVER_URL);
+  
+    socket.on('trackCreated', (newTrack) => {
+      getTracks();
+    });
+  
+    return () => {
+      socket.disconnect();
+    };
+  }, [allTracks]);
+  
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
-
+    const isMounted = useRef(false);
+  
     useEffect(() => {
-      if (trackCoordinates.length > 1) {
-        let routingControl = L.Routing.control({
-          waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-          routeWhileDragging: true,
-          addWaypoints: false,
-          draggableWaypoints: false,
-          fitSelectedRoutes: true,
-          showAlternatives: false,
-          router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
-            urlParameters: {
-              vehicle: 'foot',
-            },
-          }),
-          lineOptions: {
-            styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
-          },
-          show: false, // Esta opción oculta las direcciones para llegar
-          routeLine: function (route, options) { // Esta función oculta la línea de la ruta
-            return L.polyline(route.coordinates, options);
-          },
-          createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
-        }).addTo(map);
-
-
-        // Oculta el panel de instrucciones de ruta después de que se haya creado
-        routingControl.on('routeselected', function (e) {
-          let routesContainer = document.querySelector('.leaflet-routing-container-hide');
-          if (routesContainer) {
-            routesContainer.style.display = 'none';
+      isMounted.current = true;
+      return () => {
+        isMounted.current = false;
+      };
+    }, []);
+  
+    useEffect(() => {
+      if (map && trackCoordinates.length > 1 && isMounted.current) {
+        const whenMapIsReady = new Promise(resolve => map.whenReady(resolve));
+        whenMapIsReady.then(() => {
+          if (map) { // Asegúrate de que el mapa existe
+            let routingControl = L.Routing.control({
+              waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+              routeWhileDragging: true,
+              addWaypoints: false,
+              draggableWaypoints: false,
+              fitSelectedRoutes: true,
+              showAlternatives: false,
+              router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
+                urlParameters: {
+                  vehicle: 'foot',
+                },
+              }),
+              lineOptions: {
+                styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
+              },
+              show: false, // Esta opción oculta las direcciones para llegar
+              routeLine: function (route, options) { // Esta función oculta la línea de la ruta
+                return L.polyline(route.coordinates, options);
+              },
+              createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
+            }).addTo(map);
+  
+            // Oculta el panel de instrucciones de ruta después de que se haya creado
+            routingControl.on('routeselected', function (e) {
+              if (!isMounted.current) return;
+              let routesContainer = document.querySelector('.leaflet-routing-container-hide');
+              if (routesContainer) {
+                routesContainer.style.display = 'none';
+              }
+            });
           }
         });
-
       }
     }, [map, trackCoordinates]);
-
+  
     return null;
   };
 
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(displayTracks);
-
+  
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
       if (vehicleTracks[0].vehicleType !== vehicleType) {
         return null;
       }
-
-      let trackCoordinates;
-      if (trackView === 'complete') {
-        trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
-      } else {
-        trackCoordinates = [vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0].Location.coordinates.reverse()];
-      }
+  
+      // Ordena los tracks por fecha y toma el último
+      const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
+  
       return (
         <React.Fragment key={index}>
-          {vehicleTracks.map((track, trackIndex) => {
-            const icon = track.vehicleType === 'car' ? carIcon : bicycleIcon;
-            return (
-              <Marker
-                key={track.ID}
-                position={track.Location.coordinates.reverse()}
-                icon={icon}
-                zIndexOffset={500} // Ajusta este valor según tus necesidades
-              >
-                <Popup>
-                  <p>{`Track ID: ${track.ID}`}</p>
-                  <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
-                  <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
-                  <p>{`Status: ${track.Status}`}</p>
-                </Popup>
-              </Marker>
-            );
-          })}
-          <RoutingMachine trackCoordinates={trackCoordinates} />
+          <Marker
+            position={lastTrack.Location.coordinates.reverse()}
+            icon={lastTrack.vehicleType === 'car' ? carIcon : bicycleIcon}
+            zIndexOffset={500} // Ajusta este valor según tus necesidades
+          >
+            <Popup>
+              <p>{`Track ID: ${lastTrack.ID}`}</p>
+              <p>{`Location: ${lastTrack.Location.coordinates.join(', ')}`}</p>
+              <p>{`Vehicle ID: ${lastTrack.Vehicle_UID}`}</p>
+              <p>{`Status: ${lastTrack.Status}`}</p>
+            </Popup>
+          </Marker>
+          <RoutingMachine trackCoordinates={vehicleTracks.map(track => track.Location.coordinates.reverse())} />
         </React.Fragment>
       );
     });
   };
+  
 
 
 
@@ -239,7 +260,7 @@ const TrackList = () => {
           />
 
           <CustomControl />
-          <LayersControl position="topright">
+          <LayersControl position="topleft">
             <LayersControl.BaseLayer name="Todas las rutas">
               <LayerGroup>
               </LayerGroup>
