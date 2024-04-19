@@ -208,43 +208,35 @@ const TrackList = () => {
 
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(displayTracks);
-
+  
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
       if (vehicleTracks[0].vehicleType !== vehicleType) {
         return null;
       }
-
-      let trackCoordinates;
-      if (trackView === 'complete') {
-        trackCoordinates = vehicleTracks.map((track) => track.Location.coordinates.reverse());
-      } else {
-        trackCoordinates = [vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0].Location.coordinates.reverse()];
-      }
+  
+      // Ordena los tracks por fecha y toma el último
+      const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
+  
       return (
         <React.Fragment key={index}>
-          {vehicleTracks.map((track, trackIndex) => {
-            const icon = track.vehicleType === 'car' ? carIcon : bicycleIcon;
-            return (
-              <Marker
-                key={track.ID}
-                position={track.Location.coordinates.reverse()}
-                icon={icon}
-                zIndexOffset={500} // Ajusta este valor según tus necesidades
-              >
-                <Popup>
-                  <p>{`Track ID: ${track.ID}`}</p>
-                  <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
-                  <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
-                  <p>{`Status: ${track.Status}`}</p>
-                </Popup>
-              </Marker>
-            );
-          })}
-          <RoutingMachine trackCoordinates={trackCoordinates} />
+          <Marker
+            position={lastTrack.Location.coordinates.reverse()}
+            icon={lastTrack.vehicleType === 'car' ? carIcon : bicycleIcon}
+            zIndexOffset={500} // Ajusta este valor según tus necesidades
+          >
+            <Popup>
+              <p>{`Track ID: ${lastTrack.ID}`}</p>
+              <p>{`Location: ${lastTrack.Location.coordinates.join(', ')}`}</p>
+              <p>{`Vehicle ID: ${lastTrack.Vehicle_UID}`}</p>
+              <p>{`Status: ${lastTrack.Status}`}</p>
+            </Popup>
+          </Marker>
+          <RoutingMachine trackCoordinates={vehicleTracks.map(track => track.Location.coordinates.reverse())} />
         </React.Fragment>
       );
     });
   };
+  
 
 
 
