@@ -3,7 +3,8 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
-import { useTranslation } from 'react-i18next'; import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import { useTranslation } from 'react-i18next'; 
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
@@ -11,17 +12,22 @@ const AdminList = () => {
     const { t } = useTranslation();
 
     const [admins, setAdmins] = useState([]);
-    const [role, setRole] = useState('')
+    const [role, setRole] = useState('');
+    const [letters, setLetters] = useState('')
 
     useEffect(() => {
-        getAdmins(role);
-    }, [role]);
+        getAdmins(role, letters);
+    }, [role, letters]);
 
-    const getAdmins = async (role) => {
+    const getAdmins = async (role, letters) => {
         try {
             let response;
-            if (role) {
+            if (role && letters) {
+                response = await axios.get(`${URL}/api/admins/findByRoleAndLetters/${role}/${letters}`);
+            } else if (role) {
                 response = await axios.get(`${URL}/api/admins/findAllByRole/${role}`);
+            } else if (letters) {
+                response = await axios.get(`${URL}/api/admins/findByLetters/${letters}`);
             } else {
                 response = await axios.get(`${URL}/api/admins`);
             }
@@ -48,6 +54,11 @@ const AdminList = () => {
         setRole(e.target.value)
     }
 
+    // Manejador para el campo de texto
+    const handleInputChange = (e) => {
+        setLetters(e.target.value);
+    }
+
     return (
         <div>
             <Header />
@@ -70,7 +81,7 @@ const AdminList = () => {
                     </select>
                 </label>
                 <br></br>
-                <input type='text' value="Username" />
+                <input type='text' placeholder="Username" onChange={handleInputChange} />
             </div>
             <table className="table is-striped is-fullwidth">
                 <thead>

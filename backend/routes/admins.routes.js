@@ -26,5 +26,7 @@ module.exports = app => {
 
   router.get("/findByLetters/:letters", admins.findByLetters);
 
+  router.get("/findByRoleAndLetters/:Role/:letters", admins.findByRoleAndLetters)
+
   app.use("/api/admins", router);
 };

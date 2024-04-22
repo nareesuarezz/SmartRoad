@@ -271,12 +271,38 @@ exports.findAllByRole = (req, res) => {
 
 exports.findByLetters = (req, res) => {
   const letters = req.params.letters;
-  return Admin.findAll({
+  Admin.findAll({
     where: {
       Username: {
         [Sequelize.Op.like]: letters + '%'
       }
     }
-  });
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving users."
+      });
+    });
 };
 
+exports.findByRoleAndLetters = async (req, res) => {
+  const letters = req.params.letters;
+  const role = req.params.Role;
+
+  try {
+    const data = await Admin.findAll({
+      where: {
+        Username: { [Sequelize.Op.like]: letters + '%' },
+        Role: role
+      }
+    });
+
+    res.send(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error al obtener los datos' });
+  }
+};
