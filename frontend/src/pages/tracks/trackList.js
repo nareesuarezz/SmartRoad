@@ -64,7 +64,6 @@ const TrackList = () => {
       });
   }, []);
 
-  console.log(bounds);
 
   useEffect(() => {
     if (trackView === 'complete') {
@@ -122,7 +121,6 @@ const TrackList = () => {
         });
         return { ...track, vehicleType: vehicleResponse.data.Vehicle };
       }));
-      console.log('API response:', tracksWithVehicleInfo);
       setTracksWithinBounds(tracksWithVehicleInfo);
 
 
@@ -134,7 +132,6 @@ const TrackList = () => {
   };
 
   useEffect(() => {
-    console.log('Updated state:', tracksWithinBounds);
   }, [tracksWithinBounds]);
   const getLastTracks = (tracks) => {
     const groupedTracks = tracks.reduce((grouped, track) => {
@@ -143,7 +140,6 @@ const TrackList = () => {
     }, {});
 
     const lastTracks = Object.values(groupedTracks).map(tracks => tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]);
-    console.log('Last tracks:', lastTracks);
     return lastTracks;
   };
 
@@ -152,7 +148,6 @@ const TrackList = () => {
       (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
       return grouped;
     }, {});
-    console.log('Grouped tracks:', groupedTracks);
 
     return groupedTracks;
   };
@@ -263,7 +258,6 @@ const TrackList = () => {
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
-      console.log('vehicletracks de 0', vehicleTracks[0])
       if (vehicleTracks[0].vehicleType !== vehicleType) {
         return null;
       }
@@ -328,14 +322,12 @@ const TrackList = () => {
             <LayersControl.Overlay checked name="Bicicletas">
               <LayerGroup>
                 {renderTracksOnMap('bicycle')}
-                {console.log('bike: ', renderTracksOnMap('bicycle'))}
               </LayerGroup>
             </LayersControl.Overlay>
 
             <LayersControl.Overlay checked name="Coches">
               <LayerGroup>
                 {renderTracksOnMap('car')}
-                {console.log('car: ', renderTracksOnMap('car'))}
               </LayerGroup>
             </LayersControl.Overlay>
 
