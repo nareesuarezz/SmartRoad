@@ -49,12 +49,22 @@ const TrackList = () => {
   const [trackView, setTrackView] = useState('complete');
   const [selectedLayer, setSelectedLayer] = useState('Todas las rutas');
   const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
+  const [tracksWithinBounds, setTracksWithinBounds] = useState([]);
+  const [bounds, setBounds] = useState({ swLat: 0, swLng: 0, neLat: 0, neLng: 0 });
+  const [zoomLevel, setZoomLevel] = useState(12);
+
+
 
 
 
   useEffect(() => {
-    getTracks();
+    fetchTracksWithinBounds(bounds.swLat, bounds.swLng, bounds.neLat, bounds.neLng)
+      .catch(error => {
+        console.error('Error: ', error);
+      });
   }, []);
+
+  console.log(bounds);
 
   useEffect(() => {
     if (trackView === 'complete') {
@@ -89,17 +99,22 @@ const TrackList = () => {
   };
 
 
-  const getTracks = async () => {
-    try {
-      const authToken = AuthService.getAuthToken();
-      const response = await axios.get(`${URL}/api/tracks`, {
-        headers: {
-          Authorization: `Bearer ${authToken}`,
-        },
-      });
 
-      // Asegúrate de que cada track tenga la información del vehículo
-      const tracksWithVehicleInfo = await Promise.all(response.data.map(async (track) => {
+  const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
+        const authToken = AuthService.getAuthToken();
+
+    try {
+      const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
+        params: {
+          swLat,
+          swLng,
+          neLat,
+          neLng
+        }, headers: {
+          Authorization: `Bearer ${authToken}`,
+        }
+      }); // Asegúrate de que cada track tenga la información del vehículo
+      const tracksWithVehicleInfo = await Promise.all(response.data.tracksWithinBounds.map(async (track) => {
         const vehicleResponse = await axios.get(`${URL}/api/vehicles/${track.Vehicle_UID}`, {
           headers: {
             Authorization: `Bearer ${authToken}`,
@@ -107,13 +122,20 @@ const TrackList = () => {
         });
         return { ...track, vehicleType: vehicleResponse.data.Vehicle };
       }));
+      console.log('API response:', tracksWithVehicleInfo);
+      setTracksWithinBounds(tracksWithVehicleInfo);
 
-      setAllTracks(tracksWithVehicleInfo);
+
+
+
     } catch (error) {
-      console.error('Error fetching tracks:', error);
+      console.error('Error al buscar tracks dentro de los límites:', error);
     }
   };
 
+  useEffect(() => {
+    console.log('Updated state:', tracksWithinBounds);
+  }, [tracksWithinBounds]);
   const getLastTracks = (tracks) => {
     const groupedTracks = tracks.reduce((grouped, track) => {
       (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
@@ -121,6 +143,7 @@ const TrackList = () => {
     }, {});
 
     const lastTracks = Object.values(groupedTracks).map(tracks => tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]);
+    console.log('Last tracks:', lastTracks);
     return lastTracks;
   };
 
@@ -129,6 +152,8 @@ const TrackList = () => {
       (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
       return grouped;
     }, {});
+    console.log('Grouped tracks:', groupedTracks);
+
     return groupedTracks;
   };
 
@@ -142,27 +167,28 @@ const TrackList = () => {
 
   useEffect(() => {
     const socket = io(SOCKET_SERVER_URL);
-  
+
     socket.on('trackCreated', (newTrack) => {
-      getTracks();
+      // Llama a fetchTracksWithinBounds con las coordenadas actuales del cuadro
+      fetchTracksWithinBounds(bounds.swLat, bounds.swLng, bounds.neLat, bounds.neLng);
     });
-  
+
     return () => {
       socket.disconnect();
     };
-  }, [allTracks]);
-  
+  }, [bounds]); // Añade 'bounds' a las dependencias del useEffect
+
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
     const isMounted = useRef(false);
-  
+
     useEffect(() => {
       isMounted.current = true;
       return () => {
         isMounted.current = false;
       };
     }, []);
-  
+
     useEffect(() => {
       if (map && trackCoordinates.length > 1 && isMounted.current) {
         const whenMapIsReady = new Promise(resolve => map.whenReady(resolve));
@@ -189,7 +215,7 @@ const TrackList = () => {
               },
               createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
             }).addTo(map);
-  
+
             // Oculta el panel de instrucciones de ruta después de que se haya creado
             routingControl.on('routeselected', function (e) {
               if (!isMounted.current) return;
@@ -202,25 +228,52 @@ const TrackList = () => {
         });
       }
     }, [map, trackCoordinates]);
-  
+
     return null;
   };
 
+  const MapBounds = () => {
+    const map = useMap();
+
+    useEffect(() => {
+      map.on('moveend', () => {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+
+        // Actualiza el estado con las nuevas coordenadas del centro
+        setMapCenter([center.lat, center.lng]);
+        setZoomLevel(zoom);
+
+        const mapBounds = map.getBounds();
+        const sw = mapBounds.getSouthWest();
+        const ne = mapBounds.getNorthEast();
+
+        // Actualiza el estado con las nuevas coordenadas
+        setBounds({ swLat: sw.lat, swLng: sw.lng, neLat: ne.lat, neLng: ne.lng });
+
+        // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
+        fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+      });
+    }, [map]);
+
+    return null;
+  };
+
+
   const renderTracksOnMap = (vehicleType) => {
-    const groupedTracks = groupTracksByVehicle(displayTracks);
-  
+    const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
+      console.log('vehicletracks de 0', vehicleTracks[0])
       if (vehicleTracks[0].vehicleType !== vehicleType) {
         return null;
       }
-  
+
       // Ordena los tracks por fecha y toma el último
       const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
-  
       return (
         <React.Fragment key={index}>
           <Marker
-            position={lastTrack.Location.coordinates.reverse()}
+            position={lastTrack.Location.coordinates} // No necesitas invertir las coordenadas
             icon={lastTrack.vehicleType === 'car' ? carIcon : bicycleIcon}
             zIndexOffset={500} // Ajusta este valor según tus necesidades
           >
@@ -231,12 +284,13 @@ const TrackList = () => {
               <p>{`Status: ${lastTrack.Status}`}</p>
             </Popup>
           </Marker>
-          <RoutingMachine trackCoordinates={vehicleTracks.map(track => track.Location.coordinates.reverse())} />
+          <RoutingMachine trackCoordinates={vehicleTracks.map(track => track.Location.coordinates)} /> {/* No necesitas invertir las coordenadas */}
         </React.Fragment>
       );
     });
   };
-  
+
+
 
 
 
@@ -253,7 +307,8 @@ const TrackList = () => {
         </Link>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-        <MapContainer key={`${trackView}-${Date.now()}`} center={mapCenter} zoom={12} style={{ height: '500px', width: '700px' }}>
+        <MapContainer key={`${trackView}-${Date.now()}`} center={mapCenter} zoom={zoomLevel} style={{ height: '500px', width: '700px' }}>
+          <MapBounds />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -273,12 +328,14 @@ const TrackList = () => {
             <LayersControl.Overlay checked name="Bicicletas">
               <LayerGroup>
                 {renderTracksOnMap('bicycle')}
+                {console.log('bike: ', renderTracksOnMap('bicycle'))}
               </LayerGroup>
             </LayersControl.Overlay>
 
             <LayersControl.Overlay checked name="Coches">
               <LayerGroup>
                 {renderTracksOnMap('car')}
+                {console.log('car: ', renderTracksOnMap('car'))}
               </LayerGroup>
             </LayersControl.Overlay>
 
