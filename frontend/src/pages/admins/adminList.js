@@ -71,7 +71,7 @@ const AdminList = () => {
                     {t('Add New Admin')}
                 </Link>
             </div>
-            <div className='tracksFilters'>
+            <div className='adminsFilters'>
                 <label> Role
                     <span> </span>
                     <select name="Role" value={role} onChange={handleRoleGetter}>

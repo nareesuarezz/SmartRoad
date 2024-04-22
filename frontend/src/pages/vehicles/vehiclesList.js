@@ -13,6 +13,8 @@ const VehicleList = () => {
 
   const [vehicles, setVehicles] = useState([]);
 
+  const [vehicleT, setVehicleT] = useState('');
+
   useEffect(() => {
     getVehicles();
   }, []);
@@ -35,6 +37,10 @@ const VehicleList = () => {
     }
   };
 
+  const handleVehicleGetter = (e) => {
+    setVehicleT(e.target.value)
+  }
+
   const goBack = () => {
     window.location.href = '/login-user';
   };
@@ -49,6 +55,15 @@ const VehicleList = () => {
       <Link to="/vehicle-add" className="add">
         {t('Add New Vehicle')}
       </Link>
+      <div className='vehiclesFilters'>
+        <label>Vehicle:</label>
+        <span> </span>
+        <select name="Vehicle" value={vehicleT} onChange={handleVehicleGetter}>
+          <option value="">Select</option>
+          <option value="Car">Car</option>
+          <option value="Bicycle">Bicycle</option>
+        </select>
+      </div>
 
       <table className="table is-striped is-fullwidth">
         <thead>

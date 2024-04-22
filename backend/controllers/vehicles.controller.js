@@ -140,3 +140,16 @@ exports.deleteAll = (req, res) => {
             });
         });
 };
+
+exports.findByVehicleType = (req, res) => {
+    const vehicle = req.params.Vehicle;
+    Vehicles.findAll({ where: { Vehicle: vehicle } })
+        .then(data => {
+            res.send(data);
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving users."
+            });
+        });
+};
