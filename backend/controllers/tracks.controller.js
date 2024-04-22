@@ -179,7 +179,37 @@ exports.update = async (req, res) => {
     }
 };
 
+exports.findTracksWithinBounds = async (req, res) => {
+    // Asume que recibes las coordenadas de los límites como query params
+    const swLat = parseFloat(req.query.swLat);
+    const swLng = parseFloat(req.query.swLng);
+    const neLat = parseFloat(req.query.neLat);
+    const neLng = parseFloat(req.query.neLng);
+  
+    // Crea un polígono con las coordenadas de los límites
+    const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
+  
+    try {
+      const tracksWithinBounds = await db.Track.findAll({
+        where: Sequelize.where(
+          Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+          true
+        ),
+        logging: console.log
+      });
+      console.log(tracksWithinBounds); // Añade esta línea
 
+      res.status(200).send({
+        tracksWithinBounds: tracksWithinBounds
+      });
+    } catch (error) {
+      console.error('Error al buscar tracks dentro de los límites:', error);
+      res.status(500).send({
+        message: "Error al recuperar tracks dentro de los límites especificados."
+      });
+    }
+  };
+  
 exports.delete = async (req, res) => {
     const id = req.params.id;
 

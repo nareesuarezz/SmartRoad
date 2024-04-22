@@ -12,6 +12,8 @@ module.exports = app => {
   // Ruta para obtener tracks recientes dentro de un radio
   router.get('/recent-within-radius', tracks.findRecentTracksWithinRadius);
 
+  router.get('/within-bounds', tracks.findTracksWithinBounds);
+
   // Retrieve a single Car with id
   router.get("/:id", tracks.findOne);
 
@@ -38,6 +40,8 @@ module.exports = app => {
 
   // Retrieve the time fot the bicycle
   router.get("/bicycleTime/:Admin_UID", tracks.calculateBicycleTime);
+
+
 
   app.use("/api/tracks", router);
 }
