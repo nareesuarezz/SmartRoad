@@ -100,8 +100,8 @@ const TrackList = () => {
 
 
   const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
-        const authToken = AuthService.getAuthToken();
-
+    const authToken = AuthService.getAuthToken();
+  
     try {
       const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
         params: {
@@ -112,20 +112,12 @@ const TrackList = () => {
         }, headers: {
           Authorization: `Bearer ${authToken}`,
         }
-      }); // Asegúrate de que cada track tenga la información del vehículo
-      const tracksWithVehicleInfo = await Promise.all(response.data.tracksWithinBounds.map(async (track) => {
-        const vehicleResponse = await axios.get(`${URL}/api/vehicles/${track.Vehicle_UID}`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-        return { ...track, vehicleType: vehicleResponse.data.Vehicle };
-      }));
+      });
+  
+      // Ahora cada track debería tener la información del vehículo incluida
+      const tracksWithVehicleInfo = response.data.tracksWithinBounds;
+  
       setTracksWithinBounds(tracksWithVehicleInfo);
-
-
-
-
     } catch (error) {
       console.error('Error al buscar tracks dentro de los límites:', error);
     }
@@ -258,17 +250,17 @@ const TrackList = () => {
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
-      if (vehicleTracks[0].vehicleType !== vehicleType) {
+      if (vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
         return null;
       }
-
+  
       // Ordena los tracks por fecha y toma el último
       const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
       return (
         <React.Fragment key={index}>
           <Marker
             position={lastTrack.Location.coordinates} // No necesitas invertir las coordenadas
-            icon={lastTrack.vehicleType === 'car' ? carIcon : bicycleIcon}
+            icon={lastTrack.Vehicles.Vehicle === 'car' ? carIcon : bicycleIcon}
             zIndexOffset={500} // Ajusta este valor según tus necesidades
           >
             <Popup>
