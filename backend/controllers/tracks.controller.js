@@ -203,6 +203,13 @@ exports.findTracksWithinBounds = async (req, res) => {
           }],          
           logging: console.log
         });
+          // Si el usuario solo quiere ver el último track, filtra los tracks
+      if (req.query.view === 'last') {
+        const groupedTracks = groupBy(tracksWithinBounds, 'Vehicle_UID');
+        tracksWithinBounds = Object.values(groupedTracks).map(tracks => {
+          return tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
+        });
+      }
 
       console.log(tracksWithinBounds); // Añade esta línea
 

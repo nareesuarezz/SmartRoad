@@ -65,16 +65,6 @@ const TrackList = () => {
   }, []);
 
 
-  useEffect(() => {
-    if (trackView === 'complete') {
-      setDisplayTracks(allTracks);
-    } else {
-      const lastTracks = getLastTracks(allTracks);
-      setDisplayTracks(lastTracks);
-    }
-  }, [allTracks, trackView]);
-
-
 
 
   const layerToTrackView = {
@@ -108,7 +98,8 @@ const TrackList = () => {
           swLat,
           swLng,
           neLat,
-          neLng
+          neLng,
+          view: trackView // Añade el nuevo parámetro
         }, headers: {
           Authorization: `Bearer ${authToken}`,
         }
@@ -125,15 +116,6 @@ const TrackList = () => {
 
   useEffect(() => {
   }, [tracksWithinBounds]);
-  const getLastTracks = (tracks) => {
-    const groupedTracks = tracks.reduce((grouped, track) => {
-      (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
-      return grouped;
-    }, {});
-
-    const lastTracks = Object.values(groupedTracks).map(tracks => tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]);
-    return lastTracks;
-  };
 
   const groupTracksByVehicle = (tracks) => {
     const groupedTracks = tracks.reduce((grouped, track) => {
