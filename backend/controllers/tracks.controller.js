@@ -189,14 +189,21 @@ exports.findTracksWithinBounds = async (req, res) => {
     // Crea un polígono con las coordenadas de los límites
     const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
   
+   
     try {
-      const tracksWithinBounds = await db.Track.findAll({
-        where: Sequelize.where(
-          Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
-          true
-        ),
-        logging: console.log
-      });
+        const tracksWithinBounds = await db.Track.findAll({
+          where: Sequelize.where(
+            Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+            true
+          ),
+          include: [{
+            model: db.Vehicle, // Usa el modelo Vehicles
+            as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
+            attributes: ['Vehicle'] // Incluye el campo 'Vehicle' que contiene el tipo de vehículo
+          }],          
+          logging: console.log
+        });
+
       console.log(tracksWithinBounds); // Añade esta línea
 
       res.status(200).send({
