@@ -8,11 +8,13 @@ import 'leaflet-routing-machine';
 import 'lrm-graphhopper';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
-import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import { useSelector } from 'react-redux';
 import io from 'socket.io-client';
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 const carIcon = new L.Icon({
   iconUrl: process.env.PUBLIC_URL + '/images/car.png',
@@ -52,9 +54,23 @@ const TrackList = () => {
   const [tracksWithinBounds, setTracksWithinBounds] = useState([]);
   const [bounds, setBounds] = useState({ swLat: 0, swLng: 0, neLat: 0, neLng: 0 });
   const [zoomLevel, setZoomLevel] = useState(12);
+  const [startTime, setStartTime] = useState(new Date().toISOString());
+  const [endTime, setEndTime] = useState(new Date().toISOString());
+  const [timeInterval, setTimeInterval] = useState({ startTime: new Date().toISOString(), endTime: new Date().toISOString() });
+
+  const timeOptions = [
+    { label: 'Últimos 2 minutos', value: { startTime: new Date(Date.now() - 120000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 10 minutos', value: { startTime: new Date(Date.now() - 600000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 20 minutos', value: { startTime: new Date(Date.now() - 1200000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Última media hora', value: { startTime: new Date(Date.now() - 1800000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Última hora', value: { startTime: new Date(Date.now() - 3600000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimas 24 horas', value: { startTime: new Date(Date.now() - 86400000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 7 días', value: { startTime: new Date(Date.now() - 604800000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Todos los tracks', value: { startTime: null, endTime: new Date().toISOString() } },
+  ];
 
 
-
+console.log(timeInterval)
 
 
   useEffect(() => {
@@ -144,6 +160,24 @@ const TrackList = () => {
     };
   }, [bounds]); // Añade 'bounds' a las dependencias del useEffect
 
+  const fetchTracksInTimeInterval = () => {
+    const params = {};
+    if (timeInterval.startTime) {
+        params.startTime = timeInterval.startTime;
+    }
+    params.endTime = timeInterval.endTime;
+
+    axios.get(`${URL}/api/tracks/in-time-interval`, { params })
+    .then(response => {
+        const tracks = response.data.tracksInTimeInterval;
+        setTracksWithinBounds(tracks);
+    })
+    .catch(error => {
+        console.error('Error fetching tracks in time interval:', error);
+    });
+};
+
+
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
     const isMounted = useRef(false);
@@ -226,6 +260,7 @@ const TrackList = () => {
   };
 
 
+
   const renderTracksOnMap = (vehicleType) => {
     const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
@@ -270,6 +305,24 @@ const TrackList = () => {
         <Link to="/track-add" className="add">
           {t('Add Track')}
         </Link>
+      </div>
+      <div>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Selecciona un intervalo de tiempo"
+          optionFilterProp="children"
+          onChange={value => {
+            setTimeInterval(JSON.parse(value));
+            fetchTracksInTimeInterval();
+          }}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          {timeOptions.map((option, index) => (
+            <Option key={index} value={JSON.stringify(option.value)}>{option.label}</Option>
+          ))}
+        </Select>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
         <MapContainer key={`${trackView}-${Date.now()}`} center={mapCenter} zoom={zoomLevel} style={{ height: '500px', width: '700px' }}>
