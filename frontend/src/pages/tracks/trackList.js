@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
@@ -70,7 +70,7 @@ const TrackList = () => {
   ];
 
 
-console.log(timeInterval)
+  console.log(timeInterval)
 
 
   useEffect(() => {
@@ -163,19 +163,19 @@ console.log(timeInterval)
   const fetchTracksInTimeInterval = () => {
     const params = {};
     if (timeInterval.startTime) {
-        params.startTime = timeInterval.startTime;
+      params.startTime = timeInterval.startTime;
     }
     params.endTime = timeInterval.endTime;
 
     axios.get(`${URL}/api/tracks/in-time-interval`, { params })
-    .then(response => {
+      .then(response => {
         const tracks = response.data.tracksInTimeInterval;
         setTracksWithinBounds(tracks);
-    })
-    .catch(error => {
+      })
+      .catch(error => {
         console.error('Error fetching tracks in time interval:', error);
-    });
-};
+      });
+  };
 
 
   const RoutingMachine = ({ trackCoordinates }) => {
@@ -259,9 +259,40 @@ console.log(timeInterval)
     return null;
   };
 
+  const tracksToGeoJSON = (tracks) => {
+    return {
+      type: 'FeatureCollection',
+      features: tracks.map(track => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: track.Location.coordinates
+        },
+        properties: {
+          trackId: track.ID,
+          vehicleId: track.Vehicle_UID,
+          status: track.Status,
+          vehicleType: track.Vehicles.Vehicle
+        }
+      }))
+    };
+  };
+
+  const notificationsToGeoJSON = (notifications) => {
+    return {
+      type: 'FeatureCollection',
+      features: notifications.map(notification => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: notification.coordinates
+        }
+      }))
+    };
+  };
 
 
-  const renderTracksOnMap = (vehicleType) => {
+  const renderTracksOnMap = (vehicleType, view) => {
     const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
       if (vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
@@ -269,27 +300,51 @@ console.log(timeInterval)
       }
 
       // Ordena los tracks por fecha y toma el último
-      const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
+      let tracksToRender;
+      if (view === 'last') {
+        tracksToRender = [vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]];
+      } else {
+        tracksToRender = vehicleTracks;
+      }
+      const geoJsonData = tracksToGeoJSON(tracksToRender);
+
       return (
         <React.Fragment key={index}>
-          <Marker
-            position={lastTrack.Location.coordinates} // No necesitas invertir las coordenadas
-            icon={lastTrack.Vehicles.Vehicle === 'car' ? carIcon : bicycleIcon}
-            zIndexOffset={500} // Ajusta este valor según tus necesidades
-          >
-            <Popup>
-              <p>{`Track ID: ${lastTrack.ID}`}</p>
-              <p>{`Location: ${lastTrack.Location.coordinates.join(', ')}`}</p>
-              <p>{`Vehicle ID: ${lastTrack.Vehicle_UID}`}</p>
-              <p>{`Status: ${lastTrack.Status}`}</p>
-            </Popup>
-          </Marker>
-          <RoutingMachine trackCoordinates={vehicleTracks.map(track => track.Location.coordinates)} /> {/* No necesitas invertir las coordenadas */}
+          {tracksToRender.map((track, trackIndex) => (
+            <Marker
+              key={trackIndex}
+              position={track.Location.coordinates}
+              icon={track.Vehicles.Vehicle === 'car' ? carIcon : bicycleIcon}
+              zIndexOffset={500}
+            >
+              <Popup>
+                <p>{`Track ID: ${track.ID}`}</p>
+                <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
+                <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
+                <p>{`Status: ${track.Status}`}</p>
+              </Popup>
+            </Marker>
+          ))}
+          <GeoJSON data={geoJsonData} />
         </React.Fragment>
       );
     });
   };
 
+
+  useEffect(() => {
+    const carTracksComplete = renderTracksOnMap('car', 'complete');
+    const carTracksLast = renderTracksOnMap('car', 'last');
+    const bicycleTracksComplete = renderTracksOnMap('bicycle', 'complete');
+    const bicycleTracksLast = renderTracksOnMap('bicycle', 'last');
+    const notifications = notificationsToGeoJSON(notificationLocations);
+
+    console.log('Capa de Coches (Todas las rutas):', carTracksComplete);
+    console.log('Capa de Coches (Último track):', carTracksLast);
+    console.log('Capa de Bicicletas (Todas las rutas):', bicycleTracksComplete);
+    console.log('Capa de Bicicletas (Último track):', bicycleTracksLast);
+    console.log('Capa de Notificaciones:', notifications);
+}, [tracksWithinBounds, notificationLocations]);
 
 
 
@@ -336,22 +391,26 @@ console.log(timeInterval)
           <LayersControl position="topleft">
             <LayersControl.BaseLayer name="Todas las rutas">
               <LayerGroup>
+                {renderTracksOnMap('car', 'complete')}
+                {renderTracksOnMap('bicycle', 'complete')}
               </LayerGroup>
             </LayersControl.BaseLayer>
 
             <LayersControl.BaseLayer name="Último track">
               <LayerGroup>
+                {renderTracksOnMap('car', 'last')}
+                {renderTracksOnMap('bicycle', 'last')}
               </LayerGroup>
             </LayersControl.BaseLayer>
             <LayersControl.Overlay checked name="Bicicletas">
               <LayerGroup>
-                {renderTracksOnMap('bicycle')}
+                {renderTracksOnMap('bicycle', trackView)}
               </LayerGroup>
             </LayersControl.Overlay>
 
             <LayersControl.Overlay checked name="Coches">
               <LayerGroup>
-                {renderTracksOnMap('car')}
+                {renderTracksOnMap('car', trackView)}
               </LayerGroup>
             </LayersControl.Overlay>
 
@@ -372,8 +431,11 @@ console.log(timeInterval)
                     </Marker>
                   );
                 })}
+                <GeoJSON data={notificationsToGeoJSON(notificationLocations)} />
               </LayerGroup>
             </LayersControl.Overlay>
+
+
           </LayersControl>
         </MapContainer>
       </div>
