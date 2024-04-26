@@ -90,8 +90,7 @@ const TrackList = () => {
 
 
   const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
-    const authToken = AuthService.getAuthToken();
-  
+
     try {
       const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
         params: {
@@ -100,14 +99,12 @@ const TrackList = () => {
           neLat,
           neLng,
           view: trackView // Añade el nuevo parámetro
-        }, headers: {
-          Authorization: `Bearer ${authToken}`,
-        }
+        },
       });
-  
+      console.log('sasa ', trackView)
       // Ahora cada track debería tener la información del vehículo incluida
       const tracksWithVehicleInfo = response.data.tracksWithinBounds;
-  
+
       setTracksWithinBounds(tracksWithVehicleInfo);
     } catch (error) {
       console.error('Error al buscar tracks dentro de los límites:', error);
@@ -235,7 +232,7 @@ const TrackList = () => {
       if (vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
         return null;
       }
-  
+
       // Ordena los tracks por fecha y toma el último
       const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
       return (
