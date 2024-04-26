@@ -14,6 +14,8 @@ module.exports = app => {
 
   router.get('/within-bounds', tracks.findTracksWithinBounds);
 
+  router.get('/in-time-interval', tracks.findTracksInTimeInterval);
+
   // Retrieve a single Car with id
   router.get("/:id", tracks.findOne);
 

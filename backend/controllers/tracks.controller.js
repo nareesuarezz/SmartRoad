@@ -225,6 +225,39 @@ exports.findTracksWithinBounds = async (req, res) => {
     }
 };
 
+exports.findTracksInTimeInterval = async (req, res) => {
+    // Assume you receive the start and end times as query params in ISO 8601 format
+    const startTime = new Date(req.query.startTime);
+    const endTime = new Date(req.query.endTime);
+
+    try {
+        let tracksInTimeInterval = await db.Track.findAll({
+            where: {
+                Date: {
+                    [Op.gte]: startTime, // Greater than or equal to the start time
+                    [Op.lte]: endTime    // Less than or equal to the end time
+                }
+            },
+            include: [{
+                model: db.Vehicle, // Use the Vehicles model
+                as: 'Vehicles', // Change this to match the name of the model
+                attributes: ['Vehicle'] // Include the 'Vehicle' field which contains the type of vehicle
+            }],
+            logging: console.log
+        });
+
+        res.status(200).send({
+            tracksInTimeInterval: tracksInTimeInterval
+        });
+    } catch (error) {
+        console.error('Error fetching tracks in time interval:', error);
+        res.status(500).send({
+            message: "Error retrieving tracks in the specified time interval."
+        });
+    }
+};
+
+
 exports.delete = async (req, res) => {
     const id = req.params.id;
 
