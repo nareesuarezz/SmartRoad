@@ -5,6 +5,7 @@ const Logs = db.Log;
 const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
 const socket = require('../socket');
+const _ = require('lodash'); // Importa la biblioteca lodash
 
 
 // Variables para ajustes de desarrollo
@@ -185,38 +186,45 @@ exports.findTracksWithinBounds = async (req, res) => {
     const swLng = parseFloat(req.query.swLng);
     const neLat = parseFloat(req.query.neLat);
     const neLng = parseFloat(req.query.neLng);
-  
+
     // Crea un polígono con las coordenadas de los límites
     const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
-  
-   
+
+
     try {
-        const tracksWithinBounds = await db.Track.findAll({
-          where: Sequelize.where(
-            Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
-            true
-          ),
-          include: [{
-            model: db.Vehicle, // Usa el modelo Vehicles
-            as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
-            attributes: ['Vehicle'] // Incluye el campo 'Vehicle' que contiene el tipo de vehículo
-          }],          
-          logging: console.log
+        let tracksWithinBounds = await db.Track.findAll({
+            where: Sequelize.where(
+                Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+                true
+            ),
+            include: [{
+                model: db.Vehicle, // Usa el modelo Vehicles
+                as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
+                attributes: ['Vehicle'] // Incluye el campo 'Vehicle' que contiene el tipo de vehículo
+            }],
+            logging: console.log
         });
+        // Si el usuario solo quiere ver el último track, filtra los tracks
+        if (req.query.view === 'last') {
+            const groupedTracks = _.groupBy(tracksWithinBounds, 'Vehicle_UID'); // Utiliza _.groupBy de lodash
+            tracksWithinBounds = Object.values(groupedTracks).map(tracks => {
+                return tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
+            });
+        }
 
-      console.log(tracksWithinBounds); // Añade esta línea
+        console.log(tracksWithinBounds); // Añade esta línea
 
-      res.status(200).send({
-        tracksWithinBounds: tracksWithinBounds
-      });
+        res.status(200).send({
+            tracksWithinBounds: tracksWithinBounds
+        });
     } catch (error) {
-      console.error('Error al buscar tracks dentro de los límites:', error);
-      res.status(500).send({
-        message: "Error al recuperar tracks dentro de los límites especificados."
-      });
+        console.error('Error al buscar tracks dentro de los límites:', error);
+        res.status(500).send({
+            message: "Error al recuperar tracks dentro de los límites especificados."
+        });
     }
-  };
-  
+};
+
 exports.delete = async (req, res) => {
     const id = req.params.id;
 

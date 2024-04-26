@@ -65,16 +65,6 @@ const TrackList = () => {
   }, []);
 
 
-  useEffect(() => {
-    if (trackView === 'complete') {
-      setDisplayTracks(allTracks);
-    } else {
-      const lastTracks = getLastTracks(allTracks);
-      setDisplayTracks(lastTracks);
-    }
-  }, [allTracks, trackView]);
-
-
 
 
   const layerToTrackView = {
@@ -100,23 +90,21 @@ const TrackList = () => {
 
 
   const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
-    const authToken = AuthService.getAuthToken();
-  
+
     try {
       const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
         params: {
           swLat,
           swLng,
           neLat,
-          neLng
-        }, headers: {
-          Authorization: `Bearer ${authToken}`,
-        }
+          neLng,
+          view: trackView // Añade el nuevo parámetro
+        },
       });
-  
+      console.log('sasa ', trackView)
       // Ahora cada track debería tener la información del vehículo incluida
       const tracksWithVehicleInfo = response.data.tracksWithinBounds;
-  
+
       setTracksWithinBounds(tracksWithVehicleInfo);
     } catch (error) {
       console.error('Error al buscar tracks dentro de los límites:', error);
@@ -125,15 +113,6 @@ const TrackList = () => {
 
   useEffect(() => {
   }, [tracksWithinBounds]);
-  const getLastTracks = (tracks) => {
-    const groupedTracks = tracks.reduce((grouped, track) => {
-      (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
-      return grouped;
-    }, {});
-
-    const lastTracks = Object.values(groupedTracks).map(tracks => tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]);
-    return lastTracks;
-  };
 
   const groupTracksByVehicle = (tracks) => {
     const groupedTracks = tracks.reduce((grouped, track) => {
@@ -253,7 +232,7 @@ const TrackList = () => {
       if (vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
         return null;
       }
-  
+
       // Ordena los tracks por fecha y toma el último
       const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
       return (
