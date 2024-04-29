@@ -5,6 +5,7 @@ const Logs = db.Log;
 const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
 const socket = require('../socket');
+const _ = require('lodash'); // Importa la biblioteca lodash
 
 
 // Variables para ajustes de desarrollo
@@ -185,31 +186,78 @@ exports.findTracksWithinBounds = async (req, res) => {
     const swLng = parseFloat(req.query.swLng);
     const neLat = parseFloat(req.query.neLat);
     const neLng = parseFloat(req.query.neLng);
-  
+
     // Crea un polígono con las coordenadas de los límites
     const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
-  
-    try {
-      const tracksWithinBounds = await db.Track.findAll({
-        where: Sequelize.where(
-          Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
-          true
-        ),
-        logging: console.log
-      });
-      console.log(tracksWithinBounds); // Añade esta línea
 
-      res.status(200).send({
-        tracksWithinBounds: tracksWithinBounds
-      });
+
+    try {
+        let tracksWithinBounds = await db.Track.findAll({
+            where: Sequelize.where(
+                Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+                true
+            ),
+            include: [{
+                model: db.Vehicle, // Usa el modelo Vehicles
+                as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
+                attributes: ['Vehicle'] // Incluye el campo 'Vehicle' que contiene el tipo de vehículo
+            }],
+            logging: console.log
+        });
+        // Si el usuario solo quiere ver el último track, filtra los tracks
+        if (req.query.view === 'last') {
+            const groupedTracks = _.groupBy(tracksWithinBounds, 'Vehicle_UID'); // Utiliza _.groupBy de lodash
+            tracksWithinBounds = Object.values(groupedTracks).map(tracks => {
+                return tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
+            });
+        }
+
+        console.log(tracksWithinBounds); // Añade esta línea
+
+        res.status(200).send({
+            tracksWithinBounds: tracksWithinBounds
+        });
     } catch (error) {
-      console.error('Error al buscar tracks dentro de los límites:', error);
-      res.status(500).send({
-        message: "Error al recuperar tracks dentro de los límites especificados."
-      });
+        console.error('Error al buscar tracks dentro de los límites:', error);
+        res.status(500).send({
+            message: "Error al recuperar tracks dentro de los límites especificados."
+        });
     }
-  };
-  
+};
+
+exports.findTracksInTimeInterval = async (req, res) => {
+    // Assume you receive the start and end times as query params in ISO 8601 format
+    const startTime = new Date(req.query.startTime);
+    const endTime = new Date(req.query.endTime);
+
+    try {
+        let tracksInTimeInterval = await db.Track.findAll({
+            where: {
+                Date: {
+                    [Op.gte]: startTime, // Greater than or equal to the start time
+                    [Op.lte]: endTime    // Less than or equal to the end time
+                }
+            },
+            include: [{
+                model: db.Vehicle, // Use the Vehicles model
+                as: 'Vehicles', // Change this to match the name of the model
+                attributes: ['Vehicle'] // Include the 'Vehicle' field which contains the type of vehicle
+            }],
+            logging: console.log
+        });
+
+        res.status(200).send({
+            tracksInTimeInterval: tracksInTimeInterval
+        });
+    } catch (error) {
+        console.error('Error fetching tracks in time interval:', error);
+        res.status(500).send({
+            message: "Error retrieving tracks in the specified time interval."
+        });
+    }
+};
+
+
 exports.delete = async (req, res) => {
     const id = req.params.id;
 

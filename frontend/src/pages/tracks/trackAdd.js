@@ -42,12 +42,9 @@ const TrackAdd = ({ getTracks }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const authToken = AuthService.getAuthToken();
-
+    
     const config = {
-      headers: {
-        'Authorization': `Bearer ${authToken}`,
-      }
+   
     };
 
     if (!formData.Latitude || !formData.Longitude || !formData.Status || (!formData.Speed && formData.Status !== 'stopped') || !formData.Vehicle_UID) {

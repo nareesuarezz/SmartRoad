@@ -1,18 +1,20 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup } from 'react-leaflet';
+import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import 'lrm-graphhopper';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
-import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import { useSelector } from 'react-redux';
 import io from 'socket.io-client';
+import { Select } from 'antd';
+
+const { Option } = Select;
 
 const carIcon = new L.Icon({
   iconUrl: process.env.PUBLIC_URL + '/images/car.png',
@@ -52,7 +54,23 @@ const TrackList = () => {
   const [tracksWithinBounds, setTracksWithinBounds] = useState([]);
   const [bounds, setBounds] = useState({ swLat: 0, swLng: 0, neLat: 0, neLng: 0 });
   const [zoomLevel, setZoomLevel] = useState(12);
+  const [startTime, setStartTime] = useState(new Date().toISOString());
+  const [endTime, setEndTime] = useState(new Date().toISOString());
+  const [timeInterval, setTimeInterval] = useState({ startTime: new Date().toISOString(), endTime: new Date().toISOString() });
+  const tracksRef = useRef([]);
+  const mapPositionRef = useRef(mapCenter);
+  const mapZoomRef = useRef(zoomLevel);
 
+  const timeOptions = [
+    { label: 'Últimos 2 minutos', value: { startTime: new Date(Date.now() - 120000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 10 minutos', value: { startTime: new Date(Date.now() - 600000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 20 minutos', value: { startTime: new Date(Date.now() - 1200000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Última media hora', value: { startTime: new Date(Date.now() - 1800000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Última hora', value: { startTime: new Date(Date.now() - 3600000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimas 24 horas', value: { startTime: new Date(Date.now() - 86400000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 7 días', value: { startTime: new Date(Date.now() - 604800000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Todos los tracks', value: { startTime: null, endTime: new Date().toISOString() } },
+  ];
 
 
 
@@ -63,16 +81,6 @@ const TrackList = () => {
         console.error('Error: ', error);
       });
   }, []);
-
-
-  useEffect(() => {
-    if (trackView === 'complete') {
-      setDisplayTracks(allTracks);
-    } else {
-      const lastTracks = getLastTracks(allTracks);
-      setDisplayTracks(lastTracks);
-    }
-  }, [allTracks, trackView]);
 
 
 
@@ -100,48 +108,28 @@ const TrackList = () => {
 
 
   const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
-        const authToken = AuthService.getAuthToken();
-
-    try {
-      const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
-        params: {
-          swLat,
-          swLng,
-          neLat,
-          neLng
-        }, headers: {
-          Authorization: `Bearer ${authToken}`,
-        }
-      }); // Asegúrate de que cada track tenga la información del vehículo
-      const tracksWithVehicleInfo = await Promise.all(response.data.tracksWithinBounds.map(async (track) => {
-        const vehicleResponse = await axios.get(`${URL}/api/vehicles/${track.Vehicle_UID}`, {
-          headers: {
-            Authorization: `Bearer ${authToken}`,
-          },
-        });
-        return { ...track, vehicleType: vehicleResponse.data.Vehicle };
-      }));
-      setTracksWithinBounds(tracksWithVehicleInfo);
-
-
-
-
-    } catch (error) {
-      console.error('Error al buscar tracks dentro de los límites:', error);
+  try {
+    const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
+      params: {
+        swLat,
+        swLng,
+        neLat,
+        neLng,
+        view: trackView
+      },
+    });
+    const newTracks = response.data.tracksWithinBounds;
+    if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
+      tracksRef.current = newTracks;
+      setTracksWithinBounds(newTracks);
     }
-  };
+  } catch (error) {
+    console.error('Error al buscar tracks dentro de los límites:', error);
+  }
+};
 
   useEffect(() => {
   }, [tracksWithinBounds]);
-  const getLastTracks = (tracks) => {
-    const groupedTracks = tracks.reduce((grouped, track) => {
-      (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
-      return grouped;
-    }, {});
-
-    const lastTracks = Object.values(groupedTracks).map(tracks => tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]);
-    return lastTracks;
-  };
 
   const groupTracksByVehicle = (tracks) => {
     const groupedTracks = tracks.reduce((grouped, track) => {
@@ -173,14 +161,38 @@ const TrackList = () => {
     };
   }, [bounds]); // Añade 'bounds' a las dependencias del useEffect
 
+  const fetchTracksInTimeInterval = () => {
+    const params = {};
+    if (timeInterval.startTime) {
+      params.startTime = timeInterval.startTime;
+    }
+    params.endTime = timeInterval.endTime;
+
+    axios.get(`${URL}/api/tracks/in-time-interval`, { params })
+      .then(response => {
+        const tracks = response.data.tracksInTimeInterval;
+        setTracksWithinBounds(tracks);
+      })
+      .catch(error => {
+        console.error('Error fetching tracks in time interval:', error);
+      });
+  };
+
+
+
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
     const isMounted = useRef(false);
+    const routingControlRef = useRef(null); // Añade esta línea
 
     useEffect(() => {
       isMounted.current = true;
       return () => {
         isMounted.current = false;
+        if (routingControlRef.current) { // Añade este bloque
+          map.removeControl(routingControlRef.current);
+          routingControlRef.current = null;
+        }
       };
     }, []);
 
@@ -188,7 +200,7 @@ const TrackList = () => {
       if (map && trackCoordinates.length > 1 && isMounted.current) {
         const whenMapIsReady = new Promise(resolve => map.whenReady(resolve));
         whenMapIsReady.then(() => {
-          if (map) { // Asegúrate de que el mapa existe
+          if (map) {
             let routingControl = L.Routing.control({
               waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
               routeWhileDragging: true,
@@ -227,63 +239,115 @@ const TrackList = () => {
     return null;
   };
 
-  const MapBounds = () => {
-    const map = useMap();
 
-    useEffect(() => {
-      map.on('moveend', () => {
-        const center = map.getCenter();
-        const zoom = map.getZoom();
+const MapBounds = () => {
+  const map = useMap();
 
-        // Actualiza el estado con las nuevas coordenadas del centro
-        setMapCenter([center.lat, center.lng]);
-        setZoomLevel(zoom);
+  useEffect(() => {
+    map.on('moveend', () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
 
-        const mapBounds = map.getBounds();
-        const sw = mapBounds.getSouthWest();
-        const ne = mapBounds.getNorthEast();
+      mapZoomRef.current = zoom;
+      mapPositionRef.current = [center.lat, center.lng];
+      const mapBounds = map.getBounds();
+      const sw = mapBounds.getSouthWest();
+      const ne = mapBounds.getNorthEast();
 
-        // Actualiza el estado con las nuevas coordenadas
-        setBounds({ swLat: sw.lat, swLng: sw.lng, neLat: ne.lat, neLng: ne.lng });
+      // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
+      fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+    });
+  }, [map]);
 
-        // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
-        fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
-      });
-    }, [map]);
+  return null;
+};
+  
+  const tracksToGeoJSON = (tracks) => {
+    return {
+      type: 'FeatureCollection',
+      features: tracks.map(track => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: track.Location.coordinates
+        },
+        properties: {
+          trackId: track.ID,
+          vehicleId: track.Vehicle_UID,
+          status: track.Status,
+          vehicleType: track.Vehicles.Vehicle
+        }
+      }))
+    };
+  };
 
-    return null;
+  const notificationsToGeoJSON = (notifications) => {
+    return {
+      type: 'FeatureCollection',
+      features: notifications.map(notification => ({
+        type: 'Feature',
+        geometry: {
+          type: 'Point',
+          coordinates: notification.coordinates
+        }
+      }))
+    };
   };
 
 
-  const renderTracksOnMap = (vehicleType) => {
+  const renderTracksOnMap = (vehicleType, view) => {
     const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
-      if (vehicleTracks[0].vehicleType !== vehicleType) {
+      if (vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
         return null;
       }
-
+  
       // Ordena los tracks por fecha y toma el último
-      const lastTrack = vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
+      let tracksToRender;
+      if (view === 'last') {
+        tracksToRender = [vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]];
+      } else {
+        tracksToRender = [vehicleTracks[vehicleTracks.length - 1]]; // Solo toma el último track
+      }
+      const geoJsonData = tracksToGeoJSON(tracksToRender);
+  
       return (
         <React.Fragment key={index}>
-          <Marker
-            position={lastTrack.Location.coordinates} // No necesitas invertir las coordenadas
-            icon={lastTrack.vehicleType === 'car' ? carIcon : bicycleIcon}
-            zIndexOffset={500} // Ajusta este valor según tus necesidades
-          >
-            <Popup>
-              <p>{`Track ID: ${lastTrack.ID}`}</p>
-              <p>{`Location: ${lastTrack.Location.coordinates.join(', ')}`}</p>
-              <p>{`Vehicle ID: ${lastTrack.Vehicle_UID}`}</p>
-              <p>{`Status: ${lastTrack.Status}`}</p>
-            </Popup>
-          </Marker>
+          {tracksToRender.map((track, trackIndex) => (
+            <Marker
+              key={trackIndex}
+              position={track.Location.coordinates}
+              icon={track.Vehicles.Vehicle === 'car' ? carIcon : bicycleIcon}
+              zIndexOffset={500}
+            >
+              <Popup>
+                <p>{`Track ID: ${track.ID}`}</p>
+                <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
+                <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
+                <p>{`Status: ${track.Status}`}</p>
+              </Popup>
+            </Marker>
+          ))}
+          <GeoJSON data={geoJsonData} />
           <RoutingMachine trackCoordinates={vehicleTracks.map(track => track.Location.coordinates)} /> {/* No necesitas invertir las coordenadas */}
         </React.Fragment>
       );
     });
   };
+  
+  useEffect(() => {
+    const carTracksComplete = renderTracksOnMap('car', 'complete');
+    const carTracksLast = renderTracksOnMap('car', 'last');
+    const bicycleTracksComplete = renderTracksOnMap('bicycle', 'complete');
+    const bicycleTracksLast = renderTracksOnMap('bicycle', 'last');
+    const notifications = notificationsToGeoJSON(notificationLocations);
 
+    console.log('Capa de Coches (Todas las rutas):', carTracksComplete);
+    console.log('Capa de Coches (Último track):', carTracksLast);
+    console.log('Capa de Bicicletas (Todas las rutas):', bicycleTracksComplete);
+    console.log('Capa de Bicicletas (Último track):', bicycleTracksLast);
+    console.log('Capa de Notificaciones:', notifications);
+}, [tracksWithinBounds, notificationLocations]);
 
 
 
@@ -300,8 +364,26 @@ const TrackList = () => {
           {t('Add Track')}
         </Link>
       </div>
+      <div>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Selecciona un intervalo de tiempo"
+          optionFilterProp="children"
+          onChange={value => {
+            setTimeInterval(JSON.parse(value));
+            fetchTracksInTimeInterval();
+          }}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          {timeOptions.map((option, index) => (
+            <Option key={index} value={JSON.stringify(option.value)}>{option.label}</Option>
+          ))}
+        </Select>
+      </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-        <MapContainer key={`${trackView}-${Date.now()}`} center={mapCenter} zoom={zoomLevel} style={{ height: '500px', width: '700px' }}>
+        <MapContainer key={`${trackView}-${Date.now()}`} center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '500px', width: '700px' }}>
           <MapBounds />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -312,22 +394,26 @@ const TrackList = () => {
           <LayersControl position="topleft">
             <LayersControl.BaseLayer name="Todas las rutas">
               <LayerGroup>
+                {renderTracksOnMap('car', 'complete')}
+                {renderTracksOnMap('bicycle', 'complete')}
               </LayerGroup>
             </LayersControl.BaseLayer>
 
             <LayersControl.BaseLayer name="Último track">
               <LayerGroup>
+                {renderTracksOnMap('car', 'last')}
+                {renderTracksOnMap('bicycle', 'last')}
               </LayerGroup>
             </LayersControl.BaseLayer>
             <LayersControl.Overlay checked name="Bicicletas">
               <LayerGroup>
-                {renderTracksOnMap('bicycle')}
+                {renderTracksOnMap('bicycle', trackView)}
               </LayerGroup>
             </LayersControl.Overlay>
 
             <LayersControl.Overlay checked name="Coches">
               <LayerGroup>
-                {renderTracksOnMap('car')}
+                {renderTracksOnMap('car', trackView)}
               </LayerGroup>
             </LayersControl.Overlay>
 
@@ -348,9 +434,13 @@ const TrackList = () => {
                     </Marker>
                   );
                 })}
+                <GeoJSON data={notificationsToGeoJSON(notificationLocations)} />
               </LayerGroup>
             </LayersControl.Overlay>
+
+
           </LayersControl>
+          
         </MapContainer>
       </div>
     </div>
