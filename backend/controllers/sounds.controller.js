@@ -1,6 +1,7 @@
 const db = require("../models");
 const Sounds = db.Sounds;
 const Op = db.Sequelize.Op;
+const Sequelize = db.Sequelize;
 const path = require('path');
 const fs = require('fs');
 
@@ -116,8 +117,8 @@ exports.findByLetters = (req, res) => {
   const letters = req.params.letters;
   Sounds.findAll({
     where: {
-      Sound: {
-        [Sequelize.Op.like]: letters + '%'
+      filename: {
+        [Op.like]: letters + '%'
       }
     }
   })
@@ -126,7 +127,11 @@ exports.findByLetters = (req, res) => {
     })
     .catch(err => {
       res.status(500).send({
-        message: err.message || "Some error occurred while retrieving users."
+        message: err.message || "Some error occurred while retrieving sounds."
       });
     });
 };
+
+exports.findByDuration = (req,res) => {
+
+}
