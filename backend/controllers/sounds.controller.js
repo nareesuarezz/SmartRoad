@@ -25,7 +25,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const sounds = await Sounds.findAll();
-    res.send(sounds); 
+    res.send(sounds);
   } catch (error) {
     console.error(error);
     res.status(500).send({
@@ -110,4 +110,23 @@ exports.delete = async (req, res) => {
       message: "Error deleting sound",
     });
   }
+};
+
+exports.findByLetters = (req, res) => {
+  const letters = req.params.letters;
+  Sounds.findAll({
+    where: {
+      Sound: {
+        [Sequelize.Op.like]: letters + '%'
+      }
+    }
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving users."
+      });
+    });
 };
