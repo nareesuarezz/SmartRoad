@@ -106,15 +106,21 @@ exports.create = async (req, res) => {
 };
 
 exports.findAll = (req, res) => {
-    Tracks.findAll()
-        .then(data => {
-            res.send(data);
-        })
-        .catch(err => {
-            res.status(500).send({
-                message: err.message || "Some error occurred while retrieving all tracks."
-            });
+    Tracks.findAll({
+        include: [{
+            model: db.Vehicle, // Usa el modelo Vehicles
+            as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
+            attributes: ['Vehicle'] // Incluye el campo 'Vehicle' que contiene el tipo de vehículo
+        }]
+    })
+    .then(data => {
+        res.send(data);
+    })
+    .catch(err => {
+        res.status(500).send({
+            message: err.message || "Some error occurred while retrieving all tracks."
         });
+    });
 };
 
 exports.findOne = (req, res) => {

@@ -56,6 +56,7 @@ const TrackList = () => {
   const [zoomLevel, setZoomLevel] = useState(12);
   const [startTime, setStartTime] = useState(new Date().toISOString());
   const [endTime, setEndTime] = useState(new Date().toISOString());
+  const [showAllTracks, setShowAllTracks] = useState(false);
   const [timeInterval, setTimeInterval] = useState({ startTime: new Date().toISOString(), endTime: new Date().toISOString() });
   const tracksRef = useRef([]);
   const mapPositionRef = useRef(mapCenter);
@@ -108,25 +109,30 @@ const TrackList = () => {
 
 
   const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
-  try {
-    const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
-      params: {
-        swLat,
-        swLng,
-        neLat,
-        neLng,
-        view: trackView
-      },
-    });
-    const newTracks = response.data.tracksWithinBounds;
-    if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
-      tracksRef.current = newTracks;
-      setTracksWithinBounds(newTracks);
+    try {
+      if (showAllTracks) {
+        const allTracks = await fetchAllTracks();
+        setTracksWithinBounds(allTracks);
+      } else {
+        const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
+          params: {
+            swLat,
+            swLng,
+            neLat,
+            neLng,
+            view: trackView
+          },
+        });
+        const newTracks = response.data.tracksWithinBounds;
+        if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
+          tracksRef.current = newTracks;
+          setTracksWithinBounds(newTracks);
+        }
+      }
+    } catch (error) {
+      console.error('Error al buscar tracks dentro de los límites:', error);
     }
-  } catch (error) {
-    console.error('Error al buscar tracks dentro de los límites:', error);
-  }
-};
+  };
 
   useEffect(() => {
   }, [tracksWithinBounds]);
@@ -240,27 +246,32 @@ const TrackList = () => {
   };
 
 
-const MapBounds = () => {
-  const map = useMap();
-
-  useEffect(() => {
-    map.on('moveend', () => {
-      const center = map.getCenter();
-      const zoom = map.getZoom();
-
-      mapZoomRef.current = zoom;
-      mapPositionRef.current = [center.lat, center.lng];
-      const mapBounds = map.getBounds();
-      const sw = mapBounds.getSouthWest();
-      const ne = mapBounds.getNorthEast();
-
-      // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
-      fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
-    });
-  }, [map]);
-
-  return null;
-};
+  const MapBounds = () => {
+    const map = useMap();
+  
+    useEffect(() => {
+      if (showAllTracks) {
+        // Si showAllTracks es true, no hagas nada
+        return;
+      }
+  
+      map.on('moveend', () => {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
+  
+        mapZoomRef.current = zoom;
+        mapPositionRef.current = [center.lat, center.lng];
+        const mapBounds = map.getBounds();
+        const sw = mapBounds.getSouthWest();
+        const ne = mapBounds.getNorthEast();
+  
+        // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
+        fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+      });
+    }, [map, showAllTracks]); // Añade showAllTracks a las dependencias del useEffect
+  
+    return null;
+  };
   
   const tracksToGeoJSON = (tracks) => {
     return {
@@ -298,10 +309,12 @@ const MapBounds = () => {
   const renderTracksOnMap = (vehicleType, view) => {
     const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
     return Object.values(groupedTracks).map((vehicleTracks, index) => {
-      if (vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
+      console.log(vehicleTracks[0].Vehicles.Vehicle)
+      // Comprueba si vehicleTracks[0] y vehicleTracks[0].Vehicles existen antes de acceder a vehicleTracks[0].Vehicles.Vehicle
+      if (!vehicleTracks[0] || !vehicleTracks[0].Vehicles || vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
         return null;
       }
-  
+
       // Ordena los tracks por fecha y toma el último
       let tracksToRender;
       if (view === 'last') {
@@ -310,7 +323,7 @@ const MapBounds = () => {
         tracksToRender = [vehicleTracks[vehicleTracks.length - 1]]; // Solo toma el último track
       }
       const geoJsonData = tracksToGeoJSON(tracksToRender);
-  
+
       return (
         <React.Fragment key={index}>
           {tracksToRender.map((track, trackIndex) => (
@@ -334,7 +347,7 @@ const MapBounds = () => {
       );
     });
   };
-  
+
   useEffect(() => {
     const carTracksComplete = renderTracksOnMap('car', 'complete');
     const carTracksLast = renderTracksOnMap('car', 'last');
@@ -347,7 +360,19 @@ const MapBounds = () => {
     console.log('Capa de Bicicletas (Todas las rutas):', bicycleTracksComplete);
     console.log('Capa de Bicicletas (Último track):', bicycleTracksLast);
     console.log('Capa de Notificaciones:', notifications);
-}, [tracksWithinBounds, notificationLocations]);
+  }, [tracksWithinBounds, notificationLocations]);
+
+
+  const fetchAllTracks = async () => {
+    try {
+      const response = await axios.get(`${URL}/api/tracks`);
+      console.log(response.data)
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching all tracks:', error);
+      return null;
+    }
+  };
 
 
 
@@ -381,6 +406,10 @@ const MapBounds = () => {
             <Option key={index} value={JSON.stringify(option.value)}>{option.label}</Option>
           ))}
         </Select>
+        <button onClick={() => setShowAllTracks(!showAllTracks)}>
+        {showAllTracks ? 'Mostrar solo tracks visibles' : 'Mostrar todos los tracks'}
+      </button>
+
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
         <MapContainer key={`${trackView}-${Date.now()}`} center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '500px', width: '700px' }}>
@@ -440,7 +469,7 @@ const MapBounds = () => {
 
 
           </LayersControl>
-          
+
         </MapContainer>
       </div>
     </div>
