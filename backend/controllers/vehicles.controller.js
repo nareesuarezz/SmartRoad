@@ -149,7 +149,20 @@ exports.findByVehicleType = (req, res) => {
         })
         .catch(err => {
             res.status(500).send({
-                message: err.message || "Some error occurred while retrieving users."
+                message: err.message || "Some error occurred while retrieving vehicle."
             });
         });
 };
+
+exports.findByAdminUID = (req, res) => {
+    const adminUID = req.params.Admin_UID
+    Vehicles.findAll({ where: { Admin_UID: adminUID } })
+        .then(data => {
+            res.send(data)
+        })
+        .catch(err => {
+            res.status(500).send({
+                message: err.message || "Some error occurred while retrieving vehicles"
+            })
+        })
+}

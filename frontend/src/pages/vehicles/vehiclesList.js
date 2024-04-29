@@ -15,14 +15,27 @@ const VehicleList = () => {
 
   const [vehicleT, setVehicleT] = useState('');
 
-  useEffect(() => {
-    getVehicles(vehicleT);
-  }, [vehicleT]);
+  const [adminUID, setAdminUID] = useState('');
 
-  const getVehicles = async (vehicleType = '') => {
+  useEffect(() => {
+    getVehicles(vehicleT, adminUID);
+  }, [vehicleT, adminUID]);
+
+  const getVehicles = async (vehicleType = '', adminUID = '') => {
     try {
-      const response = await axios.get(`${URL}/api/vehicles/findByVehicleType/${vehicleType}`);
-      setVehicles(response.data);
+      let response
+
+      if (vehicleType) {
+        response = await axios.get(`${URL}/api/vehicles/findByVehicleType/${vehicleType}`);
+      }
+      else if (adminUID) {
+        response = await axios.get(`${URL}/api/vehicles/findByAdminUID/${adminUID}`);
+      }
+      else {
+        response = await axios.get(`${URL}/api/vehicles`)
+      }
+      setVehicles(response.data)
+
     } catch (error) {
       console.error('Error fetching vehicles:', error);
     }
@@ -31,7 +44,7 @@ const VehicleList = () => {
   const deleteVehicle = async (id) => {
     try {
       await axios.delete(`${URL}/api/vehicles/${id}`);
-      getVehicles();
+      getVehicles(vehicleT, adminUID);
     } catch (error) {
       console.error(`Error deleting vehicle with id=${id}:`, error);
     }
@@ -39,6 +52,10 @@ const VehicleList = () => {
 
   const handleVehicleGetter = (e) => {
     setVehicleT(e.target.value)
+  }
+
+  const handleAdminUIDGetter = (e) => {
+    setAdminUID(e.target.value)
   }
 
   const goBack = () => {
@@ -63,6 +80,7 @@ const VehicleList = () => {
           <option value="Car">Car</option>
           <option value="Bicycle">Bicycle</option>
         </select>
+        <input type='text' placeholder='Admin_UID' onChange={handleAdminUIDGetter}></input>
       </div>
 
       <table className="table is-striped is-fullwidth">

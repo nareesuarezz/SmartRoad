@@ -14,6 +14,8 @@ const SoundList = () => {
 
   const [sounds, setSounds] = useState([]);
 
+  const [soundName, setSoundName] = useState('');
+
   useEffect(() => {
     getSounds();
   }, []);
@@ -37,6 +39,10 @@ const SoundList = () => {
     }
   };
 
+  const handleSoundNameGetter = (e) => {
+    setSoundName(e.target.value)
+  }
+
   const goBack = () => {
     window.location.href = '/login-user';
   };
@@ -51,6 +57,9 @@ const SoundList = () => {
       <Link to="/sound-add" className="add">
         {t('Add New Sound')}
       </Link>
+      <div className='soundsFilters'>
+        <input type='text' placeholder='Sound Name'></input>
+      </div>
 
       <table className="table is-striped is-fullwidth">
         <thead>
