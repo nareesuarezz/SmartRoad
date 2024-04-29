@@ -77,7 +77,7 @@ db.sequelize.sync({ force: true }).then(async () => {
       Username: 'carmelo',
       Password: hashedPasswordUs,
       filename: 'user.png',
-      Role: 'User'
+      Role: 'User',
     })
 
     const createdSound1 = await db.Sounds.create({

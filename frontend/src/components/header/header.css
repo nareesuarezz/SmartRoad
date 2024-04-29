@@ -1,6 +1,6 @@
 .header-container {
   padding: 15px;
-  background-color: #333;
+  background-color: #cc838a;
 }
 
 .nav-list {
@@ -19,12 +19,12 @@
 
 .nav-link {
   text-decoration: none;
-  color: white;
+  color: black;
   font-weight: bold;
 }
 
 .nav-link:hover {
-  color: lightgray;
+  color: #ecccc4;
 }
 
 @media (min-width: 768px) {

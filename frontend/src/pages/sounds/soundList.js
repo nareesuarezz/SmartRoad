@@ -14,15 +14,37 @@ const SoundList = () => {
 
   const [sounds, setSounds] = useState([]);
 
+  const [soundName, setSoundName] = useState('');
+
+  const [durationFilter, setDurationFilter] = useState('');
+
   useEffect(() => {
-    getSounds();
-  }, []);
+    getSounds(soundName);
+  }, [soundName, durationFilter]);
 
   const getSounds = async () => {
     try {
-      const response = await axios.get(`${URL}/api/sounds/`, {});
-      console.log(response.data);
-      setSounds(response.data);
+      let response;
+      if (soundName) {
+        response = await axios.get(`${URL}/api/sounds/findBySound/${soundName}`);
+      } else {
+        response = await axios.get(`${URL}/api/sounds/`);
+      }
+      let soundsWithDuration = await Promise.all(response.data.map(async sound => {
+        return new Promise((resolve, reject) => {
+          let audio = new Audio(`${URL}/api/sounds/${sound.id}`);
+          audio.onloadedmetadata = function () {
+            resolve({ ...sound, duration: audio.duration });
+          };
+          audio.onerror = function () {
+            reject('Error loading audio');
+          };
+        });
+      }));
+      if (durationFilter) {
+        soundsWithDuration = soundsWithDuration.filter(sound => Math.floor(sound.duration) === durationFilter);
+      }
+      setSounds(soundsWithDuration);
     } catch (error) {
       console.error('Error fetching sounds:', error);
     }
@@ -36,6 +58,14 @@ const SoundList = () => {
       console.error(`Error deleting sound with id=${id}:`, error);
     }
   };
+
+  const handleSoundNameGetter = (e) => {
+    setSoundName(e.target.value)
+  }
+
+  const handleDurationFilterChange = (e) => {
+    setDurationFilter(Number(e.target.value));
+  }
 
   const goBack = () => {
     window.location.href = '/login-user';
@@ -51,6 +81,15 @@ const SoundList = () => {
       <Link to="/sound-add" className="add">
         {t('Add New Sound')}
       </Link>
+      <div className='soundsFilters'>
+        <input type='text' placeholder='Sound Name' onChange={handleSoundNameGetter}></input>
+        <select onChange={handleDurationFilterChange}>
+          <option value="">-- Select Duration --</option>
+          <option value="1">1 Second</option>
+          <option value="2">2 Seconds</option>
+          <option value="3">3 Seconds</option>
+        </select>
+      </div>
 
       <table className="table is-striped is-fullwidth">
         <thead>

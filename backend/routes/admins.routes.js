@@ -22,5 +22,11 @@ module.exports = app => {
 
   router.post("/signup", upload, auth.signup);
 
+  router.get("/findAllByRole/:Role", admins.findAllByRole)
+
+  router.get("/findByLetters/:letters", admins.findByLetters);
+
+  router.get("/findByRoleAndLetters/:Role/:letters", admins.findByRoleAndLetters)
+
   app.use("/api/admins", router);
 };

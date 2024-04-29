@@ -360,7 +360,7 @@ const MapBounds = () => {
         <LanguageSwitcher />
       </div>
       <div>
-        <Link to="/track-add" className="add">
+        <Link to="/track-add" className='add'>
           {t('Add Track')}
         </Link>
       </div>
