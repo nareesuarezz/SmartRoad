@@ -52,7 +52,7 @@ const TrackList = () => {
   const [selectedLayer, setSelectedLayer] = useState('Todas las rutas');
   const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
   const [tracksWithinBounds, setTracksWithinBounds] = useState([]);
-  const [bounds, setBounds] = useState({ swLat: 0, swLng: 0, neLat: 0, neLng: 0 });
+  const [bounds, setBounds] = useState({ swLat: 28.049560901381895, swLng: -15.510292053222658, neLat: 28.20095228838051, neLng: -15.347557067871096 });
   const [zoomLevel, setZoomLevel] = useState(12);
   const [startTime, setStartTime] = useState(new Date().toISOString());
   const [endTime, setEndTime] = useState(new Date().toISOString());
@@ -82,7 +82,6 @@ const TrackList = () => {
         console.error('Error: ', error);
       });
   }, []);
-
 
 
 
@@ -157,8 +156,8 @@ const TrackList = () => {
   useEffect(() => {
     const socket = io(SOCKET_SERVER_URL);
 
-    socket.on('trackCreated', (newTrack) => {
-      // Llama a fetchTracksWithinBounds con las coordenadas actuales del cuadro
+    socket.on('trackCreated', () => {
+      // Llama a fetchTracksWithinBounds con las coordenadas actuales de bounds
       fetchTracksWithinBounds(bounds.swLat, bounds.swLng, bounds.neLat, bounds.neLng);
     });
 
@@ -166,6 +165,7 @@ const TrackList = () => {
       socket.disconnect();
     };
   }, [bounds]); // Añade 'bounds' a las dependencias del useEffect
+
 
   const fetchTracksInTimeInterval = () => {
     const params = {};
@@ -248,31 +248,35 @@ const TrackList = () => {
 
   const MapBounds = () => {
     const map = useMap();
-  
+
     useEffect(() => {
       if (showAllTracks) {
         // Si showAllTracks es true, no hagas nada
         return;
       }
-  
+
       map.on('moveend', () => {
         const center = map.getCenter();
         const zoom = map.getZoom();
-  
+
         mapZoomRef.current = zoom;
         mapPositionRef.current = [center.lat, center.lng];
         const mapBounds = map.getBounds();
         const sw = mapBounds.getSouthWest();
         const ne = mapBounds.getNorthEast();
-  
+
+        // Muestra un console.log de las coordenadas de bounds
+        console.log('Bounds:', sw.lat, sw.lng, ne.lat, ne.lng);
+        setBounds({ swLat: sw.lat, swLng: sw.lng, neLat: ne.lat, neLng: ne.lng });
         // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
         fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
       });
     }, [map, showAllTracks]); // Añade showAllTracks a las dependencias del useEffect
-  
+
     return null;
   };
-  
+
+
   const tracksToGeoJSON = (tracks) => {
     return {
       type: 'FeatureCollection',
@@ -407,8 +411,8 @@ const TrackList = () => {
           ))}
         </Select>
         <button onClick={() => setShowAllTracks(!showAllTracks)}>
-        {showAllTracks ? 'Mostrar solo tracks visibles' : 'Mostrar todos los tracks'}
-      </button>
+          {showAllTracks ? 'Mostrar solo tracks visibles' : 'Mostrar todos los tracks'}
+        </button>
 
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
