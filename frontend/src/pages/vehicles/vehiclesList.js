@@ -16,17 +16,17 @@ const VehicleList = () => {
   const [vehicleT, setVehicleT] = useState('');
 
   useEffect(() => {
-    getVehicles();
-  }, []);
+    getVehicles(vehicleT);
+  }, [vehicleT]);
 
-  const getVehicles = async () => {
+  const getVehicles = async (vehicleType = '') => {
     try {
-      const response = await axios.get(`${URL}/api/vehicles`);
+      const response = await axios.get(`${URL}/api/vehicles/findByVehicleType/${vehicleType}`);
       setVehicles(response.data);
     } catch (error) {
       console.error('Error fetching vehicles:', error);
     }
-  };
+  }
 
   const deleteVehicle = async (id) => {
     try {
