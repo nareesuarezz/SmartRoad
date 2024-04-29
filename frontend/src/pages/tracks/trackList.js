@@ -183,11 +183,16 @@ const TrackList = () => {
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
     const isMounted = useRef(false);
+    const routingControlRef = useRef(null); // Añade esta línea
 
     useEffect(() => {
       isMounted.current = true;
       return () => {
         isMounted.current = false;
+        if (routingControlRef.current) { // Añade este bloque
+          map.removeControl(routingControlRef.current);
+          routingControlRef.current = null;
+        }
       };
     }, []);
 
@@ -195,7 +200,7 @@ const TrackList = () => {
       if (map && trackCoordinates.length > 1 && isMounted.current) {
         const whenMapIsReady = new Promise(resolve => map.whenReady(resolve));
         whenMapIsReady.then(() => {
-          if (map) { // Asegúrate de que el mapa existe
+          if (map) {
             let routingControl = L.Routing.control({
               waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
               routeWhileDragging: true,
