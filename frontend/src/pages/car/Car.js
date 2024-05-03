@@ -19,7 +19,7 @@ function Car() {
   const [subscription, setSubscription] = useState(null);
   const selectedSound = localStorage.getItem("selectedSound");
   const [lastVehicleId, setLastVehicleId] = useState(null);
-
+  const [speed, setSpeed] = useState(null);
   const time = 5000;
 
   let postsT = 0;
@@ -48,12 +48,10 @@ function Car() {
 
 
 
-  // Location
   const addTrackGeo = async (lastVehicleId) => {
     try {
       const location = await trackGeo();
 
-      console.log(lastVehicleId)
       const data = {
         Location: location,
         Status: 'Stopped',
@@ -73,6 +71,12 @@ function Car() {
         }
       })
 
+      // Obtener el penúltimo track para este vehículo
+      const response = await axios.get(`${URL}/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=2&_sort=createdAt:desc`);
+      const penultimateTrack = response.data[1]; // El penúltimo track es el segundo elemento en los datos de respuesta
+
+      setSpeed(penultimateTrack.Speed);
+
       if (recentTracks.data.recentTracks.length > 0) {
         setShowModal(true);
         sendNotification('car', `WARNING: THERE IS A BICYCLE NEAR YOU`, data.Location);
@@ -82,6 +86,7 @@ function Car() {
       console.error(err);
     }
   };
+
 
   //Función para recoger la localización y devolverla
   const trackGeo = () => {
@@ -285,7 +290,7 @@ function Car() {
           <img src={logoCar} alt={t('Logo de Coche')} />
         </div>
         <p className='car'>{t('Car')}</p>
-
+        <p className='speed'>{`Velocidad: ${speed} km/h`}</p>
         <h3 className='warn'>{t('Now you will be warned in case that a bike passes near you.')}</h3>
       </div>
       {showModal && (

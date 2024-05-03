@@ -11,8 +11,10 @@ function Bicycle() {
     const { t } = useTranslation();
 
     const API = process.env.REACT_APP_LOCALHOST_URL;
+    const URL = process.env.REACT_APP_LOCALHOST_URL;
 
     const [lastVehicleId, setLastVehicleId] = useState(null);
+    const [speed, setSpeed] = useState(null);
 
     const time = 5000;
 
@@ -21,19 +23,27 @@ function Bicycle() {
     //Location
     const addTrackGeo = async () => {
         try {
-            console.log("antes de trackGeo")
+            // Obtener la ubicación actual
             const location = await trackGeo();
-
-            console.log(lastVehicleId)
+        
             const data = {
-                Location: location,
-                Status: 'Stopped',
-                Speed: '0',
-                Extra: 'coche',
-                Vehicle_UID: lastVehicleId,
+              Location: location,
+              Status: 'Stopped',
+              Speed: '0',
+              Extra: 'bicycle',
+              Vehicle_UID: lastVehicleId,
             };
+        
+            // Llamar a axios.post con los datos actualizados
+            await axios.post(`${URL}/api/tracks`, data);
+            
+            // Obtener el último track para este vehículo
+            const response = await axios.get(`${URL}/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+            const lastTrack = response.data[0];
 
-            await axios.post('https://localhost/api/tracks', data);
+            // Actualizar el estado de la velocidad
+            setSpeed(lastTrack.Speed);
+
 
             console.log(data.Location.coordinates)
 
@@ -42,23 +52,30 @@ function Bicycle() {
         }
     };
 
-    //Función para recoger la localización y devolverla
-    const trackGeo = () => {
-        return new Promise((resolve, reject) => {
-            try {
-                navigator.geolocation.getCurrentPosition((position) => {
-                    const location = {
-                        type: 'Point',
-                        coordinates: [position.coords.latitude, position.coords.longitude],
-                    };
-                    resolve(location);  //Devuelve la localización recogida
-                });
-            } catch (error) {
-                console.error(error);
-                reject(error);
-            }
-        });
-    };
+  //Función para recoger la localización y devolverla
+const trackGeo = () => {
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            type: 'Point',
+            coordinates: [position.coords.latitude, position.coords.longitude],
+          };
+          resolve(location);  //Devuelve la localización recogida
+        },
+        (error) => {
+          console.error(error);
+          reject(error);
+        },
+        {
+          enableHighAccuracy: true,
+          maximumAge: 0,
+          timeout: 5000,
+        }
+      );
+    });
+  };
+  
 
     //Status UseEffect
     useEffect(() => {
@@ -146,10 +163,11 @@ function Bicycle() {
                     <img src={logoBicycle} alt={t('Logo de bicicleta')} />
                 </div>
                 <p className='bicycle'>{t('Bicycle')}</p>
+                <p className='speed'>{`Velocidad: ${speed} km/h`}</p>
 
                 <h3 className='warn'>{t('Now every car user will be warned in case that they are near you.')}</h3>
             </div>
-            <UserNotification/>
+            <UserNotification />
         </>
     );
 }
