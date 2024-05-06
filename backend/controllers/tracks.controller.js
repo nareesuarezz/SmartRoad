@@ -17,14 +17,57 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radio de la tierra en km
     var dLat = (lat2 - lat1) * Math.PI / 180;
     var dLon = (lon2 - lon1) * Math.PI / 180;
-    var a = 
-      0.5 - Math.cos(dLat)/2 + 
-      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
-      (1 - Math.cos(dLon))/2;
-  
+    var a =
+        0.5 - Math.cos(dLat) / 2 +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        (1 - Math.cos(dLon)) / 2;
+
     return R * 2 * Math.asin(Math.sqrt(a));
-  }
-  
+}
+
+exports.processTracks = (req, res) => {
+    const allTracks = req.body.allTracks;
+
+    // Agrupa los tracks por tipo de vehículo
+    const groupedTracks = groupTracksByVehicle(allTracks);
+
+    // Transforma los tracks agrupados a GeoJSON
+    const carTracksGeoJSON = tracksToGeoJSON(groupedTracks.car || []);
+    const bicycleTracksGeoJSON = tracksToGeoJSON(groupedTracks.bicycle || []);
+
+    // Devuelve las capas GeoJSON en la respuesta
+    res.json({ carTracksGeoJSON, bicycleTracksGeoJSON });
+};
+
+// Función para agrupar los tracks por tipo de vehículo
+function groupTracksByVehicle(tracks) {
+    return tracks.reduce((grouped, track) => {
+        (grouped[track.Vehicles.Vehicle] = grouped[track.Vehicles.Vehicle] || []).push(track);
+        return grouped;
+    }, {});
+}
+
+// Función para transformar los tracks a GeoJSON
+function tracksToGeoJSON(tracks) {
+    return {
+        type: 'FeatureCollection',
+        features: tracks.map(track => ({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: track.Location.coordinates
+            },
+            properties: {
+                trackId: track.ID,
+                vehicleId: track.Vehicle_UID,
+                status: track.Status,
+                vehicleType: track.Vehicles.Vehicle
+            }
+        }))
+    };
+}
+
+
 exports.findRecentTracksWithinRadius = async (req, res) => {
     // Calcula el tiempo mínimo (hace X minutos desde ahora)
     const timeAgo = new Date(new Date() - MINUTES_AGO * 60000);
@@ -94,45 +137,45 @@ const createLogEntry = async (action, trackId, adminId) => {
 
 exports.create = async (req, res) => {
     try {
-      const track = {
-        Location: req.body.Location,
-        Status: req.body.Status,
-        Speed: req.body.Speed,
-        Extra: req.body.Extra,
-        Vehicle_UID: req.body.Vehicle_UID,
-        Date: req.body.Date,
-      };
-  
-      // Buscar el último track para este vehículo
-      const lastTrack = await Tracks.findOne({ where: { Vehicle_UID: track.Vehicle_UID }, order: [ [ 'createdAt', 'DESC' ]]});
-  
-      if (lastTrack) {
-        // Calcular la distancia y el tiempo
-        const distance = calculateDistance(lastTrack.Location.coordinates[0], lastTrack.Location.coordinates[1], track.Location.coordinates[0], track.Location.coordinates[1]);
-        const time = (new Date(track.Date) - new Date(lastTrack.Date)) / 1000 / 60 / 60; // en horas
-  
-        // Calcular la velocidad
-        const speed = distance / time;
-  
-        // Guardar la velocidad en el track
-        track.Speed = speed;
-      }
-  
-      const createdTrack = await Tracks.create(track);
-  
-      // Emitir el evento 'trackCreated' con el track creado como dato
-      const io = socket.getIo();
-      io.emit('trackCreated', createdTrack);
-  
-      res.status(201).send({ message: "Track created successfully." });
+        const track = {
+            Location: req.body.Location,
+            Status: req.body.Status,
+            Speed: req.body.Speed,
+            Extra: req.body.Extra,
+            Vehicle_UID: req.body.Vehicle_UID,
+            Date: req.body.Date,
+        };
+
+        // Buscar el último track para este vehículo
+        const lastTrack = await Tracks.findOne({ where: { Vehicle_UID: track.Vehicle_UID }, order: [['createdAt', 'DESC']] });
+
+        if (lastTrack) {
+            // Calcular la distancia y el tiempo
+            const distance = calculateDistance(lastTrack.Location.coordinates[0], lastTrack.Location.coordinates[1], track.Location.coordinates[0], track.Location.coordinates[1]);
+            const time = (new Date(track.Date) - new Date(lastTrack.Date)) / 1000 / 60 / 60; // en horas
+
+            // Calcular la velocidad
+            const speed = distance / time;
+
+            // Guardar la velocidad en el track
+            track.Speed = speed;
+        }
+
+        const createdTrack = await Tracks.create(track);
+
+        // Emitir el evento 'trackCreated' con el track creado como dato
+        const io = socket.getIo();
+        io.emit('trackCreated', createdTrack);
+
+        res.status(201).send({ message: "Track created successfully." });
     } catch (error) {
-      console.error(error);
-      res.status(500).send({
-        message: error.message || "Some error occurred while creating the track.",
-      });
+        console.error(error);
+        res.status(500).send({
+            message: error.message || "Some error occurred while creating the track.",
+        });
     }
-  };
-  
+};
+
 
 exports.findAll = (req, res) => {
     Tracks.findAll()

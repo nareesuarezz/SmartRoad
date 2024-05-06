@@ -60,6 +60,9 @@ const TrackList = () => {
   const tracksRef = useRef([]);
   const mapPositionRef = useRef(mapCenter);
   const mapZoomRef = useRef(zoomLevel);
+  const [carTracksGeoJSON, setCarTracksGeoJSON] = useState(null);
+  const [bicycleTracksGeoJSON, setBicycleTracksGeoJSON] = useState(null);
+
 
   const timeOptions = [
     { label: 'Últimos 2 minutos', value: { startTime: new Date(Date.now() - 120000).toISOString(), endTime: new Date().toISOString() } },
@@ -108,37 +111,35 @@ const TrackList = () => {
 
 
   const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
-  try {
-    const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
-      params: {
-        swLat,
-        swLng,
-        neLat,
-        neLng,
-        view: trackView
-      },
-    });
-    const newTracks = response.data.tracksWithinBounds;
-    if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
-      tracksRef.current = newTracks;
-      setTracksWithinBounds(newTracks);
+    try {
+      const response = await axios.get(`${URL}/api/tracks/within-bounds`, {
+        params: {
+          swLat,
+          swLng,
+          neLat,
+          neLng,
+          view: trackView
+        },
+      });
+      const newTracks = response.data.tracksWithinBounds;
+
+      console.log('newTracks: ', newTracks)
+      if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
+        tracksRef.current = newTracks;
+        setTracksWithinBounds(newTracks);
+
+        // Envía los tracks al backend para su procesamiento
+        processTracks(newTracks);
+      }
+    } catch (error) {
+      console.error('Error al buscar tracks dentro de los límites:', error);
     }
-  } catch (error) {
-    console.error('Error al buscar tracks dentro de los límites:', error);
-  }
-};
+  };
+
 
   useEffect(() => {
   }, [tracksWithinBounds]);
 
-  const groupTracksByVehicle = (tracks) => {
-    const groupedTracks = tracks.reduce((grouped, track) => {
-      (grouped[track.Vehicle_UID] = grouped[track.Vehicle_UID] || []).push(track);
-      return grouped;
-    }, {});
-
-    return groupedTracks;
-  };
 
   const goBack = () => {
     window.location.href = '/login-user';
@@ -240,46 +241,39 @@ const TrackList = () => {
   };
 
 
-const MapBounds = () => {
-  const map = useMap();
+  const MapBounds = () => {
+    const map = useMap();
 
-  useEffect(() => {
-    map.on('moveend', () => {
-      const center = map.getCenter();
-      const zoom = map.getZoom();
+    useEffect(() => {
+      map.on('moveend', () => {
+        const center = map.getCenter();
+        const zoom = map.getZoom();
 
-      mapZoomRef.current = zoom;
-      mapPositionRef.current = [center.lat, center.lng];
-      const mapBounds = map.getBounds();
-      const sw = mapBounds.getSouthWest();
-      const ne = mapBounds.getNorthEast();
+        mapZoomRef.current = zoom;
+        mapPositionRef.current = [center.lat, center.lng];
+        const mapBounds = map.getBounds();
+        const sw = mapBounds.getSouthWest();
+        const ne = mapBounds.getNorthEast();
 
-      // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
-      fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
-    });
-  }, [map]);
+        // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
+        fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+      });
+    }, [map]);
 
-  return null;
-};
-  
-  const tracksToGeoJSON = (tracks) => {
-    return {
-      type: 'FeatureCollection',
-      features: tracks.map(track => ({
-        type: 'Feature',
-        geometry: {
-          type: 'Point',
-          coordinates: track.Location.coordinates
-        },
-        properties: {
-          trackId: track.ID,
-          vehicleId: track.Vehicle_UID,
-          status: track.Status,
-          vehicleType: track.Vehicles.Vehicle
-        }
-      }))
-    };
+    return null;
   };
+
+  const processTracks = async (allTracks) => {
+    try {
+      const response = await axios.post(`${URL}/api/tracks/processTracks`, { allTracks });
+      setCarTracksGeoJSON(response.data.carTracksGeoJSON);
+      setBicycleTracksGeoJSON(response.data.bicycleTracksGeoJSON);
+
+    } catch (error) {
+      console.error('Error al procesar los tracks:', error);
+    }
+  };
+
 
   const notificationsToGeoJSON = (notifications) => {
     return {
@@ -296,45 +290,50 @@ const MapBounds = () => {
 
 
   const renderTracksOnMap = (vehicleType, view) => {
-    const groupedTracks = groupTracksByVehicle(tracksWithinBounds);
-    return Object.values(groupedTracks).map((vehicleTracks, index) => {
-      if (vehicleTracks[0].Vehicles.Vehicle !== vehicleType) {
-        return null;
-      }
-  
-      // Ordena los tracks por fecha y toma el último
-      let tracksToRender;
-      if (view === 'last') {
-        tracksToRender = [vehicleTracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0]];
-      } else {
-        tracksToRender = [vehicleTracks[vehicleTracks.length - 1]]; // Solo toma el último track
-      }
-      const geoJsonData = tracksToGeoJSON(tracksToRender);
-  
-      return (
-        <React.Fragment key={index}>
-          {tracksToRender.map((track, trackIndex) => (
+    let tracksGeoJSON;
+    if (vehicleType === 'car') {
+      tracksGeoJSON = carTracksGeoJSON;
+    } else if (vehicleType === 'bicycle') {
+      tracksGeoJSON = bicycleTracksGeoJSON;
+    }
+
+    if (!tracksGeoJSON) {
+      return null;
+    }
+
+    return (
+      <React.Fragment>
+        {tracksGeoJSON.features.map((feature, index) => {
+          const track = feature.properties;
+          const coordinates = feature.geometry.coordinates;
+
+          // Solo renderiza el último track si la vista es 'last'
+          if (view === 'last' && index < tracksGeoJSON.features.length - 1) {
+            return null;
+          }
+
+          return (
             <Marker
-              key={trackIndex}
-              position={track.Location.coordinates}
-              icon={track.Vehicles.Vehicle === 'car' ? carIcon : bicycleIcon}
+              key={index}
+              position={coordinates}
+              icon={track.vehicleType === 'car' ? carIcon : bicycleIcon}
               zIndexOffset={500}
             >
               <Popup>
-                <p>{`Track ID: ${track.ID}`}</p>
-                <p>{`Location: ${track.Location.coordinates.join(', ')}`}</p>
-                <p>{`Vehicle ID: ${track.Vehicle_UID}`}</p>
-                <p>{`Status: ${track.Status}`}</p>
+                <p>{`Track ID: ${track.trackId}`}</p>
+                <p>{`Location: ${coordinates.join(', ')}`}</p>
+                <p>{`Vehicle ID: ${track.vehicleId}`}</p>
+                <p>{`Status: ${track.status}`}</p>
               </Popup>
             </Marker>
-          ))}
-          <GeoJSON data={geoJsonData} />
-          <RoutingMachine trackCoordinates={vehicleTracks.map(track => track.Location.coordinates)} /> {/* No necesitas invertir las coordenadas */}
-        </React.Fragment>
-      );
-    });
+          );
+        })}
+        <GeoJSON data={tracksGeoJSON} />
+      </React.Fragment>
+    );
   };
-  
+
+
   useEffect(() => {
     const carTracksComplete = renderTracksOnMap('car', 'complete');
     const carTracksLast = renderTracksOnMap('car', 'last');
@@ -347,7 +346,7 @@ const MapBounds = () => {
     console.log('Capa de Bicicletas (Todas las rutas):', bicycleTracksComplete);
     console.log('Capa de Bicicletas (Último track):', bicycleTracksLast);
     console.log('Capa de Notificaciones:', notifications);
-}, [tracksWithinBounds, notificationLocations]);
+  }, [tracksWithinBounds, notificationLocations]);
 
 
 
@@ -440,7 +439,7 @@ const MapBounds = () => {
 
 
           </LayersControl>
-          
+
         </MapContainer>
       </div>
     </div>
