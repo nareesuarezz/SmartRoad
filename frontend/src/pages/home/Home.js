@@ -124,6 +124,7 @@ function Home() {
         Location: location,
         Status: 'Moving',
         Speed: 0,
+        Type: 'Real',
         Extra: null,
         Vehicle_UID: vehicleId,
       });

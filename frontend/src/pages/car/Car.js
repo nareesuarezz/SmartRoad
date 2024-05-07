@@ -55,7 +55,8 @@ function Car() {
       const data = {
         Location: location,
         Status: 'Stopped',
-        Speed: '0',
+        Speed: speed,
+        Type: 'Real',
         Extra: 'coche',
         Vehicle_UID: lastVehicleId,
       };
@@ -64,6 +65,7 @@ function Car() {
       await axios.post(`${URL}/api/tracks`, data);
 
       console.log(data.Location.coordinates)
+      console.log(data.Type)
       const recentTracks = await axios.get(`${URL}/api/tracks/recent-within-radius`, {
         params: {
           lat: [data.Location.coordinates[0]],

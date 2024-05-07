@@ -141,6 +141,7 @@ exports.create = async (req, res) => {
             Location: req.body.Location,
             Status: req.body.Status,
             Speed: req.body.Speed,
+            Type: req.body.Type,
             Extra: req.body.Extra,
             Vehicle_UID: req.body.Vehicle_UID,
             Date: req.body.Date,
@@ -218,6 +219,7 @@ exports.update = async (req, res) => {
             Location: req.body.Location,
             Status: req.body.Status,
             Speed: req.body.Speed,
+            Type: req.body.Type,
             Extra: req.body.Extra,
             Vehicle_UID: req.body.Vehicle_UID,
         };

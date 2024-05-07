@@ -322,6 +322,7 @@ const TrackList = () => {
               <Popup>
                 <p>{`Track ID: ${track.trackId}`}</p>
                 <p>{`Location: ${coordinates.join(', ')}`}</p>
+                <p>{`Type: ${track.Type}`}</p>
                 <p>{`Vehicle ID: ${track.vehicleId}`}</p>
                 <p>{`Status: ${track.status}`}</p>
               </Popup>
