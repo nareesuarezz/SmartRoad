@@ -26,6 +26,7 @@ class Vehicle {
       Location: { type: 'Point', coordinates: [coord[1], coord[0]] },
       Status: 'Moving',
       Speed: 10,
+      Type: 'Simulation',
       Extra: {},
       Vehicle_UID: this.id
     };
