@@ -255,49 +255,46 @@ exports.update = async (req, res) => {
 };
 
 exports.findTracksWithinBounds = async (req, res) => {
-    // Asume que recibes las coordenadas de los límites como query params
+    // Asume que recibes las coordenadas de los límites y el ID del usuario como query params
     const swLat = parseFloat(req.query.swLat);
     const swLng = parseFloat(req.query.swLng);
     const neLat = parseFloat(req.query.neLat);
     const neLng = parseFloat(req.query.neLng);
-
+    const userId = req.query.userId; // Añade el ID del usuario aquí
+  
     // Crea un polígono con las coordenadas de los límites
     const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
-
-
+  
     try {
-        let tracksWithinBounds = await db.Track.findAll({
-            where: Sequelize.where(
-                Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
-                true
-            ),
-            include: [{
-                model: db.Vehicle, // Usa el modelo Vehicles
-                as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
-                attributes: ['Vehicle'] // Incluye el campo 'Vehicle' que contiene el tipo de vehículo
-            }],
-            logging: console.log
-        });
-        // Si el usuario solo quiere ver el último track, filtra los tracks
-        if (req.query.view === 'last') {
-            const groupedTracks = _.groupBy(tracksWithinBounds, 'Vehicle_UID'); // Utiliza _.groupBy de lodash
-            tracksWithinBounds = Object.values(groupedTracks).map(tracks => {
-                return tracks.sort((a, b) => new Date(b.Date) - new Date(a.Date))[0];
-            });
-        }
-
-        console.log(tracksWithinBounds); // Añade esta línea
-
-        res.status(200).send({
-            tracksWithinBounds: tracksWithinBounds
-        });
+      let tracksWithinBounds = await db.Track.findAll({
+        where: Sequelize.where(
+          Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+          true
+        ),
+        include: [{
+          model: db.Vehicle, // Usa el modelo Vehicles
+          as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
+          where: { 
+            Vehicle: 'bicycle',
+            Admin_UID: userId // Filtra los tracks por el ID del usuario
+          },
+          required: true
+        }],
+        logging: console.log
+      });
+  
+      console.log("LKFHBJDFHNKSJDHn", tracksWithinBounds)
+      res.status(200).send({
+          tracksWithinBounds: tracksWithinBounds
+      })
     } catch (error) {
-        console.error('Error al buscar tracks dentro de los límites:', error);
-        res.status(500).send({
-            message: "Error al recuperar tracks dentro de los límites especificados."
-        });
+      console.error('Error al buscar tracks recientes dentro del radio:', error);
+      res.status(500).send({
+          message: "Error al recuperar tracks recientes dentro del radio especificado."
+      });
     }
-};
+  };
+  
 
 exports.findTracksInTimeInterval = async (req, res) => {
     // Assume you receive the start and end times as query params in ISO 8601 format
