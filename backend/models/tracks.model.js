@@ -26,6 +26,9 @@ module.exports = (sequelize, Sequelize) => {
     Type: {
       type: Sequelize.ENUM('Simulation', 'Real')
     },
+    Method: {
+      type: Sequelize.ENUM('GPS', 'Geoapify')
+    },
     Extra: {
       type: Sequelize.JSON
     },

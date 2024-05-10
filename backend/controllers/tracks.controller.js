@@ -135,6 +135,68 @@ const createLogEntry = async (action, trackId, adminId) => {
     }
 };
 
+async function correctTrack(track) {
+    if (!track || !Array.isArray(track.Location.coordinates) || track.Location.coordinates.length < 2) {
+        console.error('Invalid track data:', track);
+        return track;
+    }
+
+    const lat = track.Location.coordinates[0];
+    const lon = track.Location.coordinates[1];
+
+    try {
+        const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=90862c7baea8498aae344555b76ab034`);
+
+        if (response.data.features[0].properties.category !== 'road') {
+            const roadAddress = response.data.features[0].properties.street;
+            const roadResponse = await axios.get(`https://api.geoapify.com/v1/geocode/search?apiKey=90862c7baea8498aae344555b76ab034&text=${roadAddress}`);
+
+            let closestRoad;
+            let minDistance = Infinity;
+
+            for (let i = 0; i < roadResponse.data.features.length; i++) {
+                const road = roadResponse.data.features[i];
+                const roadLat = road.geometry.coordinates[1];
+                const roadLon = road.geometry.coordinates[0];
+                const distance = getDistance(lat, lon, roadLat, roadLon);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestRoad = road;
+                }
+            }
+
+            if (closestRoad) {
+                console.log('Original track location:', lat, lon);
+                track.Location.coordinates[0] = closestRoad.geometry.coordinates[1];
+                track.Location.coordinates[1] = closestRoad.geometry.coordinates[0];
+                console.log('New track location:', track.Location.coordinates[0], track.Location.coordinates[1]);
+            }
+        }
+
+        return track;
+    } catch (error) {
+        console.error('Error in reverse geocoding API:', error);
+    }
+}
+
+function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radio de la tierra en km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distancia en km
+    return distance;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+}
+
 exports.create = async (req, res) => {
     try {
         const track = {
@@ -162,17 +224,24 @@ exports.create = async (req, res) => {
             track.Speed = speed;
         }
 
-        const createdTrack = await Tracks.create(track);
+        const originalTrack = await Tracks.create({ ...trackData, Method: 'GPS' });
+
 
         // Emitir el evento 'trackCreated' con el track creado como dato
         const io = socket.getIo();
-        io.emit('trackCreated', createdTrack);
+        io.emit('trackCreated', originalTrack);
 
-        res.status(201).send({ message: "Track created successfully." });
+        // Corrige el track
+        const correctedTrackData = await correctTrack(trackData);
+
+        // Crea el track corregido con el método 'Geoapify'
+        const correctedTrack = await Tracks.create({ ...correctedTrackData, Method: 'Geoapify' });
+
+        res.status(201).send({ message: "Tracks created successfully.", originalTrack, correctedTrack });
     } catch (error) {
         console.error(error);
         res.status(500).send({
-            message: error.message || "Some error occurred while creating the track.",
+            message: error.message || "Some error occurred while creating the tracks.",
         });
     }
 };
@@ -260,48 +329,48 @@ exports.findTracksWithinBounds = async (req, res) => {
     const neLat = parseFloat(req.query.neLat);
     const neLng = parseFloat(req.query.neLng);
     const userId = req.query.userId;
-  
+
     const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
-  
+
     try {
-        let whereClause = { 
+        let whereClause = {
             [Sequelize.Op.or]: [
-              { Vehicle: 'bicycle' },
-              { Vehicle: 'car' }
+                { Vehicle: 'bicycle' },
+                { Vehicle: 'car' }
             ]
-          };
-          
-          if (userId) {
+        };
+
+        if (userId) {
             whereClause.Admin_UID = userId;
-          }
-          
-          let tracksWithinBounds = await db.Track.findAll({
+        }
+
+        let tracksWithinBounds = await db.Track.findAll({
             where: Sequelize.where(
-              Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
-              true
+                Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+                true
             ),
             include: [{
-              model: db.Vehicle,
-              as: 'Vehicles',
-              where: whereClause,
-              required: true
+                model: db.Vehicle,
+                as: 'Vehicles',
+                where: whereClause,
+                required: true
             }],
             logging: console.log
-          });          
-  
-      console.log("LKFHBJDFHNKSJDHn", tracksWithinBounds)
-      res.status(200).send({
-          tracksWithinBounds: tracksWithinBounds
-      })
+        });
+
+        console.log("LKFHBJDFHNKSJDHn", tracksWithinBounds)
+        res.status(200).send({
+            tracksWithinBounds: tracksWithinBounds
+        })
     } catch (error) {
-      console.error('Error al buscar tracks recientes dentro del radio:', error);
-      res.status(500).send({
-          message: "Error al recuperar tracks recientes dentro del radio especificado."
-      });
+        console.error('Error al buscar tracks recientes dentro del radio:', error);
+        res.status(500).send({
+            message: "Error al recuperar tracks recientes dentro del radio especificado."
+        });
     }
-  };
-  
-  
+};
+
+
 
 exports.findTracksInTimeInterval = async (req, res) => {
     // Assume you receive the start and end times as query params in ISO 8601 format
