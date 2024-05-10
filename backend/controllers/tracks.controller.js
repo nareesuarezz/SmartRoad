@@ -255,33 +255,39 @@ exports.update = async (req, res) => {
 };
 
 exports.findTracksWithinBounds = async (req, res) => {
-    // Asume que recibes las coordenadas de los límites y el ID del usuario como query params
     const swLat = parseFloat(req.query.swLat);
     const swLng = parseFloat(req.query.swLng);
     const neLat = parseFloat(req.query.neLat);
     const neLng = parseFloat(req.query.neLng);
-    const userId = req.query.userId; // Añade el ID del usuario aquí
+    const userId = req.query.userId;
   
-    // Crea un polígono con las coordenadas de los límites
     const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
   
     try {
-      let tracksWithinBounds = await db.Track.findAll({
-        where: Sequelize.where(
-          Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
-          true
-        ),
-        include: [{
-          model: db.Vehicle, // Usa el modelo Vehicles
-          as: 'Vehicles', // Cambia esto para que coincida con el nombre del modelo
-          where: { 
-            Vehicle: 'bicycle',
-            Admin_UID: userId // Filtra los tracks por el ID del usuario
-          },
-          required: true
-        }],
-        logging: console.log
-      });
+        let whereClause = { 
+            [Sequelize.Op.or]: [
+              { Vehicle: 'bicycle' },
+              { Vehicle: 'car' }
+            ]
+          };
+          
+          if (userId) {
+            whereClause.Admin_UID = userId;
+          }
+          
+          let tracksWithinBounds = await db.Track.findAll({
+            where: Sequelize.where(
+              Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+              true
+            ),
+            include: [{
+              model: db.Vehicle,
+              as: 'Vehicles',
+              where: whereClause,
+              required: true
+            }],
+            logging: console.log
+          });          
   
       console.log("LKFHBJDFHNKSJDHn", tracksWithinBounds)
       res.status(200).send({
@@ -294,6 +300,7 @@ exports.findTracksWithinBounds = async (req, res) => {
       });
     }
   };
+  
   
 
 exports.findTracksInTimeInterval = async (req, res) => {
