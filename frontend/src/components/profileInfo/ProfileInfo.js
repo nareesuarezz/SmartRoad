@@ -14,7 +14,7 @@ const ProfileInfo = ({getUserId}) => {
 
   return (
     <Link to={`/user-info/${adminInfo.UID}`}>                                
-    <div className="profile-picture">
+    <div>
       <img
         src={`${URL}/images/${adminInfo.filename}`}
         alt="Admin Avatar"

@@ -6,7 +6,6 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import 'lrm-graphhopper';
-import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
@@ -138,10 +137,6 @@ const TrackList = () => {
     }, {});
 
     return groupedTracks;
-  };
-
-  const goBack = () => {
-    window.location.href = '/login-user';
   };
 
   useEffect(() => {
@@ -355,7 +350,6 @@ const MapBounds = () => {
   return (
     <div>
       <Header />
-      <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
       <div>
         <LanguageSwitcher />
       </div>

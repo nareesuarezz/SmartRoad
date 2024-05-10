@@ -1,15 +1,25 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './header.css';
-import AuthService from '../../services/authService'; 
+import AuthService from '../../services/authService';
 import ProfilePicture from '../profilePicture/profilePicture';
-
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 function Header() {
   const isAuthenticated = AuthService.isAuthenticated();
 
+  const goBack = () => {
+    window.location.href = '/login-user';
+  };
+
   return (
     <div className="header-container">
+      <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
+      {isAuthenticated && (
+        <div className="profile-picture">
+          <ProfilePicture />
+        </div>
+      )}
       <nav>
         <ul className="nav-list">
           <li className="nav-item">
@@ -30,14 +40,9 @@ function Header() {
           <li className="nav-item">
             <Link to="/admin-notification" className="nav-link" target='blank'>Global Notification</Link>
           </li>
-          {isAuthenticated && (
-            <li className="nav-item">
-              <ProfilePicture/>
-            </li>
-          )}
         </ul>
       </nav>
-   
+
     </div>
   );
 }
