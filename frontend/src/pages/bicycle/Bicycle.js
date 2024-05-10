@@ -29,14 +29,15 @@ function Bicycle() {
             const data = {
               Location: location,
               Status: 'Stopped',
-              Speed: '0',
+              Speed: speed,
+              Type: 'Real',
               Extra: 'bicycle',
               Vehicle_UID: lastVehicleId,
             };
-        
             // Llamar a axios.post con los datos actualizados
             await axios.post(`${URL}/api/tracks`, data);
-            
+            console.log(data.Type)
+
             // Obtener el último track para este vehículo
             const response = await axios.get(`${URL}/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
             const lastTrack = response.data[0];
@@ -46,6 +47,7 @@ function Bicycle() {
 
 
             console.log(data.Location.coordinates)
+
 
         } catch (err) {
             console.error(err.response);

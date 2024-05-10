@@ -23,6 +23,9 @@ module.exports = (sequelize, Sequelize) => {
     Speed: {
       type: Sequelize.DECIMAL
     },
+    Type: {
+      type: Sequelize.ENUM('Simulation', 'Real')
+    },
     Extra: {
       type: Sequelize.JSON
     },
