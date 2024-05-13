@@ -30,20 +30,28 @@ exports.processTracks = (req, res) => {
     const allTracks = req.body.allTracks;
 
     // Agrupa los tracks por tipo de vehículo
-    const groupedTracks = groupTracksByVehicle(allTracks);
+    const groupedTracks = groupTracksByVehicleAndMethod(allTracks);
 
-    // Transforma los tracks agrupados a GeoJSON
-    const carTracksGeoJSON = tracksToGeoJSON(groupedTracks.car || []);
-    const bicycleTracksGeoJSON = tracksToGeoJSON(groupedTracks.bicycle || []);
+    console.log('car', groupedTracks.car.Geoapify)
+    console.log('bike', groupedTracks.bicycle.Geoapify)
+    console.log('carGPS', groupedTracks.car.GPS)
+    console.log('bikeGPS', groupedTracks.bicycle.GPS)
+
+
+    const carTracksGPSGeoJSON = tracksToGeoJSON(groupedTracks.car.GPS || []);
+    const carTracksGeoapifyGeoJSON = tracksToGeoJSON(groupedTracks.car.Geoapify || []);
+    const bicycleTracksGPSGeoJSON = tracksToGeoJSON(groupedTracks.bicycle.GPS || []);
+    const bicycleTracksGeoapifyGeoJSON = tracksToGeoJSON(groupedTracks.bicycle.Geoapify || []);
 
     // Devuelve las capas GeoJSON en la respuesta
-    res.json({ carTracksGeoJSON, bicycleTracksGeoJSON });
+    res.json({ carTracksGPSGeoJSON, carTracksGeoapifyGeoJSON, bicycleTracksGPSGeoJSON, bicycleTracksGeoapifyGeoJSON });
 };
 
 // Función para agrupar los tracks por tipo de vehículo
-function groupTracksByVehicle(tracks) {
+function groupTracksByVehicleAndMethod(tracks) {
     return tracks.reduce((grouped, track) => {
-        (grouped[track.Vehicles.Vehicle] = grouped[track.Vehicles.Vehicle] || []).push(track);
+        const vehicleGroup = (grouped[track.Vehicles.Vehicle] = grouped[track.Vehicles.Vehicle] || {});
+        (vehicleGroup[track.Method] = vehicleGroup[track.Method] || []).push(track);
         return grouped;
     }, {});
 }
