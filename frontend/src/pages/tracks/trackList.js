@@ -325,10 +325,11 @@ const TrackList = () => {
     // Filtrar los tracks basándose en la vista
     let tracksToRender;
     if (view === 'last') {
-      tracksToRender = [tracksGeoJSON.features[tracksGeoJSON.features.length - 1]];
+      tracksToRender = tracksGeoJSON.features && tracksGeoJSON.features.length > 0 ? [tracksGeoJSON.features[tracksGeoJSON.features.length - 1]] : [];
     } else {
-      tracksToRender = tracksGeoJSON.features;
+      tracksToRender = tracksGeoJSON.features || [];
     }
+
 
     return (
       <React.Fragment>
