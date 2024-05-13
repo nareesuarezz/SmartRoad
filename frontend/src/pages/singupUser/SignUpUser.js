@@ -18,7 +18,6 @@ function SignUpUser() {
             const pfp = `${URL}/images/user.png`
             const response = await AuthService.signUp(username, password, 'User', pfp);
 
-
             console.log('Respuesta del backend:', response);
 
             if (response.error) {
@@ -33,6 +32,13 @@ function SignUpUser() {
         }
     }
 
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevenir la acción por defecto del formulario
+            createUser();
+        }
+    }
+
     return (
         <>
             <div>
@@ -43,7 +49,7 @@ function SignUpUser() {
                     <div className="left">
                         <h2 className="heading">{t('Sign Up')}</h2>
                     </div>
-                    <form className="form">
+                    <form className="form" onKeyPress={handleKeyPress}>
                         <div className="formGroup">
                             <label htmlFor="username">{t('Username')}:</label>
                             <input
