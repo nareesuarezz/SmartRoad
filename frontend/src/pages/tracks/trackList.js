@@ -60,8 +60,11 @@ const TrackList = () => {
   const tracksRef = useRef([]);
   const mapPositionRef = useRef(mapCenter);
   const mapZoomRef = useRef(zoomLevel);
-  const [carTracksGeoJSON, setCarTracksGeoJSON] = useState(null);
-  const [bicycleTracksGeoJSON, setBicycleTracksGeoJSON] = useState(null);
+  const [carTracksGPSGeoJSON, setCarTracksGPSGeoJSON] = useState(null);
+  const [carTracksGeoapifyGeoJSON, setCarTracksGeoapifyGeoJSON] = useState(null);
+  const [bicycleTracksGPSGeoJSON, setBicycleTracksGPSGeoJSON] = useState(null);
+  const [bicycleTracksGeoapifyGeoJSON, setBicycleTracksGeoapifyGeoJSON] = useState(null);
+  const [method, setMethod] = useState('GPS');
 
 
   const timeOptions = [
@@ -75,19 +78,6 @@ const TrackList = () => {
     { label: 'Todos los tracks', value: { startTime: null, endTime: new Date().toISOString() } },
   ];
 
-
-
-
-  useEffect(() => {
-    fetchTracksWithinBounds(bounds.swLat, bounds.swLng, bounds.neLat, bounds.neLng)
-      .catch(error => {
-        console.error('Error: ', error);
-      });
-  }, []);
-
-
-
-
   const layerToTrackView = {
     "Todas las rutas": "complete",
     "Último track": "last"
@@ -100,11 +90,15 @@ const TrackList = () => {
 
   const CustomControl = (props) => {
     const map = useMap();
+
     useEffect(() => {
-      map.on('baselayerchange', (event) => {
-        handleLayerChange(event.name);
+      map.whenReady(() => {
+        map.on('baselayerchange', (event) => {
+          handleLayerChange(event.name);
+        });
       });
     }, [map]);
+
     return null;
   };
 
@@ -121,9 +115,11 @@ const TrackList = () => {
           view: trackView
         },
       });
-      const newTracks = response.data.tracksWithinBounds;
+      let newTracks = response.data.tracksWithinBounds;
 
-      console.log('newTracks: ', newTracks)
+
+
+
       if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
         tracksRef.current = newTracks;
         setTracksWithinBounds(newTracks);
@@ -137,13 +133,17 @@ const TrackList = () => {
   };
 
 
-  useEffect(() => {
-  }, [tracksWithinBounds]);
-
 
   useEffect(() => {
     console.log(trackView);
   }, [trackView]);
+
+  useEffect(() => {
+    console.log(method);
+  }, [method]);
+
+  useEffect(() => {
+  }, [tracksWithinBounds]);
 
   useEffect(() => {
     const socket = io(SOCKET_SERVER_URL);
@@ -157,6 +157,8 @@ const TrackList = () => {
       socket.disconnect();
     };
   }, [bounds]); // Añade 'bounds' a las dependencias del useEffect
+
+
 
   const fetchTracksInTimeInterval = () => {
     const params = {};
@@ -177,98 +179,113 @@ const TrackList = () => {
 
 
 
-  const RoutingMachine = ({ trackCoordinates }) => {
-    const map = useMap();
-    const isMounted = useRef(false);
-    const routingControlRef = useRef(null); // Añade esta línea
-
-    useEffect(() => {
-      isMounted.current = true;
-      return () => {
-        isMounted.current = false;
-        if (routingControlRef.current) { // Añade este bloque
-          map.removeControl(routingControlRef.current);
-          routingControlRef.current = null;
-        }
-      };
-    }, []);
-
-    useEffect(() => {
-      if (map && trackCoordinates.length > 1 && isMounted.current) {
-        const whenMapIsReady = new Promise(resolve => map.whenReady(resolve));
-        whenMapIsReady.then(() => {
-          if (map) {
-            let routingControl = L.Routing.control({
-              waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-              routeWhileDragging: true,
-              addWaypoints: false,
-              draggableWaypoints: false,
-              fitSelectedRoutes: true,
-              showAlternatives: false,
-              router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
-                urlParameters: {
-                  vehicle: 'foot',
-                },
-              }),
-              lineOptions: {
-                styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
-              },
-              show: false, // Esta opción oculta las direcciones para llegar
-              routeLine: function (route, options) { // Esta función oculta la línea de la ruta
-                return L.polyline(route.coordinates, options);
-              },
-              createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
-            }).addTo(map);
-
-            // Oculta el panel de instrucciones de ruta después de que se haya creado
-            routingControl.on('routeselected', function (e) {
-              if (!isMounted.current) return;
-              let routesContainer = document.querySelector('.leaflet-routing-container-hide');
-              if (routesContainer) {
-                routesContainer.style.display = 'none';
-              }
-            });
-          }
-        });
-      }
-    }, [map, trackCoordinates]);
-
-    return null;
-  };
 
 
   const MapBounds = () => {
     const map = useMap();
 
     useEffect(() => {
-      map.on('moveend', () => {
-        const center = map.getCenter();
-        const zoom = map.getZoom();
+      // Asegúrate de que el mapa esté completamente cargado antes de interactuar con él
+      map.whenReady(() => {
+        map.on('moveend', () => {
+          const center = map.getCenter();
+          const zoom = map.getZoom();
 
-        mapZoomRef.current = zoom;
-        mapPositionRef.current = [center.lat, center.lng];
-        const mapBounds = map.getBounds();
-        const sw = mapBounds.getSouthWest();
-        const ne = mapBounds.getNorthEast();
+          mapZoomRef.current = zoom;
+          mapPositionRef.current = [center.lat, center.lng];
+          const mapBounds = map.getBounds();
+          const sw = mapBounds.getSouthWest();
+          const ne = mapBounds.getNorthEast();
 
-        // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
-        fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+          // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
+          fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+        });
       });
     }, [map]);
 
     return null;
   };
 
+  const correctTrack = async (track) => {
+    if (!track || !Array.isArray(track.Location.coordinates) || track.Location.coordinates.length < 2) {
+      console.error('Invalid track data:', track);
+      return track;
+    }
+
+    const lat = track.Location.coordinates[0];
+    const lon = track.Location.coordinates[1];
+
+    try {
+      const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=90862c7baea8498aae344555b76ab034`);
+
+      if (response.data.features[0].properties.category !== 'road') {
+        const roadAddress = response.data.features[0].properties.street;
+        const roadResponse = await axios.get(`https://api.geoapify.com/v1/geocode/search?apiKey=90862c7baea8498aae344555b76ab034&text=${roadAddress}`);
+
+        let closestRoad;
+        let minDistance = Infinity;
+
+        for (let i = 0; i < roadResponse.data.features.length; i++) {
+          const road = roadResponse.data.features[i];
+          const roadLat = road.geometry.coordinates[1];
+          const roadLon = road.geometry.coordinates[0];
+          const distance = getDistance(lat, lon, roadLat, roadLon);
+
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestRoad = road;
+          }
+        }
+
+        if (closestRoad) {
+          console.log('Original track location:', lat, lon);
+          track.Location.coordinates[0] = closestRoad.geometry.coordinates[1];
+          track.Location.coordinates[1] = closestRoad.geometry.coordinates[0];
+          console.log('New track location:', track.Location.coordinates[0], track.Location.coordinates[1]);
+        }
+      }
+
+      return track;
+    } catch (error) {
+      console.error('Error in reverse geocoding API:', error);
+    }
+  };
+
+  function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radio de la tierra en km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distancia en km
+    return distance;
+  }
+
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+  }
+
+
+
+
+
+
+
   const processTracks = async (allTracks) => {
     try {
       const response = await axios.post(`${URL}/api/tracks/processTracks`, { allTracks });
-      setCarTracksGeoJSON(response.data.carTracksGeoJSON);
-      setBicycleTracksGeoJSON(response.data.bicycleTracksGeoJSON);
-
+      setCarTracksGPSGeoJSON(response.data.carTracksGPSGeoJSON);
+      setCarTracksGeoapifyGeoJSON(response.data.carTracksGeoapifyGeoJSON);
+      setBicycleTracksGPSGeoJSON(response.data.bicycleTracksGPSGeoJSON);
+      setBicycleTracksGeoapifyGeoJSON(response.data.bicycleTracksGeoapifyGeoJSON);
     } catch (error) {
       console.error('Error al procesar los tracks:', error);
     }
   };
+
 
 
   const notificationsToGeoJSON = (notifications) => {
@@ -288,25 +305,36 @@ const TrackList = () => {
   const renderTracksOnMap = (vehicleType, view) => {
     let tracksGeoJSON;
     if (vehicleType === 'car') {
-      tracksGeoJSON = carTracksGeoJSON;
+      if (method === 'GPS') {
+        tracksGeoJSON = carTracksGPSGeoJSON;
+      } else if (method === 'Geoapify') {
+        tracksGeoJSON = carTracksGeoapifyGeoJSON;
+      }
     } else if (vehicleType === 'bicycle') {
-      tracksGeoJSON = bicycleTracksGeoJSON;
+      if (method === 'GPS') {
+        tracksGeoJSON = bicycleTracksGPSGeoJSON;
+      } else if (method === 'Geoapify') {
+        tracksGeoJSON = bicycleTracksGeoapifyGeoJSON;
+      }
     }
 
     if (!tracksGeoJSON) {
       return null;
     }
 
+    // Filtrar los tracks basándose en la vista
+    let tracksToRender;
+    if (view === 'last') {
+      tracksToRender = [tracksGeoJSON.features[tracksGeoJSON.features.length - 1]];
+    } else {
+      tracksToRender = tracksGeoJSON.features;
+    }
+
     return (
       <React.Fragment>
-        {tracksGeoJSON.features.map((feature, index) => {
+        {tracksToRender.map((feature, index) => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
-
-          // Solo renderiza el último track si la vista es 'last'
-          if (view === 'last' && index < tracksGeoJSON.features.length - 1) {
-            return null;
-          }
 
           return (
             <Marker
@@ -338,11 +366,12 @@ const TrackList = () => {
     const bicycleTracksLast = renderTracksOnMap('bicycle', 'last');
     const notifications = notificationsToGeoJSON(notificationLocations);
 
-    console.log('Capa de Coches (Todas las rutas):', carTracksComplete);
-    console.log('Capa de Coches (Último track):', carTracksLast);
-    console.log('Capa de Bicicletas (Todas las rutas):', bicycleTracksComplete);
-    console.log('Capa de Bicicletas (Último track):', bicycleTracksLast);
-    console.log('Capa de Notificaciones:', notifications);
+
+    // console.log('Capa de Coches (Todas las rutas):', carTracksComplete);
+    // console.log('Capa de Coches (Último track):', carTracksLast);
+    // console.log('Capa de Bicicletas (Todas las rutas):', bicycleTracksComplete);
+    // console.log('Capa de Bicicletas (Último track):', bicycleTracksLast);
+    // console.log('Capa de Notificaciones:', notifications);
   }, [tracksWithinBounds, notificationLocations]);
 
 
@@ -379,6 +408,18 @@ const TrackList = () => {
           ))}
         </Select>
       </div>
+      <div>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Selecciona un método"
+          optionFilterProp="children"
+          onChange={value => {
+            setMethod(value);
+          }}>
+          <Option value='GPS' />
+          <Option value='Geoapify' />
+        </Select>
+      </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
         <MapContainer key={`${trackView}-${Date.now()}`} center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '500px', width: '700px' }}>
           <MapBounds />
@@ -391,17 +432,18 @@ const TrackList = () => {
           <LayersControl position="topleft">
             <LayersControl.BaseLayer name="Todas las rutas">
               <LayerGroup>
-                {renderTracksOnMap('car', 'complete')}
-                {renderTracksOnMap('bicycle', 'complete')}
+                {renderTracksOnMap('car', method, 'complete')}
+                {renderTracksOnMap('bicycle', method, 'complete')}
               </LayerGroup>
             </LayersControl.BaseLayer>
 
             <LayersControl.BaseLayer name="Último track">
               <LayerGroup>
-                {renderTracksOnMap('car', 'last')}
-                {renderTracksOnMap('bicycle', 'last')}
+                {renderTracksOnMap('car', method, 'last')}
+                {renderTracksOnMap('bicycle', method, 'last')}
               </LayerGroup>
             </LayersControl.BaseLayer>
+
             <LayersControl.Overlay checked name="Bicicletas">
               <LayerGroup>
                 {renderTracksOnMap('bicycle', trackView)}
@@ -440,9 +482,9 @@ const TrackList = () => {
 
         </MapContainer>
       </div>
-    </div>
+    </div >
   );
 
 };
 
-export default TrackList;
+export default TrackList;   
