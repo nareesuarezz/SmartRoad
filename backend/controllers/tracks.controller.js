@@ -64,6 +64,8 @@ function tracksToGeoJSON(tracks) {
                 trackId: track.ID,
                 vehicleId: track.Vehicle_UID,
                 status: track.Status,
+                speed: track.Speed,
+                type: track.Type,
                 vehicleType: track.Vehicles.Vehicle
             }
         }))
