@@ -124,11 +124,16 @@ const trackGeo = () => {
         const fetchData = async () => {
             console.log("Recogiendo ID del vehiculo");
             const response = await axios.get('https://localhost/api/vehicles');
-            const vehicles = response.data;
-            const lastId = vehicles[vehicles.length - 1].UID;
-            setLastVehicleId(lastId);
-            console.log("ID del vehiculo: ", lastId);
+            const vehicles = Array.isArray(response.data) ? response.data : [];
+            if (vehicles.length > 0) {
+                const lastId = vehicles[vehicles.length - 1].UID;
+                setLastVehicleId(lastId);
+                console.log("ID del vehiculo: ", lastId);
+            } else {
+                console.log("No se encontraron vehículos");
+            }
         };
+        
 
         fetchData(); // Llamada inicial para recoger el ID del vehículo
 
