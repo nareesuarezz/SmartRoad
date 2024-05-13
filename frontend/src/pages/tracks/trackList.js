@@ -12,6 +12,7 @@ import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher
 import { useSelector } from 'react-redux';
 import io from 'socket.io-client';
 import { Select } from 'antd';
+import "./trackList.css";
 
 const { Option } = Select;
 
@@ -350,13 +351,15 @@ const TrackList = () => {
   return (
     <div>
       <Header />
-      <div className='language-switcher-TRL'>
-        <LanguageSwitcher />
-      </div>
-      <div>
-        <Link to="/track-add" className='add'>
-          {t('Add Track')}
-        </Link>
+      <div className='language-add-bottons-container-track'>
+        <div className='track-add-container'>
+          <Link to="/track-add" className='add'>
+            {t('Add Track')}
+          </Link>
+        </div>
+        <div>
+          <LanguageSwitcher />
+        </div>
       </div>
       <div>
         <Select

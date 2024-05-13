@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import './trackList.css';
+import './soundList.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import { useTranslation } from 'react-i18next';
@@ -74,13 +74,16 @@ const SoundList = () => {
   return (
     <div>
       <Header />
-      <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
-        <LanguageSwitcher />
+      <div className='language-add-bottons-container-sound'>
+        <div className='sound-add-container'>
+          <Link to="/sound-add" className="add">
+            {t('Add New Sound')}
+          </Link>
+        </div>
+        <div>
+          <LanguageSwitcher />
+        </div>
       </div>
-      <Link to="/sound-add" className="add">
-        {t('Add New Sound')}
-      </Link>
       <div className='soundsFilters'>
         <input type='text' placeholder='Sound Name' onChange={handleSoundNameGetter}></input>
         <select onChange={handleDurationFilterChange}>
