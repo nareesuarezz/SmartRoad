@@ -6,6 +6,7 @@ const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
 const socket = require('../socket');
 const _ = require('lodash'); // Importa la biblioteca lodash
+const axios = require('axios');
 
 
 // Variables para ajustes de desarrollo
@@ -224,7 +225,7 @@ exports.create = async (req, res) => {
             track.Speed = speed;
         }
 
-        const originalTrack = await Tracks.create({ ...trackData, Method: 'GPS' });
+        const originalTrack = await Tracks.create({ ...track, Method: 'GPS' });
 
 
         // Emitir el evento 'trackCreated' con el track creado como dato
@@ -232,7 +233,7 @@ exports.create = async (req, res) => {
         io.emit('trackCreated', originalTrack);
 
         // Corrige el track
-        const correctedTrackData = await correctTrack(trackData);
+        const correctedTrackData = await correctTrack(track);
 
         // Crea el track corregido con el método 'Geoapify'
         const correctedTrack = await Tracks.create({ ...correctedTrackData, Method: 'Geoapify' });
