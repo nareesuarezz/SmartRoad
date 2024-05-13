@@ -206,74 +206,6 @@ const TrackList = () => {
     return null;
   };
 
-  const correctTrack = async (track) => {
-    if (!track || !Array.isArray(track.Location.coordinates) || track.Location.coordinates.length < 2) {
-      console.error('Invalid track data:', track);
-      return track;
-    }
-
-    const lat = track.Location.coordinates[0];
-    const lon = track.Location.coordinates[1];
-
-    try {
-      const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=90862c7baea8498aae344555b76ab034`);
-
-      if (response.data.features[0].properties.category !== 'road') {
-        const roadAddress = response.data.features[0].properties.street;
-        const roadResponse = await axios.get(`https://api.geoapify.com/v1/geocode/search?apiKey=90862c7baea8498aae344555b76ab034&text=${roadAddress}`);
-
-        let closestRoad;
-        let minDistance = Infinity;
-
-        for (let i = 0; i < roadResponse.data.features.length; i++) {
-          const road = roadResponse.data.features[i];
-          const roadLat = road.geometry.coordinates[1];
-          const roadLon = road.geometry.coordinates[0];
-          const distance = getDistance(lat, lon, roadLat, roadLon);
-
-          if (distance < minDistance) {
-            minDistance = distance;
-            closestRoad = road;
-          }
-        }
-
-        if (closestRoad) {
-          console.log('Original track location:', lat, lon);
-          track.Location.coordinates[0] = closestRoad.geometry.coordinates[1];
-          track.Location.coordinates[1] = closestRoad.geometry.coordinates[0];
-          console.log('New track location:', track.Location.coordinates[0], track.Location.coordinates[1]);
-        }
-      }
-
-      return track;
-    } catch (error) {
-      console.error('Error in reverse geocoding API:', error);
-    }
-  };
-
-  function getDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radio de la tierra en km
-    const dLat = deg2rad(lat2 - lat1);
-    const dLon = deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
-      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const distance = R * c; // Distancia en km
-    return distance;
-  }
-
-  function deg2rad(deg) {
-    return deg * (Math.PI / 180);
-  }
-
-
-
-
-
-
-
   const processTracks = async (allTracks) => {
     try {
       const response = await axios.post(`${URL}/api/tracks/processTracks`, { allTracks });
@@ -337,6 +269,7 @@ const TrackList = () => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
 
+          console.log(tracksToRender)
           return (
             <Marker
               key={index}
@@ -347,7 +280,8 @@ const TrackList = () => {
               <Popup>
                 <p>{`Track ID: ${track.trackId}`}</p>
                 <p>{`Location: ${coordinates.join(', ')}`}</p>
-                <p>{`Type: ${track.Type}`}</p>
+                <p>{`Type: ${track.type}`}</p>
+                <p>{`Speed: ${track.speed}`}</p>
                 <p>{`Vehicle ID: ${track.vehicleId}`}</p>
                 <p>{`Status: ${track.status}`}</p>
               </Popup>
