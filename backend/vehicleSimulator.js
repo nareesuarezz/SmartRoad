@@ -22,15 +22,17 @@ class Vehicle {
   }
 
   async sendTrack(coord) {
+    const speed = Math.random() * 100;
     const track = {
       Location: { type: 'Point', coordinates: [coord[1], coord[0]] },
       Status: 'Moving',
-      Speed: 10,
+      Speed: speed,
       Type: 'Simulation',
       Extra: {},
       Vehicle_UID: this.id
     };
     const response = await axios.post(`${this.backendUrl}/api/tracks`, track);
+    console.log(track.Speed + " " + track.Type)
     return response.data;
   }
 
@@ -38,10 +40,16 @@ class Vehicle {
     try {
       const registerResponse = await this.register();
       if (registerResponse.status === 200) { // Asegúrate de que el registro fue exitoso
+        let prevCoord = null;
         for (let coord of this.route) {
           console.log(`Vehicle ${this.id} is at ${coord}`);
-          await this.sendTrack(coord);
-          await new Promise(resolve => setTimeout(resolve, 1000)); // Espera un segundo antes de moverse al siguiente punto
+          const trackResponse = await this.sendTrack(coord);
+          if (prevCoord) {
+            const distance = Math.sqrt(Math.pow(prevCoord[0] - coord[0], 2) + Math.pow(prevCoord[1] - coord[1], 2)); // Calcula la distancia euclidiana
+            const waitTime = distance / trackResponse.Speed; // Correlaciona la velocidad con la distancia
+            await new Promise(resolve => setTimeout(resolve, waitTime * 1000)); // Espera un tiempo proporcional a la distancia antes de moverse al siguiente punto
+          }
+          prevCoord = coord;
         }
       } else {
         console.log(registerResponse.status)
@@ -51,7 +59,7 @@ class Vehicle {
       console.error(`Error starting vehicle ${this.id}:`, error);
     }
   }
-  
+
 }
 
 const points = [

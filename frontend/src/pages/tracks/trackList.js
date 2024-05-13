@@ -268,12 +268,6 @@ const TrackList = () => {
     return deg * (Math.PI / 180);
   }
 
-
-
-
-
-
-
   const processTracks = async (allTracks) => {
     try {
       const response = await axios.post(`${URL}/api/tracks/processTracks`, { allTracks });
@@ -337,6 +331,8 @@ const TrackList = () => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
 
+          console.log(track)
+
           return (
             <Marker
               key={index}
@@ -347,9 +343,11 @@ const TrackList = () => {
               <Popup>
                 <p>{`Track ID: ${track.trackId}`}</p>
                 <p>{`Location: ${coordinates.join(', ')}`}</p>
-                <p>{`Type: ${track.Type}`}</p>
-                <p>{`Vehicle ID: ${track.vehicleId}`}</p>
                 <p>{`Status: ${track.status}`}</p>
+                <p>{`Speed: ${track.speed}`}</p>
+                <p>{`Type: ${track.type}`}</p>
+                <p>{`Vehicle ID: ${track.vehicleId}`}</p>
+
               </Popup>
             </Marker>
           );
