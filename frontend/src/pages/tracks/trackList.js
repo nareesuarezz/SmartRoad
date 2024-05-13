@@ -350,7 +350,7 @@ const TrackList = () => {
   return (
     <div>
       <Header />
-      <div>
+      <div className='language-switcher-TRL'>
         <LanguageSwitcher />
       </div>
       <div>

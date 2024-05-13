@@ -93,6 +93,10 @@
   background-color: #7b0e02;
 }
 
+.language-switcher-TRL {
+  border: 1px solid red;
+}
+
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
   .container {
     max-width: 600px;

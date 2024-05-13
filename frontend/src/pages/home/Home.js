@@ -149,13 +149,15 @@ function Home() {
 
   return (
     <>
-      <div className="title">
-        <h1>SmartRoad</h1>
-      </div>
       <div className='arrow' onClick={() => goBack()}>
         <UserDeleteOutlined />
       </div>
-      <div><ProfilePictureUser /></div>
+      <div className='profile-picture'>
+        <ProfilePictureUser />
+      </div>
+      <div className="title">
+        <h1>SmartRoad</h1>
+      </div>
       <div>
         <LanguageSwitcher />
       </div>
