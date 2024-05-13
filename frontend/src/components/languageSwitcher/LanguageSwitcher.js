@@ -5,14 +5,16 @@ import "./LanguageSwitcher.css";
 function LanguageSwitcher() {
     const { i18n } = useTranslation();
 
-    const changeLanguage = (language) => {
-        i18n.changeLanguage(language);
+    const changeLanguage = (event) => {
+        i18n.changeLanguage(event.target.value);
     };
 
     return (
-        <div className="LanguageSwitcher">
-            <button onClick={() => changeLanguage('en')}>EN</button>
-            <button onClick={() => changeLanguage('es')}>ES</button>
+        <div>
+            <select className='language-switcher' onChange={changeLanguage}>
+                <option value='en'>EN</option>
+                <option value='es'>ES</option>
+            </select>
         </div>
     );
 }

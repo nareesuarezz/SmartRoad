@@ -70,7 +70,7 @@
     background-color: #f8ab2f;
   }
   
-  .track-add-container {
+  .sound-add-container {
     margin-left: 12px;
   }
   
@@ -96,7 +96,7 @@
     background-color: #7b0e02;
   }
   
-  .language-add-bottons-container-track {
+  .language-add-bottons-container-sound {
     display: flex;
     align-items: center;
     justify-content: space-between;

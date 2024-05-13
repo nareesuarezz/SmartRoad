@@ -6,13 +6,13 @@ import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
 import 'leaflet-routing-machine';
 import 'lrm-graphhopper';
-import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import { useSelector } from 'react-redux';
 import io from 'socket.io-client';
 import { Select } from 'antd';
+import "./trackList.css";
 
 const { Option } = Select;
 
@@ -133,10 +133,6 @@ const TrackList = () => {
   };
 
 
-
-  const goBack = () => {
-    window.location.href = '/login-user';
-  };
 
   useEffect(() => {
     console.log(trackView);
@@ -384,14 +380,15 @@ const TrackList = () => {
   return (
     <div>
       <Header />
-      <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
-        <LanguageSwitcher />
-      </div>
-      <div>
-        <Link to="/track-add" className='add'>
-          {t('Add Track')}
-        </Link>
+      <div className='language-add-bottons-container-track'>
+        <div className='track-add-container'>
+          <Link to="/track-add" className='add'>
+            {t('Add Track')}
+          </Link>
+        </div>
+        <div>
+          <LanguageSwitcher />
+        </div>
       </div>
       <div>
         <Select

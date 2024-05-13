@@ -3,8 +3,9 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
-import { useTranslation } from 'react-i18next'; 
+import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./adminList.css"
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
@@ -63,13 +64,15 @@ const AdminList = () => {
         <div>
             <Header />
             <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-            <div>
-                <LanguageSwitcher />
-            </div>
-            <div>
-                <Link to="/admin-add" className="add">
-                    {t('Add New Admin')}
-                </Link>
+            <div className='language-add-bottons-container-admin'>
+                <div className='admin-add-container'>
+                    <Link to="/admin-add" className="add">
+                        {t('Add New Admin')}
+                    </Link>
+                </div>
+                <div>
+                    <LanguageSwitcher />
+                </div>
             </div>
             <div className='adminsFilters'>
                 <label> Role

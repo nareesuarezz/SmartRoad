@@ -4,6 +4,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import AuthService from '../../services/authService';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./trackAdd.css";
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
@@ -91,7 +92,7 @@ const TrackAdd = ({ getTracks }) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
+      <div className='language-switcher-trAdd'>
         <LanguageSwitcher />
       </div>
       <form onSubmit={handleSubmit}>

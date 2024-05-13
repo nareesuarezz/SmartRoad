@@ -16,11 +16,11 @@ function LoginUser() {
     const goHome = async () => {
         try {
             const response = await AuthService.signIn(username, password);
-    
+
             console.log('Respuesta del backend:', response.admin.Username);
-    
+
             localStorage.setItem('userInfo', JSON.stringify(response.admin));
-    
+
             if (response.admin.Role === 'User') {
                 window.location.href = "/home";
             } else if (response.admin.Role === 'Admin') {
@@ -34,53 +34,61 @@ function LoginUser() {
             setError('Usuario o contraseña incorrectos');
         }
     }
-    
+
+    const handleKeyPress = (e) => {
+        if (e.key === 'Enter') {
+            e.preventDefault(); // Prevenir la acción por defecto del formulario
+            goHome();
+        }
+    }
 
     return (
         <>
             <div>
-                <LanguageSwitcher />
-            </div>
-            <div className="container-wrapper">
-                <div className="container">
-                    <div className="left">
-                        <h2 className="heading">{t('Login')}</h2>
-                    </div>
-                    <form className="form">
-                        <div className="formGroup">
-                            <label htmlFor="username">{t('Username')}:</label>
-                            <input
-                                type="text"
-                                id="username"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
+                <div className='language-switcher'>
+                    <LanguageSwitcher />
+                </div>
+                <div className="container-wrapper">
+                    <div className="container">
+                        <div className="left">
+                            <h2 className="heading">{t('Login')}</h2>
                         </div>
-                        <div className="formGroup">
-                            <label htmlFor="password">{t('Password')}:</label>
-                            <div className="password-input">
+                        <form className="form" onKeyPress={handleKeyPress}>
+                            <div className="formGroup">
+                                <label htmlFor="username">{t('Username')}:</label>
                                 <input
-                                    type={showPassword ? 'text' : 'password'}
-                                    id="password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    type="text"
+                                    id="username"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
                                 />
-                                <div className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
-                                    {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                            </div>
+                            <div className="formGroup">
+                                <label htmlFor="password">{t('Password')}:</label>
+                                <div className="password-input">
+                                    <input
+                                        type={showPassword ? 'text' : 'password'}
+                                        id="password"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                    />
+                                    <div className="eye-icon" onClick={() => setShowPassword(!showPassword)}>
+                                        {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <div className="formGroup forgot-password">
-                            <a href="/sign-up">{t(`Don't you have an account? Create one!`)}</a>
-                        </div>
-                        <div className="formGroup forgot-password">
-                            <a href="/home">{t(`Continue as a guest`)}</a>
-                        </div>
-                        {error && <div className="error-message">{error}</div>}
-                        <button type="button" onClick={goHome}>
-                            {t('Login')}
-                        </button>
-                    </form>
+                            <div className="formGroup forgot-password">
+                                <a href="/sign-up">{t(`Don't you have an account? Create one!`)}</a>
+                            </div>
+                            <div className="formGroup forgot-password">
+                                <a href="/home">{t(`Continue as a guest`)}</a>
+                            </div>
+                            {error && <div className="error-message">{error}</div>}
+                            <button type="button" onClick={goHome}>
+                                {t('Login')}
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         </>
