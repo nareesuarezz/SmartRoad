@@ -32,16 +32,10 @@ exports.processTracks = (req, res) => {
     // Agrupa los tracks por tipo de vehículo
     const groupedTracks = groupTracksByVehicleAndMethod(allTracks);
 
-    console.log('car', groupedTracks.car.Geoapify)
-    console.log('bike', groupedTracks.bicycle.Geoapify)
-    console.log('carGPS', groupedTracks.car.GPS)
-    console.log('bikeGPS', groupedTracks.bicycle.GPS)
-
-
-    const carTracksGPSGeoJSON = tracksToGeoJSON(groupedTracks.car.GPS || []);
-    const carTracksGeoapifyGeoJSON = tracksToGeoJSON(groupedTracks.car.Geoapify || []);
-    const bicycleTracksGPSGeoJSON = tracksToGeoJSON(groupedTracks.bicycle.GPS || []);
-    const bicycleTracksGeoapifyGeoJSON = tracksToGeoJSON(groupedTracks.bicycle.Geoapify || []);
+    const carTracksGPSGeoJSON = groupedTracks.car ? tracksToGeoJSON(groupedTracks.car.GPS || []) : [];
+    const bicycleTracksGPSGeoJSON = groupedTracks.bicycle ? tracksToGeoJSON(groupedTracks.bicycle.GPS || []) : [];
+    const carTracksGeoapifyGeoJSON = groupedTracks.car ? tracksToGeoJSON(groupedTracks.car.Geoapify || []) : [];
+    const bicycleTracksGeoapifyGeoJSON = groupedTracks.bicycle ? tracksToGeoJSON(groupedTracks.bicycle.Geoapify || []) : [];
 
     // Devuelve las capas GeoJSON en la respuesta
     res.json({ carTracksGPSGeoJSON, carTracksGeoapifyGeoJSON, bicycleTracksGPSGeoJSON, bicycleTracksGeoapifyGeoJSON });
