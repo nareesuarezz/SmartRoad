@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import logoBicycle from '../../img/bike.png';
+import logoCar from '../../img/car.png';
 import './Bicycle.css'
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -15,6 +16,7 @@ function Bicycle() {
 
     const [lastVehicleId, setLastVehicleId] = useState(null);
     const [speed, setSpeed] = useState(null);
+    const [isTooFast, setIsTooFast] = useState(false);
 
     const time = 5000;
 
@@ -25,14 +27,22 @@ function Bicycle() {
         try {
             // Obtener la ubicación actual
             const location = await trackGeo();
-        
+
+            let vehicleType = 'bicycle';
+            if (speed >= 0) {
+                vehicleType = 'car';
+                setIsTooFast(true);
+                // Actualizar el tipo de vehículo en la base de datos
+                await axios.put(`${URL}/api/vehicles/${lastVehicleId}`, { Vehicle: vehicleType });
+            }
+            console.log(vehicleType)
             const data = {
-              Location: location,
-              Status: 'Stopped',
-              Speed: speed,
-              Type: 'Real',
-              Extra: 'bicycle',
-              Vehicle_UID: lastVehicleId,
+                Location: location,
+                Status: 'Stopped',
+                Speed: speed,
+                Type: 'Real',
+                Extra: `vehiculo: ${vehicleType}`, // Mantén esto como 'bicycle' sin importar la velocidad
+                Vehicle_UID: lastVehicleId,
             };
             // Llamar a axios.post con los datos actualizados
             await axios.post(`${URL}/api/tracks`, data);
@@ -45,39 +55,38 @@ function Bicycle() {
             // Actualizar el estado de la velocidad
             setSpeed(lastTrack.Speed);
 
-
             console.log(data.Location.coordinates)
-
 
         } catch (err) {
             console.error(err.response);
         }
     };
 
-  //Función para recoger la localización y devolverla
-const trackGeo = () => {
-    return new Promise((resolve, reject) => {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = {
-            type: 'Point',
-            coordinates: [position.coords.latitude, position.coords.longitude],
-          };
-          resolve(location);  //Devuelve la localización recogida
-        },
-        (error) => {
-          console.error(error);
-          reject(error);
-        },
-        {
-          enableHighAccuracy: true,
-          maximumAge: 0,
-          timeout: 5000,
-        }
-      );
-    });
-  };
-  
+
+    //Función para recoger la localización y devolverla
+    const trackGeo = () => {
+        return new Promise((resolve, reject) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
+                    const location = {
+                        type: 'Point',
+                        coordinates: [position.coords.latitude, position.coords.longitude],
+                    };
+                    resolve(location);  //Devuelve la localización recogida
+                },
+                (error) => {
+                    console.error(error);
+                    reject(error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 5000,
+                }
+            );
+        });
+    };
+
 
     //Status UseEffect
     useEffect(() => {
@@ -133,7 +142,7 @@ const trackGeo = () => {
                 console.log("No se encontraron vehículos");
             }
         };
-        
+
 
         fetchData(); // Llamada inicial para recoger el ID del vehículo
 
@@ -166,12 +175,11 @@ const trackGeo = () => {
             </div>
 
             <div className="bicycle-container">
-                <div className="vehicle-box bicycle-box">
-                    <img src={logoBicycle} alt={t('Logo de bicicleta')} />
-                </div>
-                <p className='bicycle'>{t('Bicycle')}</p>
+                <div className={isTooFast ? "vehicle-box car-box" : "vehicle-box bicycle-box"}>
+                    <img src={isTooFast ? logoCar : logoBicycle} alt={t(isTooFast ? 'Logo de coche' : 'Logo de bicicleta')} />                </div>
+                <p className='bicycle'>{t(isTooFast ? 'Car' : 'Bicycle')}</p>
                 <p className='speed'>{`Velocidad: ${speed} km/h`}</p>
-
+                {isTooFast && <p className='warning'>{t('You are going too fast, we will track you as a car')}</p>}
                 <h3 className='warn'>{t('Now every car user will be warned in case that they are near you.')}</h3>
             </div>
             <UserNotification />
