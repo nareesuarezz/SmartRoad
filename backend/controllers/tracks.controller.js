@@ -11,8 +11,7 @@ const axios = require('axios');
 
 // Variables para ajustes de desarrollo
 const MINUTES_AGO = 10; // Encuentra tracks subidos en los últimos 10 minutos
-const RADIUS_IN_METERS = 500; // Encuentra tracks dentro de un radio de 500 metros
-
+const RADIUS_IN_METERS = 500; // Encuentra tracks dentro de un radio de 500 metro
 
 function calculateDistance(lat1, lon1, lat2, lon2) {
     var R = 6371; // Radio de la tierra en km
@@ -222,11 +221,11 @@ exports.create = async (req, res) => {
             const distance = calculateDistance(lastTrack.Location.coordinates[0], lastTrack.Location.coordinates[1], track.Location.coordinates[0], track.Location.coordinates[1]);
             const time = (new Date(track.Date) - new Date(lastTrack.Date)) / 1000 / 60 / 60; // en horas
 
-            // Calcular la velocidad
-            const speed = distance / time;
+            // // Calcular la velocidad
+            // const speed = distance / time;
 
-            // Guardar la velocidad en el track
-            track.Speed = speed;
+            // // Guardar la velocidad en el track
+            // track.Speed = speed;
         }
 
         const originalTrack = await Tracks.create({ ...track, Method: 'GPS' });
