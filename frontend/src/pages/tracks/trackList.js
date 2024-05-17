@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup, useMap, LayersControl, LayerGroup, GeoJSON } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
-import 'leaflet-routing-machine';
+// import 'leaflet-routing-machine';
 import 'lrm-graphhopper';
 import Header from '../../components/header/header';
 import { useTranslation } from 'react-i18next';
@@ -233,6 +233,47 @@ const TrackList = () => {
     };
   };
 
+  const RoutingMachine = ({ trackCoordinates }) => {
+    const map = useMap();
+  
+    useEffect(() => {
+      if (trackCoordinates.length > 1) {
+        let routingControl = L.Routing.control({
+          waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+          routeWhileDragging: true,
+          addWaypoints: false,
+          draggableWaypoints: false,
+          fitSelectedRoutes: true,
+          showAlternatives: false,
+          router: new L.Routing.osrmv1({
+            // Asegúrate de reemplazar 'localhost:5000' con la dirección de tu servidor OSRM
+            serviceUrl: 'http://localhost:5000/route/v1',
+            language: 'es',
+            profile: 'foot',
+          }),
+          lineOptions: {
+            styles: [{color: 'blue', opacity: 1, weight: 5}]
+          },
+          show: false, // Esta opción oculta las direcciones para llegar
+          routeLine: function(route, options) { // Esta función oculta la línea de la ruta
+            return L.polyline(route.coordinates, options);
+          },
+          createMarker: function() { return null; }, // Esta función oculta los marcadores de inicio y fin
+        }).addTo(map);
+  
+        // Oculta el panel de instrucciones de ruta después de que se haya creado
+        routingControl.on('routeselected', function(e) {
+          let routesContainer = document.querySelector('.leaflet-routing-container-hide');
+          if (routesContainer) {
+            routesContainer.style.display = 'none';
+          }
+        });
+      }
+    }, [map, trackCoordinates]);
+  
+    return null;
+  };
+  
 
   const renderTracksOnMap = (vehicleType, view) => {
     let tracksGeoJSON;
@@ -269,7 +310,7 @@ const TrackList = () => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
 
-          console.log(tracksToRender)
+          console.log(coordinates)
           return (
             <Marker
               key={index}
@@ -289,6 +330,7 @@ const TrackList = () => {
           );
         })}
         <GeoJSON data={tracksGeoJSON} />
+        <RoutingMachine trackCoordinates={tracksToRender.map(feature => feature.geometry.coordinates)} />
       </React.Fragment>
     );
   };
