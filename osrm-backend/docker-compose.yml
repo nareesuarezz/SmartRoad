@@ -1,0 +1,12 @@
+version: '3.8'
+
+services:
+  osrm:
+    build: .
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data:/data
+    command: >
+      bash -c "cp /osrm-data/* /data &&
+               osrm-routed --algorithm mld /data/canary-islands-latest.osrm"
