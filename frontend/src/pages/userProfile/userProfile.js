@@ -30,6 +30,13 @@ const bicycleIcon = new L.Icon({
   popupAnchor: [0, -32],
 });
 
+const routeIcon = new L.Icon({
+  iconUrl: process.env.PUBLIC_URL + '/images/route.png',
+  iconSize: [32, 32],
+  iconAnchor: [16, 32],
+  popupAnchor: [0, -32],
+});
+
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
