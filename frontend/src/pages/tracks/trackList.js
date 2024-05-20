@@ -117,7 +117,7 @@ const TrackList = () => {
         },
       });
       let newTracks = response.data.tracksWithinBounds;
-  
+
       // Si el usuario seleccionó 'Último track', solo conserva el último track de cada vehículo
       if (trackView === 'last') {
         const lastTracks = {};
@@ -129,11 +129,11 @@ const TrackList = () => {
         });
         newTracks = Object.values(lastTracks);
       }
-  
+
       if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
         tracksRef.current = newTracks;
         setTracksWithinBounds(newTracks);
-  
+
         // Envía los tracks al backend para su procesamiento
         processTracks(newTracks);
       }
@@ -141,10 +141,10 @@ const TrackList = () => {
       console.error('Error al buscar tracks dentro de los límites:', error);
     }
   };
-  
 
-  
-  
+
+
+
 
   useEffect(() => {
     console.log(trackView);
@@ -250,6 +250,8 @@ const TrackList = () => {
 
     useEffect(() => {
       if (trackCoordinates.length > 1) {
+        console.log("trackView:", trackView); // Añade esta línea
+
         let routingControl = L.Routing.control({
           waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
           routeWhileDragging: false,
@@ -262,15 +264,16 @@ const TrackList = () => {
             language: 'es',
             profile: 'foot',
           }),
-          lineOptions: {
-            styles: [{color: 'blue', opacity: 1, weight: 5}]
-          },
+          addWaypoints: trackView === 'last' ? false : true,
           show: false, // Cambia esta línea
           routeLine: function(route, options) {
-            return L.polyline(route.coordinates, options);
+            return L.polyline(route.coordinates, {color: trackView === 'last' ? 'orange' : 'blue', opacity: 1, weight: 5});
           },
           createMarker: function() { return null; },
         }).addTo(map);
+        
+
+
       }
     }, [map, trackCoordinates]);
 
@@ -293,11 +296,11 @@ const TrackList = () => {
         tracksGeoJSON = bicycleTracksGeoapifyGeoJSON;
       }
     }
-  
+
     if (!tracksGeoJSON) {
       return null;
     }
-  
+
     // Filtrar los tracks basándose en la vista
     let tracksToRender;
     if (view === 'last') {
@@ -311,7 +314,7 @@ const TrackList = () => {
           }
           tracksByVehicleId[track.vehicleId].push(feature);
         });
-  
+
         // Para cada vehículo, seleccionar solo el último track
         tracksToRender = Object.values(tracksByVehicleId).map(tracks => tracks[tracks.length - 1]);
       } else {
@@ -320,7 +323,7 @@ const TrackList = () => {
     } else {
       tracksToRender = tracksGeoJSON && tracksGeoJSON.features ? tracksGeoJSON.features : [];
     }
-  
+
     // Agrupar los tracks por el ID del vehículo
     let tracksByVehicleId = {};
     tracksToRender.forEach(feature => {
@@ -330,7 +333,7 @@ const TrackList = () => {
       }
       tracksByVehicleId[track.vehicleId].push(feature.geometry.coordinates);
     });
-  
+
     return (
       <React.Fragment>
         {Object.keys(tracksByVehicleId).map(vehicleId => {
@@ -342,7 +345,7 @@ const TrackList = () => {
         {tracksToRender.map((feature, index) => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
-  
+
           return (
             <Marker
               key={index}
@@ -428,7 +431,7 @@ const TrackList = () => {
         </Select>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-      <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '500px', width: '700px' }}>
+        <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '500px', width: '700px' }}>
           <MapBounds />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"

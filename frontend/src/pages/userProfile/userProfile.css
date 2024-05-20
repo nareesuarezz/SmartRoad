@@ -12,6 +12,11 @@ header {
     top: 15px;
 }
 
+.leaflet-routing-container {
+    display: none;
+  }
+  
+
 .username {
     position: absolute;
     bottom: 20px;
