@@ -152,7 +152,7 @@ function Home() {
       <div className='arrow' onClick={() => goBack()}>
         <UserDeleteOutlined />
       </div>
-      <div className='profile-picture'>
+      <div className='home-view-profile-picture'>
         <ProfilePictureUser />
       </div>
       <div className="title">

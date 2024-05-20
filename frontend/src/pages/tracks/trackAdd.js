@@ -43,9 +43,9 @@ const TrackAdd = ({ getTracks }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    
+
     const config = {
-   
+
     };
 
     if (!formData.Latitude || !formData.Longitude || !formData.Status || (!formData.Speed && formData.Status !== 'stopped') || !formData.Vehicle_UID) {
@@ -95,35 +95,35 @@ const TrackAdd = ({ getTracks }) => {
       <div className='language-switcher-trAdd'>
         <LanguageSwitcher />
       </div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='tracks-add-form'>
         <label>
           {t('Longitude')}:
-          <input type="text" name="Latitude" value={formData.Latitude} onChange={(e) => handleLocationChange('Latitude', e.target.value)} />
         </label>
+        <input type="text" name="Latitude" value={formData.Latitude} onChange={(e) => handleLocationChange('Latitude', e.target.value)} />
         <label>
           {t('Latitude')}:
-          <input type="text" name="Longitude" value={formData.Longitude} onChange={(e) => handleLocationChange('Longitude', e.target.value)} />
         </label>
+        <input type="text" name="Longitude" value={formData.Longitude} onChange={(e) => handleLocationChange('Longitude', e.target.value)} />
         <label>
           {t('Status')}
-          <select name="Status" value={formData.Status} onChange={handleChange}>
-            <option value="select">{t('Select')}</option>
-            <option value="stopped">{t('Stopped')}</option>
-            <option value="moving">{t('Moving')}</option>
-          </select>
         </label>
+        <select name="Status" value={formData.Status} onChange={handleChange}>
+          <option value="select">{t('Select')}</option>
+          <option value="stopped">{t('Stopped')}</option>
+          <option value="moving">{t('Moving')}</option>
+        </select>
         <label>
           {t('Speed')}:
-          <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} disabled={formData.Status === 'stopped'} />
         </label>
+        <input type="text" name="Speed" value={formData.Status === 'stopped' ? '0' : formData.Speed} onChange={handleChange} disabled={formData.Status === 'stopped'} />
         <label>
           {t('Extra')}:
-          <input type="text" name="Extra" value={formData.Extra} onChange={handleChange} />
         </label>
+        <input type="text" name="Extra" value={formData.Extra} onChange={handleChange} />
         <label>
           {t('Vehicle_UID')}:
-          <input type="text" name="Vehicle_UID" value={formData.Vehicle_UID} onChange={handleChange} />
         </label>
+        <input type="text" name="Vehicle_UID" value={formData.Vehicle_UID} onChange={handleChange} />
         <button type="submit">{t('Add Track')}</button>
       </form>
     </>

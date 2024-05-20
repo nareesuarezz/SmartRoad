@@ -325,7 +325,7 @@ const TrackList = () => {
           <LanguageSwitcher />
         </div>
       </div>
-      <div>
+      <div className='div-select-tracks-time'>
         <Select
           style={{ width: 200 }}
           placeholder="Selecciona un intervalo de tiempo"
@@ -343,7 +343,7 @@ const TrackList = () => {
           ))}
         </Select>
       </div>
-      <div>
+      <div className='div-select-tracks-method'>
         <Select
           style={{ width: 200 }}
           placeholder="Selecciona un método"

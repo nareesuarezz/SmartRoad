@@ -1,5 +1,18 @@
-.language-switcher-trAdd{
-    border: 1px solid red;
+.language-switcher-trAdd {
     margin-top: 12px;
-    margin-left: 12em;
+    margin-left: 20em;
+}
+
+.tracks-add-form {
+    width: auto;
+    margin: 12px;
+    align-items: center;
+}
+
+.tracks-add-form input {
+    width: 80%;
+}
+
+.tracks-add-form button {
+    width: 90%;
 }
