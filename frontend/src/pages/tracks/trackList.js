@@ -143,7 +143,8 @@ const TrackList = () => {
   };
   
 
-
+  
+  
 
   useEffect(() => {
     console.log(trackView);
@@ -292,20 +293,34 @@ const TrackList = () => {
         tracksGeoJSON = bicycleTracksGeoapifyGeoJSON;
       }
     }
-
+  
     if (!tracksGeoJSON) {
       return null;
     }
-
+  
     // Filtrar los tracks basándose en la vista
     let tracksToRender;
     if (view === 'last') {
-      tracksToRender = tracksGeoJSON.features && tracksGeoJSON.features.length > 0 ? [tracksGeoJSON.features[tracksGeoJSON.features.length - 1]] : [];
+      if (tracksGeoJSON && tracksGeoJSON.features) {
+        // Agrupar los tracks por el ID del vehículo
+        let tracksByVehicleId = {};
+        tracksGeoJSON.features.forEach(feature => {
+          const track = feature.properties;
+          if (!tracksByVehicleId[track.vehicleId]) {
+            tracksByVehicleId[track.vehicleId] = [];
+          }
+          tracksByVehicleId[track.vehicleId].push(feature);
+        });
+  
+        // Para cada vehículo, seleccionar solo el último track
+        tracksToRender = Object.values(tracksByVehicleId).map(tracks => tracks[tracks.length - 1]);
+      } else {
+        tracksToRender = [];
+      }
     } else {
-      tracksToRender = tracksGeoJSON.features || [];
+      tracksToRender = tracksGeoJSON && tracksGeoJSON.features ? tracksGeoJSON.features : [];
     }
-
-    console.log(tracksToRender)
+  
     // Agrupar los tracks por el ID del vehículo
     let tracksByVehicleId = {};
     tracksToRender.forEach(feature => {
@@ -315,7 +330,7 @@ const TrackList = () => {
       }
       tracksByVehicleId[track.vehicleId].push(feature.geometry.coordinates);
     });
-
+  
     return (
       <React.Fragment>
         {Object.keys(tracksByVehicleId).map(vehicleId => {
@@ -327,7 +342,7 @@ const TrackList = () => {
         {tracksToRender.map((feature, index) => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
-
+  
           return (
             <Marker
               key={index}
@@ -350,8 +365,6 @@ const TrackList = () => {
       </React.Fragment>
     );
   };
-
-
 
   useEffect(() => {
     const carTracksComplete = renderTracksOnMap('car', 'complete');
@@ -415,7 +428,7 @@ const TrackList = () => {
         </Select>
       </div>
       <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '70vh' }}>
-        <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '500px', width: '700px' }}>
+      <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '500px', width: '700px' }}>
           <MapBounds />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -423,7 +436,7 @@ const TrackList = () => {
           />
 
           <CustomControl />
-          <LayersControl position="topleft">
+          <LayersControl key={`${trackView}-${Date.now()}`} position="topleft">
             <LayersControl.BaseLayer name="Todas las rutas">
               <LayerGroup>
                 {renderTracksOnMap('car', method, 'complete')}
