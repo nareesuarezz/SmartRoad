@@ -95,6 +95,38 @@ function UserProfile() {
   ];
   const userInfo = JSON.parse(localStorage.getItem('userInfo'))
 
+  const layerToTrackView = {
+    "Todas las rutas": "complete",
+    "Último track": "last"
+  };
+
+  const handleLayerChange = (layer) => {
+    setTrackView(layerToTrackView[layer]);
+  };
+
+
+  const CustomControl = (props) => {
+    const map = useMap();
+
+    useEffect(() => {
+      map.whenReady(() => {
+        map.on('baselayerchange', (event) => {
+          handleLayerChange(event.name);
+        });
+      });
+    }, [map]);
+
+    return null;
+  };
+
+  useEffect(() => {
+    console.log(trackView);
+  }, [trackView]);
+
+
+  useEffect(() => {
+  }, [tracksWithinBounds]);
+
   useEffect(() => {
     //Total Time
     axios.get(`${URL}/api/tracks/totalTime/${userInfo.UID}`)
@@ -230,13 +262,23 @@ function UserProfile() {
           swLng,
           neLat,
           neLng,
-          view: trackView,
-          userId: userInfo.UID 
+          view: trackView
         },
       });
-      const newTracks = response.data.tracksWithinBounds;
+      let newTracks = response.data.tracksWithinBounds;
 
-      console.log('newTracks: ', newTracks)
+      // Si el usuario seleccionó 'Último track', solo conserva el último track de cada vehículo
+      if (trackView === 'last') {
+        const lastTracks = {};
+        newTracks.forEach(track => {
+          const vehicleId = track.vehicleId;
+          if (!lastTracks[vehicleId] || lastTracks[vehicleId].timestamp < track.timestamp) {
+            lastTracks[vehicleId] = track;
+          }
+        });
+        newTracks = Object.values(lastTracks);
+      }
+
       if (JSON.stringify(newTracks) !== JSON.stringify(tracksRef.current)) {
         tracksRef.current = newTracks;
         setTracksWithinBounds(newTracks);
@@ -248,7 +290,6 @@ function UserProfile() {
       console.error('Error al buscar tracks dentro de los límites:', error);
     }
   };
-
 
   useEffect(() => {
   }, [tracksWithinBounds]);
@@ -309,42 +350,36 @@ function UserProfile() {
 
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
-  
+
     useEffect(() => {
       if (trackCoordinates.length > 1) {
+        console.log("trackView:", trackView); // Añade esta línea
+
         let routingControl = L.Routing.control({
           waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-          routeWhileDragging: true,
+          routeWhileDragging: false,
           addWaypoints: false,
           draggableWaypoints: false,
-          fitSelectedRoutes: true,
+          fitSelectedRoutes: false,
           showAlternatives: false,
           router: new L.Routing.osrmv1({
-            // Asegúrate de reemplazar 'localhost:5000' con la dirección de tu servidor OSRM
             serviceUrl: 'http://localhost:5000/route/v1',
             language: 'es',
             profile: 'foot',
           }),
-          lineOptions: {
-            styles: [{color: 'blue', opacity: 1, weight: 5}]
+          addWaypoints: trackView === 'last' ? false : true,
+          show: false, // Cambia esta línea
+          routeLine: function (route, options) {
+            return L.polyline(route.coordinates, { color: trackView === 'last' ? 'orange' : 'blue', opacity: 1, weight: 5 });
           },
-          show: false, // Esta opción oculta las direcciones para llegar
-          routeLine: function(route, options) { // Esta función oculta la línea de la ruta
-            return L.polyline(route.coordinates, options);
-          },
-          createMarker: function() { return null; }, // Esta función oculta los marcadores de inicio y fin
+          createMarker: function () { return null; },
         }).addTo(map);
-  
-        // Oculta el panel de instrucciones de ruta después de que se haya creado
-        routingControl.on('routeselected', function(e) {
-          let routesContainer = document.querySelector('.leaflet-routing-container-hide');
-          if (routesContainer) {
-            routesContainer.style.display = 'none';
-          }
-        });
+
+
+
       }
     }, [map, trackCoordinates]);
-  
+
     return null;
   };
 
@@ -371,19 +406,48 @@ function UserProfile() {
     // Filtrar los tracks basándose en la vista
     let tracksToRender;
     if (view === 'last') {
-      tracksToRender = tracksGeoJSON.features && tracksGeoJSON.features.length > 0 ? [tracksGeoJSON.features[tracksGeoJSON.features.length - 1]] : [];
+      if (tracksGeoJSON && tracksGeoJSON.features) {
+        // Agrupar los tracks por el ID del vehículo
+        let tracksByVehicleId = {};
+        tracksGeoJSON.features.forEach(feature => {
+          const track = feature.properties;
+          if (!tracksByVehicleId[track.vehicleId]) {
+            tracksByVehicleId[track.vehicleId] = [];
+          }
+          tracksByVehicleId[track.vehicleId].push(feature);
+        });
+
+        // Para cada vehículo, seleccionar solo el último track
+        tracksToRender = Object.values(tracksByVehicleId).map(tracks => tracks[tracks.length - 1]);
+      } else {
+        tracksToRender = [];
+      }
     } else {
-      tracksToRender = tracksGeoJSON.features || [];
+      tracksToRender = tracksGeoJSON && tracksGeoJSON.features ? tracksGeoJSON.features : [];
     }
 
+    // Agrupar los tracks por el ID del vehículo
+    let tracksByVehicleId = {};
+    tracksToRender.forEach(feature => {
+      const track = feature.properties;
+      if (!tracksByVehicleId[track.vehicleId]) {
+        tracksByVehicleId[track.vehicleId] = [];
+      }
+      tracksByVehicleId[track.vehicleId].push(feature.geometry.coordinates);
+    });
 
     return (
       <React.Fragment>
+        {Object.keys(tracksByVehicleId).map(vehicleId => {
+          const trackCoordinates = tracksByVehicleId[vehicleId];
+          return (
+            <RoutingMachine key={vehicleId} trackCoordinates={trackCoordinates} />
+          );
+        })}
         {tracksToRender.map((feature, index) => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
 
-          console.log(coordinates)
           return (
             <Marker
               key={index}
@@ -403,7 +467,6 @@ function UserProfile() {
           );
         })}
         <GeoJSON data={tracksGeoJSON} />
-        <RoutingMachine trackCoordinates={tracksToRender.map(feature => feature.geometry.coordinates)} />
       </React.Fragment>
     );
   };
@@ -497,6 +560,18 @@ function UserProfile() {
           ))}
         </Select>
       </div>
+      <div>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Selecciona un método"
+          optionFilterProp="children"
+          onChange={value => {
+            setMethod(value);
+          }}>
+          <Option value='GPS' />
+          <Option value='Geoapify' />
+        </Select>
+      </div>
       <div style={{ height: '500px', width: '100%' }}>
         <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
           <MapBounds />
@@ -504,8 +579,8 @@ function UserProfile() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-
-          <LayersControl position="topleft">
+          <CustomControl />
+          <LayersControl key={`${trackView}-${Date.now()}`} position="topleft">
             <LayersControl.BaseLayer name="Todas las rutas">
               <LayerGroup>
                 {renderTracksOnMap('car', 'complete')}
