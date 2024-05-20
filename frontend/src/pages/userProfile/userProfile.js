@@ -77,10 +77,22 @@ function UserProfile() {
   const tracksRef = useRef([]);
   const mapPositionRef = useRef(mapCenter);
   const mapZoomRef = useRef(zoomLevel);
-  const [carTracksGeoJSON, setCarTracksGeoJSON] = useState(null);
-  const [bicycleTracksGeoJSON, setBicycleTracksGeoJSON] = useState(null);
+  const [carTracksGPSGeoJSON, setCarTracksGPSGeoJSON] = useState(null);
+  const [carTracksGeoapifyGeoJSON, setCarTracksGeoapifyGeoJSON] = useState(null);
+  const [bicycleTracksGPSGeoJSON, setBicycleTracksGPSGeoJSON] = useState(null);
+  const [bicycleTracksGeoapifyGeoJSON, setBicycleTracksGeoapifyGeoJSON] = useState(null);
+  const [method, setMethod] = useState('GPS');
 
-
+  const timeOptions = [
+    { label: 'Últimos 2 minutos', value: { startTime: new Date(Date.now() - 120000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 10 minutos', value: { startTime: new Date(Date.now() - 600000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 20 minutos', value: { startTime: new Date(Date.now() - 1200000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Última media hora', value: { startTime: new Date(Date.now() - 1800000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Última hora', value: { startTime: new Date(Date.now() - 3600000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimas 24 horas', value: { startTime: new Date(Date.now() - 86400000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Últimos 7 días', value: { startTime: new Date(Date.now() - 604800000).toISOString(), endTime: new Date().toISOString() } },
+    { label: 'Todos los tracks', value: { startTime: null, endTime: new Date().toISOString() } },
+  ];
   const userInfo = JSON.parse(localStorage.getItem('userInfo'))
 
   useEffect(() => {
@@ -157,6 +169,10 @@ function UserProfile() {
   const goBack = () => {
     window.location.href = '/home';
   };
+
+  useEffect(() => {
+    console.log(method);
+  }, [method]);
 
   useEffect(() => {
     // Define una función asincrónica que realiza la solicitud a la API
@@ -254,82 +270,25 @@ function UserProfile() {
       });
   };
 
-  const RoutingMachine = ({ trackCoordinates }) => {
-    const map = useMap();
-    const isMounted = useRef(false);
-    const routingControlRef = useRef(null); // Añade esta línea
-
-    useEffect(() => {
-      isMounted.current = true;
-      return () => {
-        isMounted.current = false;
-        if (routingControlRef.current) { // Añade este bloque
-          map.removeControl(routingControlRef.current);
-          routingControlRef.current = null;
-        }
-      };
-    }, []);
-
-    useEffect(() => {
-      if (map && trackCoordinates.length > 1 && isMounted.current) {
-        const whenMapIsReady = new Promise(resolve => map.whenReady(resolve));
-        whenMapIsReady.then(() => {
-          if (map) {
-            let routingControl = L.Routing.control({
-              waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-              routeWhileDragging: true,
-              addWaypoints: false,
-              draggableWaypoints: false,
-              fitSelectedRoutes: true,
-              showAlternatives: false,
-              router: L.Routing.graphHopper('3b3cf297-dba9-4a69-a17a-7ecc3873a1da', {
-                urlParameters: {
-                  vehicle: 'foot',
-                },
-              }),
-              lineOptions: {
-                styles: [{ color: 'sasa', opacity: 1, weight: 5 }]
-              },
-              show: false, // Esta opción oculta las direcciones para llegar
-              routeLine: function (route, options) { // Esta función oculta la línea de la ruta
-                return L.polyline(route.coordinates, options);
-              },
-              createMarker: function () { return null; }, // Esta función oculta los marcadores de inicio y fin
-            }).addTo(map);
-
-            // Oculta el panel de instrucciones de ruta después de que se haya creado
-            routingControl.on('routeselected', function (e) {
-              if (!isMounted.current) return;
-              let routesContainer = document.querySelector('.leaflet-routing-container-hide');
-              if (routesContainer) {
-                routesContainer.style.display = 'none';
-              }
-            });
-          }
-        });
-      }
-    }, [map, trackCoordinates]);
-
-    return null;
-  };
-
-
   const MapBounds = () => {
     const map = useMap();
 
     useEffect(() => {
-      map.on('moveend', () => {
-        const center = map.getCenter();
-        const zoom = map.getZoom();
+      // Asegúrate de que el mapa esté completamente cargado antes de interactuar con él
+      map.whenReady(() => {
+        map.on('moveend', () => {
+          const center = map.getCenter();
+          const zoom = map.getZoom();
 
-        mapZoomRef.current = zoom;
-        mapPositionRef.current = [center.lat, center.lng];
-        const mapBounds = map.getBounds();
-        const sw = mapBounds.getSouthWest();
-        const ne = mapBounds.getNorthEast();
+          mapZoomRef.current = zoom;
+          mapPositionRef.current = [center.lat, center.lng];
+          const mapBounds = map.getBounds();
+          const sw = mapBounds.getSouthWest();
+          const ne = mapBounds.getNorthEast();
 
-        // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
-        fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+          // Hace la solicitud a la API con las coordenadas de las esquinas del mapa
+          fetchTracksWithinBounds(sw.lat, sw.lng, ne.lat, ne.lng);
+        });
       });
     }, [map]);
 
@@ -339,37 +298,92 @@ function UserProfile() {
   const processTracks = async (allTracks) => {
     try {
       const response = await axios.post(`${URL}/api/tracks/processTracks`, { allTracks });
-      setCarTracksGeoJSON(response.data.carTracksGeoJSON);
-      setBicycleTracksGeoJSON(response.data.bicycleTracksGeoJSON);
-
+      setCarTracksGPSGeoJSON(response.data.carTracksGPSGeoJSON);
+      setCarTracksGeoapifyGeoJSON(response.data.carTracksGeoapifyGeoJSON);
+      setBicycleTracksGPSGeoJSON(response.data.bicycleTracksGPSGeoJSON);
+      setBicycleTracksGeoapifyGeoJSON(response.data.bicycleTracksGeoapifyGeoJSON);
     } catch (error) {
       console.error('Error al procesar los tracks:', error);
     }
   };
 
+  const RoutingMachine = ({ trackCoordinates }) => {
+    const map = useMap();
+  
+    useEffect(() => {
+      if (trackCoordinates.length > 1) {
+        let routingControl = L.Routing.control({
+          waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+          routeWhileDragging: true,
+          addWaypoints: false,
+          draggableWaypoints: false,
+          fitSelectedRoutes: true,
+          showAlternatives: false,
+          router: new L.Routing.osrmv1({
+            // Asegúrate de reemplazar 'localhost:5000' con la dirección de tu servidor OSRM
+            serviceUrl: 'http://localhost:5000/route/v1',
+            language: 'es',
+            profile: 'foot',
+          }),
+          lineOptions: {
+            styles: [{color: 'blue', opacity: 1, weight: 5}]
+          },
+          show: false, // Esta opción oculta las direcciones para llegar
+          routeLine: function(route, options) { // Esta función oculta la línea de la ruta
+            return L.polyline(route.coordinates, options);
+          },
+          createMarker: function() { return null; }, // Esta función oculta los marcadores de inicio y fin
+        }).addTo(map);
+  
+        // Oculta el panel de instrucciones de ruta después de que se haya creado
+        routingControl.on('routeselected', function(e) {
+          let routesContainer = document.querySelector('.leaflet-routing-container-hide');
+          if (routesContainer) {
+            routesContainer.style.display = 'none';
+          }
+        });
+      }
+    }, [map, trackCoordinates]);
+  
+    return null;
+  };
+
   const renderTracksOnMap = (vehicleType, view) => {
     let tracksGeoJSON;
     if (vehicleType === 'car') {
-      tracksGeoJSON = carTracksGeoJSON;
+      if (method === 'GPS') {
+        tracksGeoJSON = carTracksGPSGeoJSON;
+      } else if (method === 'Geoapify') {
+        tracksGeoJSON = carTracksGeoapifyGeoJSON;
+      }
     } else if (vehicleType === 'bicycle') {
-      tracksGeoJSON = bicycleTracksGeoJSON;
+      if (method === 'GPS') {
+        tracksGeoJSON = bicycleTracksGPSGeoJSON;
+      } else if (method === 'Geoapify') {
+        tracksGeoJSON = bicycleTracksGeoapifyGeoJSON;
+      }
     }
 
     if (!tracksGeoJSON) {
       return null;
     }
 
+    // Filtrar los tracks basándose en la vista
+    let tracksToRender;
+    if (view === 'last') {
+      tracksToRender = tracksGeoJSON.features && tracksGeoJSON.features.length > 0 ? [tracksGeoJSON.features[tracksGeoJSON.features.length - 1]] : [];
+    } else {
+      tracksToRender = tracksGeoJSON.features || [];
+    }
+
+
     return (
       <React.Fragment>
-        {tracksGeoJSON.features.map((feature, index) => {
+        {tracksToRender.map((feature, index) => {
           const track = feature.properties;
           const coordinates = feature.geometry.coordinates;
 
-          // Solo renderiza el último track si la vista es 'last'
-          if (view === 'last' && index < tracksGeoJSON.features.length - 1) {
-            return null;
-          }
-
+          console.log(coordinates)
           return (
             <Marker
               key={index}
@@ -380,7 +394,8 @@ function UserProfile() {
               <Popup>
                 <p>{`Track ID: ${track.trackId}`}</p>
                 <p>{`Location: ${coordinates.join(', ')}`}</p>
-                <p>{`Type: ${track.Type}`}</p>
+                <p>{`Type: ${track.type}`}</p>
+                <p>{`Speed: ${track.speed}`}</p>
                 <p>{`Vehicle ID: ${track.vehicleId}`}</p>
                 <p>{`Status: ${track.status}`}</p>
               </Popup>
@@ -388,21 +403,14 @@ function UserProfile() {
           );
         })}
         <GeoJSON data={tracksGeoJSON} />
+        <RoutingMachine trackCoordinates={tracksToRender.map(feature => feature.geometry.coordinates)} />
       </React.Fragment>
     );
   };
 
 
-  useEffect(() => {
-    const carTracksComplete = renderTracksOnMap('car', 'complete');
-    const carTracksLast = renderTracksOnMap('car', 'last');
-    const bicycleTracksComplete = renderTracksOnMap('bicycle', 'complete');
-    const bicycleTracksLast = renderTracksOnMap('bicycle', 'last');
 
-    console.log('Capa de Coches (Todas las rutas):', carTracksComplete);
-    console.log('Capa de Coches (Último track):', carTracksLast);
-    console.log('Capa de Bicicletas (Todas las rutas):', bicycleTracksComplete);
-    console.log('Capa de Bicicletas (Último track):', bicycleTracksLast);
+  useEffect(() => {
   }, [tracksWithinBounds]);
 
 
@@ -470,6 +478,24 @@ function UserProfile() {
             <button type="submit">Actualizar imagen de perfil</button>
           </form>
         )}
+      </div>
+      <div>
+        <Select
+          style={{ width: 200 }}
+          placeholder="Selecciona un intervalo de tiempo"
+          optionFilterProp="children"
+          onChange={value => {
+            setTimeInterval(JSON.parse(value));
+            fetchTracksInTimeInterval();
+          }}
+          filterOption={(input, option) =>
+            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+          }
+        >
+          {timeOptions.map((option, index) => (
+            <Option key={index} value={JSON.stringify(option.value)}>{option.label}</Option>
+          ))}
+        </Select>
       </div>
       <div style={{ height: '500px', width: '100%' }}>
         <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
