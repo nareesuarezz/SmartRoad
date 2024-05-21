@@ -89,6 +89,14 @@ function UserProfile() {
   const [bicycleTracksGPSGeoJSON, setBicycleTracksGPSGeoJSON] = useState(null);
   const [bicycleTracksGeoapifyGeoJSON, setBicycleTracksGeoapifyGeoJSON] = useState(null);
   const [method, setMethod] = useState('GPS');
+  const [pointA, setPointA] = useState(null);
+  const [pointB, setPointB] = useState(null);
+  const markerARef = useRef(null);
+  const markerBRef = useRef(null);
+  const [routingControl, setRoutingControl] = useState(null);
+
+
+  
 
   const timeOptions = [
     { label: 'Últimos 2 minutos', value: { startTime: new Date(Date.now() - 120000).toISOString(), endTime: new Date().toISOString() } },
@@ -110,7 +118,7 @@ function UserProfile() {
   const handleLayerChange = (layer) => {
     setTrackView(layerToTrackView[layer]);
   };
-
+ 
 
   const CustomControl = (props) => {
     const map = useMap();
@@ -212,6 +220,7 @@ function UserProfile() {
   useEffect(() => {
     console.log(method);
   }, [method]);
+
 
   useEffect(() => {
     // Define una función asincrónica que realiza la solicitud a la API
@@ -355,6 +364,64 @@ function UserProfile() {
     }
   };
 
+
+  const MapClickHandler = ({ setPointA, setPointB, markerARef, markerBRef }) => {
+    const map = useMap();
+    const [routingControl, setRoutingControl] = useState(null);
+  
+    const handleMapClick = (e) => {
+      if (!pointA) {
+        setPointA(e.latlng);
+        markerARef.current = L.marker(e.latlng, { icon: routeIcon }).addTo(map);
+      } else if (!pointB) {
+        setPointB(e.latlng);
+        markerBRef.current = L.marker(e.latlng, { icon: routeIcon }).addTo(map);
+      } else {
+        // Si ambos puntos ya están establecidos, restablece todo
+        setPointA(e.latlng);
+        setPointB(null);
+        map.removeLayer(markerARef.current);
+        map.removeLayer(markerBRef.current);
+        markerARef.current = L.marker(e.latlng, { icon: routeIcon }).addTo(map);
+        markerBRef.current = null;
+      }
+    };
+  
+  
+    useEffect(() => {
+      map.on('click', handleMapClick);
+      return () => {
+        map.off('click', handleMapClick);
+      };
+    }, [map, pointA, pointB]);
+  
+    useEffect(() => {
+      if (pointA && pointB) {
+        const newRoutingControl = L.Routing.control({
+          waypoints: [
+            L.latLng(pointA.lat, pointA.lng),
+            L.latLng(pointB.lat, pointB.lng)
+          ],
+          lineOptions: {
+            styles: [{ color: 'black', opacity: 1, weight: 5 }] // Establece el color de la línea a naranja
+          },
+          createMarker: function () { return null; }, // No crea marcadores para los waypoints
+          router: new L.Routing.osrmv1({
+            serviceUrl: 'http://localhost:5000/route/v1',
+            language: 'es',
+            profile: 'foot',
+          }),
+          routeWhileDragging: true,
+        }).addTo(map);
+        setRoutingControl(newRoutingControl);
+      }
+    }, [map, pointA, pointB]);
+  
+    return null;
+  };
+  
+
+
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
 
@@ -365,7 +432,6 @@ function UserProfile() {
         let routingControl = L.Routing.control({
           waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
           routeWhileDragging: false,
-          addWaypoints: false,
           draggableWaypoints: false,
           fitSelectedRoutes: false,
           showAlternatives: false,
@@ -579,9 +645,11 @@ function UserProfile() {
           <Option value='Geoapify' />
         </Select>
       </div>
+     
       <div style={{ height: '500px', width: '100%' }}>
-        <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
-          <MapBounds />
+      <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
+        <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} setRoutingControl={setRoutingControl} />
+        <MapBounds />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
