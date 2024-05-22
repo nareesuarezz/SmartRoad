@@ -12,6 +12,8 @@ import 'lrm-graphhopper';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
 import { Select } from 'antd';
+import { GeoSearchControl, OpenStreetMapProvider } from 'leaflet-geosearch';
+
 
 
 const { Option } = Select;
@@ -91,12 +93,16 @@ function UserProfile() {
   const [method, setMethod] = useState('GPS');
   const [pointA, setPointA] = useState(null);
   const [pointB, setPointB] = useState(null);
+  const [placeA, setPlaceA] = useState('');
+  const [placeB, setPlaceB] = useState('');
+  const pointARef = useRef(null);
+  const pointBRef = useRef(null);
   const markerARef = useRef(null);
   const markerBRef = useRef(null);
   const [routingControl, setRoutingControl] = useState(null);
 
 
-  
+
 
   const timeOptions = [
     { label: 'Últimos 2 minutos', value: { startTime: new Date(Date.now() - 120000).toISOString(), endTime: new Date().toISOString() } },
@@ -118,7 +124,18 @@ function UserProfile() {
   const handleLayerChange = (layer) => {
     setTrackView(layerToTrackView[layer]);
   };
- 
+
+
+  const handlePlaceSubmit = async (place, setPoint, pointRef) => {
+    const provider = new OpenStreetMapProvider();
+    const results = await provider.search({ query: place });
+    if (results && results.length > 0) {
+      const latlng = [results[0].y, results[0].x];
+      setPoint(latlng);
+      pointRef.current = latlng;
+    }
+  };
+
 
   const CustomControl = (props) => {
     const map = useMap();
@@ -368,7 +385,7 @@ function UserProfile() {
   const MapClickHandler = ({ setPointA, setPointB, markerARef, markerBRef }) => {
     const map = useMap();
     const [routingControl, setRoutingControl] = useState(null);
-  
+
     const handleMapClick = (e) => {
       if (!pointA) {
         setPointA(e.latlng);
@@ -386,15 +403,15 @@ function UserProfile() {
         markerBRef.current = null;
       }
     };
-  
-  
+
+
     useEffect(() => {
       map.on('click', handleMapClick);
       return () => {
         map.off('click', handleMapClick);
       };
     }, [map, pointA, pointB]);
-  
+
     useEffect(() => {
       if (pointA && pointB) {
         const newRoutingControl = L.Routing.control({
@@ -416,10 +433,58 @@ function UserProfile() {
         setRoutingControl(newRoutingControl);
       }
     }, [map, pointA, pointB]);
-  
+
+    useEffect(() => {
+      if (pointARef.current) {
+        // Si ya existe un marcador para el punto A, lo elimina del mapa
+        if (markerARef.current) {
+          map.removeLayer(markerARef.current);
+        }
+        // Crea un nuevo marcador para el punto A y lo añade al mapa
+        markerARef.current = L.marker([pointARef.current[0], pointARef.current[1]], { icon: routeIcon }).addTo(map);
+      }
+      if (pointBRef.current) {
+        // Si ya existe un marcador para el punto B, lo elimina del mapa
+        if (markerBRef.current) {
+          map.removeLayer(markerBRef.current);
+        }
+        // Crea un nuevo marcador para el punto B y lo añade al mapa
+        markerBRef.current = L.marker([pointBRef.current[0], pointBRef.current[1]], { icon: routeIcon }).addTo(map);
+      }
+    }, [pointARef.current, pointBRef.current]);
+    
+
+    useEffect(() => {
+      if (pointARef.current && pointBRef.current) {
+        if (routingControl) {
+          // Si ya existe un control de enrutamiento, lo elimina del mapa
+          map.removeControl(routingControl);
+        }
+        // Crea un nuevo control de enrutamiento con los puntos A y B actuales
+        const newRoutingControl = L.Routing.control({
+          waypoints: [
+            L.latLng(pointARef.current[0], pointARef.current[1]),
+            L.latLng(pointBRef.current[0], pointBRef.current[1])
+          ],
+          lineOptions: {
+            styles: [{ color: 'black', opacity: 1, weight: 5 }]
+          },
+          createMarker: function () { return null; },
+          router: new L.Routing.osrmv1({
+            serviceUrl: 'http://localhost:5000/route/v1',
+            language: 'es',
+            profile: 'foot',
+          }),
+          routeWhileDragging: true,
+        }).addTo(map);
+        setRoutingControl(newRoutingControl);
+      }
+    }, [pointARef.current, pointBRef.current]);
+    
+
     return null;
   };
-  
+
 
 
   const RoutingMachine = ({ trackCoordinates }) => {
@@ -645,11 +710,32 @@ function UserProfile() {
           <Option value='Geoapify' />
         </Select>
       </div>
-     
+      <input
+        type="text"
+        value={placeA}
+        onChange={e => setPlaceA(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            handlePlaceSubmit(placeA, setPointA, pointARef);
+            console.log(pointARef.current);
+          }
+        }}
+      />
+      <input
+        type="text"
+        value={placeB}
+        onChange={e => setPlaceB(e.target.value)}
+        onKeyDown={e => {
+          if (e.key === 'Enter') {
+            handlePlaceSubmit(placeB, setPointB, pointBRef);
+            console.log(pointBRef);
+          }
+        }}
+      />
       <div style={{ height: '500px', width: '100%' }}>
-      <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
-        <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} setRoutingControl={setRoutingControl} />
-        <MapBounds />
+        <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
+          <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} setRoutingControl={setRoutingControl} />
+          <MapBounds />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
