@@ -99,8 +99,8 @@ function UserProfile() {
   const pointBRef = useRef(null);
   const markerARef = useRef(null);
   const markerBRef = useRef(null);
-  const [routingControl, setRoutingControl] = useState(null);
-
+  const mapRef = useRef(null);
+  const routingControlRef = useRef([]);
 
 
 
@@ -385,6 +385,7 @@ function UserProfile() {
   const MapClickHandler = ({ setPointA, setPointB, markerARef, markerBRef }) => {
     const map = useMap();
     const [routingControl, setRoutingControl] = useState(null);
+    mapRef.current = map; // Actualiza la referencia al mapa
 
     const handleMapClick = (e) => {
       if (!pointA) {
@@ -430,7 +431,7 @@ function UserProfile() {
           }),
           routeWhileDragging: true,
         }).addTo(map);
-        setRoutingControl(newRoutingControl);
+        routingControlRef.current.push(newRoutingControl);
       }
     }, [map, pointA, pointB]);
 
@@ -452,7 +453,7 @@ function UserProfile() {
         markerBRef.current = L.marker([pointBRef.current[0], pointBRef.current[1]], { icon: routeIcon }).addTo(map);
       }
     }, [pointARef.current, pointBRef.current]);
-    
+
 
     useEffect(() => {
       if (pointARef.current && pointBRef.current) {
@@ -477,15 +478,22 @@ function UserProfile() {
           }),
           routeWhileDragging: true,
         }).addTo(map);
-        setRoutingControl(newRoutingControl);
+        routingControlRef.current.push(newRoutingControl);
       }
     }, [pointARef.current, pointBRef.current]);
-    
+
 
     return null;
   };
 
-
+  const handleRemoveRoutes = () => {
+    routingControlRef.current.forEach(routingControlRef => {
+      mapRef.current.removeControl(routingControlRef.current);
+    });
+    // Vacía el array después de eliminar todas las rutas
+    routingControlRef.current = [];
+  };
+  
 
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
@@ -732,9 +740,10 @@ function UserProfile() {
           }
         }}
       />
+    <button onClick={() => handleRemoveRoutes()}>Eliminar rutas</button>
       <div style={{ height: '500px', width: '100%' }}>
         <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
-          <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} setRoutingControl={setRoutingControl} />
+          <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} />
           <MapBounds />
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
