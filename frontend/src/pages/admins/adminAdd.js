@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./adminAdd.css"
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
@@ -84,35 +85,35 @@ const AdminAdd = ({ getAdmins }) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
+      <div className='language-switcher-adAdd'>
         <LanguageSwitcher />
       </div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='admins-add-form'>
         <label>
           {t('Username')}:
-          <input type="text" name="Username" value={formData.Username} onChange={handleChange} />
         </label>
+        <input type="text" name="Username" value={formData.Username} onChange={handleChange} />
         <label>
           {t('Password')}:
-          <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
         </label>
+        <input type="password" name="Password" value={formData.Password} onChange={handleChange} />
         <label>
           {t('Role')}:
-          <select name="Role" value={formData.Role} onChange={handleChange}>
-            <option value="">{t('Select')}</option>
-            <option value="Admin">{t('Admin')}</option>
-            <option value="User">{t('User')}</option>
-          </select>
         </label>
+        <select name="Role" value={formData.Role} onChange={handleChange}>
+          <option value="">{t('Select')}</option>
+          <option value="Admin">{t('Admin')}</option>
+          <option value="User">{t('User')}</option>
+        </select>
         <label>
           {t('Image')}:
-          <input type="file" name="Image" onChange={handleChange} accept="image/*" />
-          {previewImage && (
-            <div className="image-preview">
-              <img src={previewImage} alt="Preview" />
-            </div>
-          )}
         </label>
+        <input type="file" name="Image" onChange={handleChange} accept="image/*" />
+        {previewImage && (
+          <div className="image-preview">
+            <img src={previewImage} alt="Preview" />
+          </div>
+        )}
         <button type="submit">{t('Add Admin')}</button>
       </form>
     </>

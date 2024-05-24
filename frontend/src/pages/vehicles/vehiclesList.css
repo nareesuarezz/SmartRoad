@@ -70,7 +70,7 @@
     background-color: #f8ab2f;
 }
 
-.admin-add-container {
+.vehicles-add-container {
     margin-left: 12px;
 }
 
@@ -96,24 +96,24 @@
     background-color: #7b0e02;
 }
 
-.language-add-bottons-container-admin {
+.language-add-bottons-container-vehicles {
     display: flex;
     align-items: center;
     justify-content: space-between;
 }
 
-.admin-filter {
+.vehicles-filter {
     width: auto;
     margin: 8px;
     display: flex;
     flex-direction: column;
 }
 
-.admin-filter-role {
+.vehicles-filter-type {
     margin-bottom: 12px;
 }
 
-.admin-filter-username {
+.vehicles-filter-adminUID {
     width: 80%;
 }
 

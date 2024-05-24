@@ -1,0 +1,18 @@
+.language-switcher-vhEdit {
+    margin-top: 12px;
+    margin-left: 20em;
+}
+
+.vehicles-edit-form {
+    width: auto;
+    margin: 12px;
+    align-items: center;
+}
+
+.vehicles-edit-form input {
+    width: 80%;
+}
+
+.vehicles-edit-form button {
+    width: 90%;
+}

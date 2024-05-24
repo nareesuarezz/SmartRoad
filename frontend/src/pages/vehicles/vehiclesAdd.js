@@ -3,6 +3,7 @@ import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./vehiclesAdd.css"
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
@@ -42,22 +43,22 @@ const VehicleAdd = ({ getVehicles }) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
+      <div className='language-switcher-vhAdd'>
         <LanguageSwitcher />
       </div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='vehicles-add-form'>
         <label>
           {t('Vehicle')}:
-          <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
-            <option value="">{t('Select')}</option>
-            <option value="car">{t('Car')}</option>
-            <option value="bicycle">{t('Bike')}</option>
-          </select>
         </label>
+        <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
+          <option value="">{t('Select')}</option>
+          <option value="car">{t('Car')}</option>
+          <option value="bicycle">{t('Bicycle')}</option>
+        </select>
         <label>
           {t('Admin_UID')}:
-          <input type="text" name="Admin_UID" value={formData.Admin_UID} onChange={handleChange} />
         </label>
+        <input type="text" name="Admin_UID" value={formData.Admin_UID} onChange={handleChange} />
         <button type="submit" className="submit">{t('Add Vehicle')}</button>
       </form>
     </>

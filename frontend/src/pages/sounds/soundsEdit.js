@@ -4,6 +4,8 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./soundsEdit.css"
+
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
@@ -86,14 +88,14 @@ const SoundEdit = ({ getSounds }) => {
     return (
         <>
             <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-            <div>
+            <div className='language-switcher-soundsEdit'>
                 <LanguageSwitcher />
             </div>
-            <form onSubmit={handleSubmit} encType="multipart/form-data">
+            <form onSubmit={handleSubmit} encType="multipart/form-data" className='sounds-edit-form'>
                 <label>
                     {t('Sound')}:
-                    <input type="file" name="Sound" onChange={handleChange} accept="audio/*" />
                 </label>
+                <input type="file" name="Sound" onChange={handleChange} accept="audio/*" />
                 <button type="submit">{t('Edit Sound')}</button>
             </form>
         </>

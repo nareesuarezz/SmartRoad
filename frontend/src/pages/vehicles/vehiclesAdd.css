@@ -1,0 +1,18 @@
+.language-switcher-vhAdd {
+    margin-top: 12px;
+    margin-left: 20em;
+}
+
+.vehicles-add-form {
+    width: auto;
+    margin: 12px;
+    align-items: center;
+}
+
+.vehicles-add-form input {
+    width: 80%;
+}
+
+.vehicles-add-form button {
+    width: 90%;
+}
