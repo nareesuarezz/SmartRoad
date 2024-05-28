@@ -487,13 +487,14 @@ function UserProfile() {
   };
 
   const handleRemoveRoutes = () => {
-    routingControlRef.current.forEach(routingControlRef => {
-      mapRef.current.removeControl(routingControlRef.current);
+    routingControlRef.current.forEach(routingControl => {
+      if (routingControl) {
+        mapRef.current.removeControl(routingControl);
+      }
     });
     // Vacía el array después de eliminar todas las rutas
     routingControlRef.current = [];
   };
-  
 
   const RoutingMachine = ({ trackCoordinates }) => {
     const map = useMap();
@@ -740,7 +741,7 @@ function UserProfile() {
           }
         }}
       />
-    <button onClick={() => handleRemoveRoutes()}>Eliminar rutas</button>
+      <button onClick={handleRemoveRoutes}>Eliminar rutas</button>
       <div style={{ height: '500px', width: '100%' }}>
         <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
           <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} />
