@@ -74,17 +74,20 @@ const AdminList = () => {
                     <LanguageSwitcher />
                 </div>
             </div>
-            <div className='adminsFilters'>
-                <label> Role
-                    <span> </span>
-                    <select name="Role" value={role} onChange={handleRoleGetter}>
-                        <option value="">Select</option>
-                        <option value="Admin">Admin</option>
-                        <option value="User">User</option>
-                    </select>
-                </label>
-                <br></br>
-                <input type='text' placeholder="Username" onChange={handleInputChange} />
+            <div className='admin-filter'>
+                <div className='admin-filter-role'>
+                    <label> {t('Role')}
+                        <span> </span>
+                        <select name="Role" value={role} onChange={handleRoleGetter}>
+                            <option value="">{t('Select')}</option>
+                            <option value="Admin">{t('Admin')}</option>
+                            <option value="User">{t('User')}</option>
+                        </select>
+                    </label>
+                </div>
+                <div className='admin-filter-username'>
+                    <input type='text' placeholder={t('Username')} onChange={handleInputChange} />
+                </div>
             </div>
             <table className="table is-striped is-fullwidth">
                 <thead>

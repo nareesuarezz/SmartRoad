@@ -325,10 +325,10 @@ const TrackList = () => {
           <LanguageSwitcher />
         </div>
       </div>
-      <div>
+      <div className='div-select-tracks-time'>
         <Select
           style={{ width: 200 }}
-          placeholder="Selecciona un intervalo de tiempo"
+          placeholder={t('Select a time interval')}
           optionFilterProp="children"
           onChange={value => {
             setTimeInterval(JSON.parse(value));
@@ -343,10 +343,10 @@ const TrackList = () => {
           ))}
         </Select>
       </div>
-      <div>
+      <div className='div-select-tracks-method'>
         <Select
           style={{ width: 200 }}
-          placeholder="Selecciona un método"
+          placeholder={t('Select a method')}
           optionFilterProp="children"
           onChange={value => {
             setMethod(value);
@@ -365,33 +365,33 @@ const TrackList = () => {
 
           <CustomControl />
           <LayersControl position="topleft">
-            <LayersControl.BaseLayer name="Todas las rutas">
+            <LayersControl.BaseLayer name={t('All routes')}>
               <LayerGroup>
                 {renderTracksOnMap('car', method, 'complete')}
                 {renderTracksOnMap('bicycle', method, 'complete')}
               </LayerGroup>
             </LayersControl.BaseLayer>
 
-            <LayersControl.BaseLayer name="Último track">
+            <LayersControl.BaseLayer name={t('Last track')}>
               <LayerGroup>
                 {renderTracksOnMap('car', method, 'last')}
                 {renderTracksOnMap('bicycle', method, 'last')}
               </LayerGroup>
             </LayersControl.BaseLayer>
 
-            <LayersControl.Overlay checked name="Bicicletas">
+            <LayersControl.Overlay checked name={t('Bikes')}>
               <LayerGroup>
                 {renderTracksOnMap('bicycle', trackView)}
               </LayerGroup>
             </LayersControl.Overlay>
 
-            <LayersControl.Overlay checked name="Coches">
+            <LayersControl.Overlay checked name={t('Car')}>
               <LayerGroup>
                 {renderTracksOnMap('car', trackView)}
               </LayerGroup>
             </LayersControl.Overlay>
 
-            <LayersControl.Overlay checked name="Notificaciones">
+            <LayersControl.Overlay checked name={t('Notifications')}>
               <LayerGroup>
                 {notificationLocations.map((location, index) => {
                   const coordinates = location.coordinates;
@@ -403,7 +403,7 @@ const TrackList = () => {
                       zIndexOffset={1000}
                     >
                       <Popup>
-                        <p>Notificación enviada desde aquí</p>
+                        <p>{t('Notification sent from here')}</p>
                       </Popup>
                     </Marker>
                   );
