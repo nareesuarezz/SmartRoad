@@ -110,7 +110,7 @@ exports.delete = (req, res) => {
 };
 
 exports.findByAdminId = (req, res) => {
-    const adminId = req.params.AdminId
+    const adminId = req.params.Admin_UID
     Routes.findAll({ where: { AdminId: adminId } })
         .then(data => {
             res.send(data)

@@ -101,7 +101,11 @@ function UserProfile() {
   const markerBRef = useRef(null);
   const mapRef = useRef(null);
   const routingControlRef = useRef([]);
+  const [routes, setRoutes] = useState([]);
+  const routingControlsRef = useRef([]);
 
+  
+  
 
 
   const timeOptions = [
@@ -286,6 +290,20 @@ function UserProfile() {
     fetchTotalDistance();
   }, []);
 
+  const fetchRoutes = async () => {
+  
+    try {
+      const response = await axios.get(`${URL}/api/routes/findByAdminUID/${userInfo.UID}`);
+      setRoutes(response.data);
+      console.log(routes)
+    } catch (error) {
+      console.error(`Error fetching routes: ${error}`);
+    }
+  };
+  
+  useEffect(() => {
+    fetchRoutes();
+  }, []);
 
   const fetchTracksWithinBounds = async (swLat, swLng, neLat, neLng) => {
     try {
@@ -387,13 +405,36 @@ function UserProfile() {
     const [routingControl, setRoutingControl] = useState(null);
     mapRef.current = map; // Actualiza la referencia al mapa
 
-    const handleMapClick = (e) => {
+    const handleMapClick = async (e) => {
       if (!pointA) {
         setPointA(e.latlng);
         markerARef.current = L.marker(e.latlng, { icon: routeIcon }).addTo(map);
       } else if (!pointB) {
         setPointB(e.latlng);
         markerBRef.current = L.marker(e.latlng, { icon: routeIcon }).addTo(map);
+    
+        // Crea la ruta después de seleccionar el segundo punto
+        const routeData = {
+          from: {
+            type: 'Point',
+            coordinates: [pointA.lng, pointA.lat],
+          },
+          to: {
+            type: 'Point',
+            coordinates: [e.latlng.lng, e.latlng.lat],
+          },
+          AdminId: userInfo.UID, // Asegúrate de tener el ID del administrador disponible
+        };
+    
+        try {
+          const response = await axios.post(`${URL}/api/routes`, routeData);
+          console.log(response.data);
+    
+          // Actualiza el estado de las rutas para incluir la nueva ruta
+          setRoutes(prevRoutes => [...prevRoutes, response.data]);
+        } catch (error) {
+          console.error(`Error creating route: ${error}`);
+        }
       } else {
         // Si ambos puntos ya están establecidos, restablece todo
         setPointA(e.latlng);
@@ -404,7 +445,7 @@ function UserProfile() {
         markerBRef.current = null;
       }
     };
-
+    
 
     useEffect(() => {
       map.on('click', handleMapClick);
@@ -414,16 +455,19 @@ function UserProfile() {
     }, [map, pointA, pointB]);
 
     useEffect(() => {
-      if (pointA && pointB) {
-        const newRoutingControl = L.Routing.control({
+      routes.forEach(route => {
+        const from = [route.from.coordinates[1], route.from.coordinates[0]]; // Recuerda que las coordenadas de Leaflet son [lat, lng]
+        const to = [route.to.coordinates[1], route.to.coordinates[0]];
+    
+        const routingControl = L.Routing.control({
           waypoints: [
-            L.latLng(pointA.lat, pointA.lng),
-            L.latLng(pointB.lat, pointB.lng)
+            L.latLng(from[0], from[1]),
+            L.latLng(to[0], to[1])
           ],
           lineOptions: {
-            styles: [{ color: 'black', opacity: 1, weight: 5 }] // Establece el color de la línea a naranja
+            styles: [{ color: 'black', opacity: 1, weight: 5 }]
           },
-          createMarker: function () { return null; }, // No crea marcadores para los waypoints
+          createMarker: function () { return null; },
           router: new L.Routing.osrmv1({
             serviceUrl: 'http://localhost:5000/route/v1',
             language: 'es',
@@ -431,9 +475,11 @@ function UserProfile() {
           }),
           routeWhileDragging: true,
         }).addTo(map);
-        routingControlRef.current.push(newRoutingControl);
-      }
-    }, [map, pointA, pointB]);
+    
+        routingControlsRef.current.push(routingControl);
+      });
+    },);
+    
 
     useEffect(() => {
       if (pointARef.current) {
@@ -467,6 +513,7 @@ function UserProfile() {
             L.latLng(pointARef.current[0], pointARef.current[1]),
             L.latLng(pointBRef.current[0], pointBRef.current[1])
           ],
+          fitSelectedRoutes: false, 
           lineOptions: {
             styles: [{ color: 'black', opacity: 1, weight: 5 }]
           },
@@ -486,301 +533,313 @@ function UserProfile() {
     return null;
   };
 
-  const handleRemoveRoutes = () => {
-    routingControlRef.current.forEach(routingControl => {
-      if (routingControl) {
-        mapRef.current.removeControl(routingControl);
-      }
-    });
-    // Vacía el array después de eliminar todas las rutas
-    routingControlRef.current = [];
-  };
-
-  const RoutingMachine = ({ trackCoordinates }) => {
-    const map = useMap();
-
-    useEffect(() => {
-      if (trackCoordinates.length > 1) {
-        console.log("trackView:", trackView); // Añade esta línea
-
-        let routingControl = L.Routing.control({
-          waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
-          routeWhileDragging: false,
-          draggableWaypoints: false,
-          fitSelectedRoutes: false,
-          showAlternatives: false,
-          router: new L.Routing.osrmv1({
-            serviceUrl: 'http://localhost:5000/route/v1',
-            language: 'es',
-            profile: 'foot',
-          }),
-          addWaypoints: trackView === 'last' ? false : true,
-          show: false, // Cambia esta línea
-          routeLine: function (route, options) {
-            return L.polyline(route.coordinates, { color: trackView === 'last' ? 'orange' : 'blue', opacity: 1, weight: 5 });
-          },
-          createMarker: function () { return null; },
-        }).addTo(map);
-
-
-
-      }
-    }, [map, trackCoordinates]);
-
-    return null;
-  };
-
-  const renderTracksOnMap = (vehicleType, view) => {
-    let tracksGeoJSON;
-    if (vehicleType === 'car') {
-      if (method === 'GPS') {
-        tracksGeoJSON = carTracksGPSGeoJSON;
-      } else if (method === 'Geoapify') {
-        tracksGeoJSON = carTracksGeoapifyGeoJSON;
-      }
-    } else if (vehicleType === 'bicycle') {
-      if (method === 'GPS') {
-        tracksGeoJSON = bicycleTracksGPSGeoJSON;
-      } else if (method === 'Geoapify') {
-        tracksGeoJSON = bicycleTracksGeoapifyGeoJSON;
-      }
-    }
-
-    if (!tracksGeoJSON) {
-      return null;
-    }
-
-    // Filtrar los tracks basándose en la vista
-    let tracksToRender;
-    if (view === 'last') {
-      if (tracksGeoJSON && tracksGeoJSON.features) {
-        // Agrupar los tracks por el ID del vehículo
-        let tracksByVehicleId = {};
-        tracksGeoJSON.features.forEach(feature => {
-          const track = feature.properties;
-          if (!tracksByVehicleId[track.vehicleId]) {
-            tracksByVehicleId[track.vehicleId] = [];
-          }
-          tracksByVehicleId[track.vehicleId].push(feature);
+  const handleRemoveRoutes = async () => {
+    if (routes.length > 0) {
+      try {
+        const response = await axios.delete(`${URL}/api/routes`);
+        console.log('Rutas borradas');
+        setRoutes([]); // Aquí actualizas el estado para que no haya rutas
+        routingControlRef.current.forEach(routingControl => {
+          mapRef.current.removeControl(routingControl);
         });
-
-        // Para cada vehículo, seleccionar solo el último track
-        tracksToRender = Object.values(tracksByVehicleId).map(tracks => tracks[tracks.length - 1]);
-      } else {
-        tracksToRender = [];
+        routingControlRef.current = [];
+        mapRef.current.invalidateSize(); // Aquí fuerzas a Leaflet a redibujar el mapa
+      } catch (error) {
+        console.error(`Error al borrar la ruta: ${error}`);
       }
     } else {
-      tracksToRender = tracksGeoJSON && tracksGeoJSON.features ? tracksGeoJSON.features : [];
+      console.log("Nada que borrar");
     }
-
-    // Agrupar los tracks por el ID del vehículo
-    let tracksByVehicleId = {};
-    tracksToRender.forEach(feature => {
-      const track = feature.properties;
-      if (!tracksByVehicleId[track.vehicleId]) {
-        tracksByVehicleId[track.vehicleId] = [];
-      }
-      tracksByVehicleId[track.vehicleId].push(feature.geometry.coordinates);
-    });
-
-    return (
-      <React.Fragment>
-        {Object.keys(tracksByVehicleId).map(vehicleId => {
-          const trackCoordinates = tracksByVehicleId[vehicleId];
-          return (
-            <RoutingMachine key={vehicleId} trackCoordinates={trackCoordinates} />
-          );
-        })}
-        {tracksToRender.map((feature, index) => {
-          const track = feature.properties;
-          const coordinates = feature.geometry.coordinates;
-
-          return (
-            <Marker
-              key={index}
-              position={coordinates}
-              icon={track.vehicleType === 'car' ? carIcon : bicycleIcon}
-              zIndexOffset={500}
-            >
-              <Popup>
-                <p>{`Track ID: ${track.trackId}`}</p>
-                <p>{`Location: ${coordinates.join(', ')}`}</p>
-                <p>{`Type: ${track.type}`}</p>
-                <p>{`Speed: ${track.speed}`}</p>
-                <p>{`Vehicle ID: ${track.vehicleId}`}</p>
-                <p>{`Status: ${track.status}`}</p>
-              </Popup>
-            </Marker>
-          );
-        })}
-        <GeoJSON data={tracksGeoJSON} />
-      </React.Fragment>
-    );
   };
+  
+  
+  
 
-
+const RoutingMachine = ({ trackCoordinates }) => {
+  const map = useMap();
 
   useEffect(() => {
-  }, [tracksWithinBounds]);
+    if (trackCoordinates.length > 1) {
+      console.log("trackView:", trackView); // Añade esta línea
+
+      let routingControl = L.Routing.control({
+        waypoints: trackCoordinates.map(coord => L.latLng(coord[0], coord[1])),
+        routeWhileDragging: false,
+        draggableWaypoints: false,
+        fitSelectedRoutes: false,
+        showAlternatives: false,
+        router: new L.Routing.osrmv1({
+          serviceUrl: 'http://localhost:5000/route/v1',
+          language: 'es',
+          profile: 'foot',
+        }),
+        addWaypoints: trackView === 'last' ? false : true,
+        show: false, // Cambia esta línea
+        routeLine: function (route, options) {
+          return L.polyline(route.coordinates, { color: trackView === 'last' ? 'orange' : 'blue', opacity: 1, weight: 5 });
+        },
+        createMarker: function () { return null; },
+      }).addTo(map);
 
 
 
+    }
+  }, [map, trackCoordinates]);
+
+  return null;
+};
+
+const renderTracksOnMap = (vehicleType, view) => {
+  let tracksGeoJSON;
+  if (vehicleType === 'car') {
+    if (method === 'GPS') {
+      tracksGeoJSON = carTracksGPSGeoJSON;
+    } else if (method === 'Geoapify') {
+      tracksGeoJSON = carTracksGeoapifyGeoJSON;
+    }
+  } else if (vehicleType === 'bicycle') {
+    if (method === 'GPS') {
+      tracksGeoJSON = bicycleTracksGPSGeoJSON;
+    } else if (method === 'Geoapify') {
+      tracksGeoJSON = bicycleTracksGeoapifyGeoJSON;
+    }
+  }
+
+  if (!tracksGeoJSON) {
+    return null;
+  }
+
+  // Filtrar los tracks basándose en la vista
+  let tracksToRender;
+  if (view === 'last') {
+    if (tracksGeoJSON && tracksGeoJSON.features) {
+      // Agrupar los tracks por el ID del vehículo
+      let tracksByVehicleId = {};
+      tracksGeoJSON.features.forEach(feature => {
+        const track = feature.properties;
+        if (!tracksByVehicleId[track.vehicleId]) {
+          tracksByVehicleId[track.vehicleId] = [];
+        }
+        tracksByVehicleId[track.vehicleId].push(feature);
+      });
+
+      // Para cada vehículo, seleccionar solo el último track
+      tracksToRender = Object.values(tracksByVehicleId).map(tracks => tracks[tracks.length - 1]);
+    } else {
+      tracksToRender = [];
+    }
+  } else {
+    tracksToRender = tracksGeoJSON && tracksGeoJSON.features ? tracksGeoJSON.features : [];
+  }
+
+  // Agrupar los tracks por el ID del vehículo
+  let tracksByVehicleId = {};
+  tracksToRender.forEach(feature => {
+    const track = feature.properties;
+    if (!tracksByVehicleId[track.vehicleId]) {
+      tracksByVehicleId[track.vehicleId] = [];
+    }
+    tracksByVehicleId[track.vehicleId].push(feature.geometry.coordinates);
+  });
 
   return (
-    <>
-      <header>
-        <div className='arrow' onClick={() => goBack()}>
-          <ArrowLeftOutlined />
-        </div>
-        <div className="menuUserInfo">
-          <MenuUserInfo />
-        </div>
-        {/* <div className='profile'>
+    <React.Fragment>
+      {Object.keys(tracksByVehicleId).map(vehicleId => {
+        const trackCoordinates = tracksByVehicleId[vehicleId];
+        return (
+          <RoutingMachine key={vehicleId} trackCoordinates={trackCoordinates} />
+        );
+      })}
+      {tracksToRender.map((feature, index) => {
+        const track = feature.properties;
+        const coordinates = feature.geometry.coordinates;
+
+        return (
+          <Marker
+            key={index}
+            position={coordinates}
+            icon={track.vehicleType === 'car' ? carIcon : bicycleIcon}
+            zIndexOffset={500}
+          >
+            <Popup>
+              <p>{`Track ID: ${track.trackId}`}</p>
+              <p>{`Location: ${coordinates.join(', ')}`}</p>
+              <p>{`Type: ${track.type}`}</p>
+              <p>{`Speed: ${track.speed}`}</p>
+              <p>{`Vehicle ID: ${track.vehicleId}`}</p>
+              <p>{`Status: ${track.status}`}</p>
+            </Popup>
+          </Marker>
+        );
+      })}
+      <GeoJSON data={tracksGeoJSON} />
+    </React.Fragment>
+  );
+};
+
+
+
+useEffect(() => {
+}, [tracksWithinBounds]);
+
+
+
+
+return (
+  <>
+    <header>
+      <div className='arrow' onClick={() => goBack()}>
+        <ArrowLeftOutlined />
+      </div>
+      <div className="menuUserInfo">
+        <MenuUserInfo />
+      </div>
+      {/* <div className='profile'>
           <ProfilePictureUser onClick={() => setShowEditImage(!showEditImage)} />
         </div> */}
-        <div className='username'>
-          <h1 onClick={() => setShowEditUsername(!showEditUsername)}>
-            {userInfo.Username}
-          </h1>
+      <div className='username'>
+        <h1 onClick={() => setShowEditUsername(!showEditUsername)}>
+          {userInfo.Username}
+        </h1>
 
-        </div>
-      </header>
-      <div className="userProfileData">
-        <h2>Here you will see you stats:</h2>
-        <p>Car Time = {carTime}</p>
-        <p>Bicycle Time = {bicycleTime}</p>
-        <p>Car Km = {(carDistance / 1000).toFixed(2)} Km</p>
-
-        <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)} Km{bicycleTime}</p>
-        <p>Total Time = {totalTime}</p>
-        <p>Total Km = {(totalDistance / 1000).toFixed(2)} Km</p>
-        {lastJourney ? (
-          <>
-            <h3>Last Journey:</h3>
-            <p>Start: {new Date(lastJourney.firstTrack.Date).toLocaleString()} at {startPlaceName}</p>
-            <p>End: {new Date(lastJourney.lastTrack.Date).toLocaleString()} at {endPlaceName}</p>
-          </>
-        ) : (
-          <p>Loading last journey...</p>
-        )}
-
-
-        {showEditUsername && (
-          <form onSubmit={handleSubmit}>
-            <label>
-              Cambiar nombre de usuario:
-              <input type="text" name="Username" value={formData.Username} onChange={handleChange} />
-            </label>
-            <button type="submit">Actualizar nombre de usuario</button>
-          </form>
-        )}
-        {showEditImage && (
-          <form onSubmit={handleSubmit} encType="multipart/form-data">
-            <label>
-              Cambiar imagen de perfil:
-              <input type="file" name="Image" onChange={handleChange} accept="image/*" />
-            </label>
-            {previewImage && (
-              <div className="image-preview">
-                <img src={previewImage} alt="Preview" />
-              </div>
-            )}
-            <button type="submit">Actualizar imagen de perfil</button>
-          </form>
-        )}
       </div>
-      <div>
-        <Select
-          style={{ width: 200 }}
-          placeholder="Selecciona un intervalo de tiempo"
-          optionFilterProp="children"
-          onChange={value => {
-            setTimeInterval(JSON.parse(value));
-            fetchTracksInTimeInterval();
-          }}
-          filterOption={(input, option) =>
-            option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
-          }
-        >
-          {timeOptions.map((option, index) => (
-            <Option key={index} value={JSON.stringify(option.value)}>{option.label}</Option>
-          ))}
-        </Select>
-      </div>
-      <div>
-        <Select
-          style={{ width: 200 }}
-          placeholder="Selecciona un método"
-          optionFilterProp="children"
-          onChange={value => {
-            setMethod(value);
-          }}>
-          <Option value='GPS' />
-          <Option value='Geoapify' />
-        </Select>
-      </div>
-      <input
-        type="text"
-        value={placeA}
-        onChange={e => setPlaceA(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            handlePlaceSubmit(placeA, setPointA, pointARef);
-            console.log(pointARef.current);
-          }
+    </header>
+    <div className="userProfileData">
+      <h2>Here you will see you stats:</h2>
+      <p>Car Time = {carTime}</p>
+      <p>Bicycle Time = {bicycleTime}</p>
+      <p>Car Km = {(carDistance / 1000).toFixed(2)} Km</p>
+
+      <p>Bicycle Km = {(bicycleDistance / 1000).toFixed(2)} Km{bicycleTime}</p>
+      <p>Total Time = {totalTime}</p>
+      <p>Total Km = {(totalDistance / 1000).toFixed(2)} Km</p>
+      {lastJourney ? (
+        <>
+          <h3>Last Journey:</h3>
+          <p>Start: {new Date(lastJourney.firstTrack.Date).toLocaleString()} at {startPlaceName}</p>
+          <p>End: {new Date(lastJourney.lastTrack.Date).toLocaleString()} at {endPlaceName}</p>
+        </>
+      ) : (
+        <p>Loading last journey...</p>
+      )}
+
+
+      {showEditUsername && (
+        <form onSubmit={handleSubmit}>
+          <label>
+            Cambiar nombre de usuario:
+            <input type="text" name="Username" value={formData.Username} onChange={handleChange} />
+          </label>
+          <button type="submit">Actualizar nombre de usuario</button>
+        </form>
+      )}
+      {showEditImage && (
+        <form onSubmit={handleSubmit} encType="multipart/form-data">
+          <label>
+            Cambiar imagen de perfil:
+            <input type="file" name="Image" onChange={handleChange} accept="image/*" />
+          </label>
+          {previewImage && (
+            <div className="image-preview">
+              <img src={previewImage} alt="Preview" />
+            </div>
+          )}
+          <button type="submit">Actualizar imagen de perfil</button>
+        </form>
+      )}
+    </div>
+    <div>
+      <Select
+        style={{ width: 200 }}
+        placeholder="Selecciona un intervalo de tiempo"
+        optionFilterProp="children"
+        onChange={value => {
+          setTimeInterval(JSON.parse(value));
+          fetchTracksInTimeInterval();
         }}
-      />
-      <input
-        type="text"
-        value={placeB}
-        onChange={e => setPlaceB(e.target.value)}
-        onKeyDown={e => {
-          if (e.key === 'Enter') {
-            handlePlaceSubmit(placeB, setPointB, pointBRef);
-            console.log(pointBRef);
-          }
-        }}
-      />
-      <button onClick={handleRemoveRoutes}>Eliminar rutas</button>
-      <div style={{ height: '500px', width: '100%' }}>
-        <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
-          <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} />
-          <MapBounds />
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          <CustomControl />
-          <LayersControl key={`${trackView}-${Date.now()}`} position="topleft">
-            <LayersControl.BaseLayer name="Todas las rutas">
-              <LayerGroup>
-                {renderTracksOnMap('car', 'complete')}
-                {renderTracksOnMap('bicycle', 'complete')}
-              </LayerGroup>
-            </LayersControl.BaseLayer>
+        filterOption={(input, option) =>
+          option.children.toLowerCase().indexOf(input.toLowerCase()) >= 0
+        }
+      >
+        {timeOptions.map((option, index) => (
+          <Option key={index} value={JSON.stringify(option.value)}>{option.label}</Option>
+        ))}
+      </Select>
+    </div>
+    <div>
+      <Select
+        style={{ width: 200 }}
+        placeholder="Selecciona un método"
+        optionFilterProp="children"
+        onChange={value => {
+          setMethod(value);
+        }}>
+        <Option value='GPS' />
+        <Option value='Geoapify' />
+      </Select>
+    </div>
+    <input
+      type="text"
+      value={placeA}
+      onChange={e => setPlaceA(e.target.value)}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          handlePlaceSubmit(placeA, setPointA, pointARef);
+          console.log(pointARef.current);
+        }
+      }}
+    />
+    <input
+      type="text"
+      value={placeB}
+      onChange={e => setPlaceB(e.target.value)}
+      onKeyDown={e => {
+        if (e.key === 'Enter') {
+          handlePlaceSubmit(placeB, setPointB, pointBRef);
+          console.log(pointBRef);
+        }
+      }}
+    />
+    <button onClick={handleRemoveRoutes}>Eliminar rutas</button>
+    <div style={{ height: '500px', width: '100%' }}>
+      <MapContainer center={mapPositionRef.current} zoom={mapZoomRef.current} style={{ height: '100%', width: '100%' }}>
+        <MapClickHandler setPointA={setPointA} setPointB={setPointB} markerARef={markerARef} markerBRef={markerBRef} />
+        <MapBounds />
+        <TileLayer
+          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        />
+        <CustomControl />
+        <LayersControl key={`${trackView}-${Date.now()}`} position="topleft">
+          <LayersControl.BaseLayer name="Todas las rutas">
+            <LayerGroup>
+              {renderTracksOnMap('car', 'complete')}
+              {renderTracksOnMap('bicycle', 'complete')}
+            </LayerGroup>
+          </LayersControl.BaseLayer>
 
-            <LayersControl.BaseLayer name="Último track">
-              <LayerGroup>
-                {renderTracksOnMap('car', 'last')}
-                {renderTracksOnMap('bicycle', 'last')}
-              </LayerGroup>
-            </LayersControl.BaseLayer>
-            <LayersControl.Overlay checked name="Bicicletas">
-              <LayerGroup>
-                {renderTracksOnMap('bicycle', trackView)}
-              </LayerGroup>
-            </LayersControl.Overlay>
+          <LayersControl.BaseLayer name="Último track">
+            <LayerGroup>
+              {renderTracksOnMap('car', 'last')}
+              {renderTracksOnMap('bicycle', 'last')}
+            </LayerGroup>
+          </LayersControl.BaseLayer>
+          <LayersControl.Overlay checked name="Bicicletas">
+            <LayerGroup>
+              {renderTracksOnMap('bicycle', trackView)}
+            </LayerGroup>
+          </LayersControl.Overlay>
 
-            <LayersControl.Overlay checked name="Coches">
-              <LayerGroup>
-                {renderTracksOnMap('car', trackView)}
-              </LayerGroup>
-            </LayersControl.Overlay>
-          </LayersControl>
-        </MapContainer>
-      </div>
-    </>
-  );
+          <LayersControl.Overlay checked name="Coches">
+            <LayerGroup>
+              {renderTracksOnMap('car', trackView)}
+            </LayerGroup>
+          </LayersControl.Overlay>
+        </LayersControl>
+      </MapContainer>
+    </div>
+  </>
+);
 }
 
 export default UserProfile;
