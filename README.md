@@ -96,7 +96,8 @@ That's how it looks like if you change it to spanish:
 
 ### Admin interface:
 When you try to enter as an admin, it will apear a login page as the following:
-![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/e941ab32-a5cc-4986-9030-3b57b2cd987b)
+
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/b32a0147-cff6-448d-81e2-98a9e07028de)
 
 Then if you enter succesfully, you will have access to every table of the database (only the Admin table as an example is shown)
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/d2914af9-1763-48d4-b039-9e5982f72a5f)
