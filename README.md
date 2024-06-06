@@ -65,13 +65,15 @@ The interface of the app it's really simple, for the user, two buttons where you
 
 ### User interface:
 First, once you enter into the app, you will have a login page, where you can login and depending of the role of your user you'll be redirected to the user or admin page:
+
 ![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/dd3c0b06-dacc-44d5-bf62-4721d9e89ed6)
 
 This is the home page:
 
-![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/b0ed9750-0d60-4cc6-a954-07e72c7acf04)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/a017fc8e-50c5-493b-9c77-b46948b3d3df)
 
 If you log as a car it appears this interface:
+
 ![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/931ec42f-f85d-4903-8cb6-01339b27a259)
 
 And if you log as a bike it appears this interface:
