@@ -24,6 +24,14 @@ These are the database entities that we are using to store all the information f
 
 **Subscription**: This entity has an endpoint **(endpoint)**, an expiration time **(expirationTime)**, keys **(keys)**, and a subscription name **(subscriptionName)**.
 
+Additionally, here is the description of the relationships between the entities:
+
+An **Admin** can manage many **Vehicles**.
+An **Admin** can manage many **Routes**.
+A **Vehicle** can send many **Tracks**, and a **Track** only belongs to one **Vehicle**.
+A **Track** can be managed by many **Admins** and an **Admin** can manage many **Tracks**.
+A **Log** belongs to an **Admin** and a **Track**.
+
 ## Use Case Diagram
 
 I made this Use Case Diagram to have an idea of all the things that our app can do:
