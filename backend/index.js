@@ -207,6 +207,8 @@ require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
+require("./routes/routes.routes")(app);
+
 
 (USING_HTTPS ? SERVER : app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
