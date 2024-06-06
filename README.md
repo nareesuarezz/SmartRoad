@@ -116,9 +116,9 @@ We added some reports using JsReport, below, you have a pdf with a installation 
 
 Also we added websockets with the idea of warn every user in broadcast from an admin. That's how it 
 looks like in the admin and user interface:
-![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/44b4c12b-1075-4d89-9ff3-bf6c4f0a6962)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/c26c6b29-c66f-43e2-908a-a9a42ef798f6)
 
-![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/97b81d7d-fa95-4a51-9f88-a1ef070aefc9)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/4b0c00eb-6dab-438d-9586-c7dfac49ef77)
 
 
 
