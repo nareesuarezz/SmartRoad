@@ -90,8 +90,8 @@ Another new feature is that we added a multilanguage support (we just added engl
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/a805dd13-c78f-4a04-af69-cf308113dc9c)
 
 That's how it looks like if you change it to spanish:
-![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/e3e5278e-656e-471f-95a9-d21fbf3bf037)
 
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/7e6ea330-e65c-4bd4-99bd-ef81adeb0770)
 
 
 ### Admin interface:
