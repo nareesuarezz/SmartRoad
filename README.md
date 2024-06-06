@@ -100,7 +100,7 @@ When you try to enter as an admin, it will apear a login page as the following:
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/b32a0147-cff6-448d-81e2-98a9e07028de)
 
 Then if you enter succesfully, you will have access to every table of the database (only the Admin table as an example is shown)
-![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/d2914af9-1763-48d4-b039-9e5982f72a5f)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/4c474d7f-4869-4157-bdef-331105e3406d)
 
 Also we added a map on the tracks where you can difference a bicycle from a car by looking at their marks (bicycles are marked in blue and cars in red)
 
