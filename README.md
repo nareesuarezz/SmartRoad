@@ -74,10 +74,11 @@ This is the home page:
 
 If you log as a car it appears this interface:
 
-![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/931ec42f-f85d-4903-8cb6-01339b27a259)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/0678a3e8-cbc1-4b9d-bb94-447350076e22)
 
 And if you log as a bike it appears this interface:
-![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/c27904d9-aef0-4aa3-b377-d4cb369f4914)
+
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/e6713eda-b450-4a87-a13d-5084ea6799de)
 
 We also added a sound selector, where you can select a notification sound in case that you are a
 car driver:
