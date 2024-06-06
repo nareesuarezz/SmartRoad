@@ -1,6 +1,6 @@
 # SmartRoad:
 
-SmartRoad is a project whose purpose is to keep the driver informed of everything that happens around him, constantly saving data on the elements of the road (passive, such as traffic signs, changing, such as traffic lights, and active, such as the vehicles themselves.).
+SmartRoad is a project whose purpose is to keep the driver informed of everything that is happening around him and to have the possibility of making routes to know which road is the fastest.
 
 Apart from incorporating a cyclist alert which notifies the car driver when his path matches with that of a cyclist, notifying him of the approximate time of the encounter with the cyclist.
 
@@ -10,14 +10,19 @@ Apart from incorporating a cyclist alert which notifies the car driver when his 
 
 These are the database entities that we are using to store all the information for this application to work.
 
-**Vehicles** : This entity has an Unique ID **(UID)**, and the type of vehicle that it is **(Vehicle)**
+**Vehicles**: This entity has a unique ID **(UID)**, the type of vehicle **(Vehicle)**, and the ID of the admin it belongs to **(Admin_UID)**.
 
-**Tracks** : This entity has an ID of the track **(ID)**, the location of the track **(Location)**, the status of the vehicle that it tracked **(Status)**, the speed of the vehicle **(Speed)**, a JSON of extra information like an encounter with a bike **(Extra)** and also the Vehicle UID **(Vehicle_UID)**
+**Tracks**: This entity has a track ID **(ID)**, the location of the track **(Location)**, the status of the tracked vehicle **(Status)**, the speed of the vehicle **(Speed)**, the type of tracking that can be *Simulation or Real* **(Type)**, the tracking method that can be *GPS or Geoapify* **(Method)**, a JSON with extra information like an encounter with a bike **(Extra)**, the date of the tracking **(Date)**, and the vehicle ID **(Vehicle_UID)**.
 
-**Admin** : This entity has and ID of the admin **(ID)**, an username **(Username)**, a password **(Password)** and a filename which is the profile picture **(Filename)**
+**Admins**: This entity has an admin unique ID (UID), an username **(Username)**, a password **(Password)**, a filename which is the profile picture **(Filename)**, a role which can be *User or Admin* **(Role)**, and additional details that are used for the filter of Admins **(Details)**.
 
-**Logs** : This entity has and ID of the log **(Log_ID)**, an id of the admin that made an action on a track **(Admin_UID)**
-In our database, we assume that an admin (in this case the is an administrator since a common user does not require to login and is anonymous) can manage many tracks and a track can be managed by several administrators. Also, a vehicle can send many tracks and a track only belongs to one vehicle.
+**Logs**: This entity has a log ID **(Log_ID)**, the action performed **(Action)**, the ID of the admin who performed the action **(Admin_UID)**, and the ID of the track on which the action was performed **(Track_ID)**.
+
+**Routes**: This entity has a route ID **(id)**, a starting point **(from)**, an ending point **(to)**, and the ID of the admin who created the route **(AdminId)**.
+
+**Sounds**: This entity has an id **(id)** filename **(filename)**.
+
+**Subscription**: This entity has an endpoint **(endpoint)**, an expiration time **(expirationTime)**, keys **(keys)**, and a subscription name **(subscriptionName)**.
 
 ## Use Case Diagram
 
