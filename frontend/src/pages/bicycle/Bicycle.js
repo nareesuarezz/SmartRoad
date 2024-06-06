@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import logoBicycle from '../../img/bike.png';
+import logoCar from '../../img/car.png';
 import './Bicycle.css'
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import axios from 'axios';
@@ -10,7 +11,12 @@ import UserNotification from '../../components/websocketTest/UserNotification';
 function Bicycle() {
     const { t } = useTranslation();
 
+    const API = process.env.REACT_APP_LOCALHOST_URL;
+    const URL = process.env.REACT_APP_LOCALHOST_URL;
+
     const [lastVehicleId, setLastVehicleId] = useState(null);
+    const [speed, setSpeed] = useState(null);
+    const [isTooFast, setIsTooFast] = useState(false);
 
     const time = 5000;
 
@@ -19,19 +25,35 @@ function Bicycle() {
     //Location
     const addTrackGeo = async () => {
         try {
-            console.log("antes de trackGeo")
+            // Obtener la ubicación actual
             const location = await trackGeo();
 
-            console.log(lastVehicleId)
+            let vehicleType = 'bicycle';
+            if (speed >= 0) {
+                vehicleType = 'car';
+                setIsTooFast(true);
+                // Actualizar el tipo de vehículo en la base de datos
+                await axios.put(`${URL}/api/vehicles/${lastVehicleId}`, { Vehicle: vehicleType });
+            }
+            console.log(vehicleType)
             const data = {
                 Location: location,
                 Status: 'Stopped',
-                Speed: '0',
-                Extra: 'coche',
+                Speed: speed,
+                Type: 'Real',
+                Extra: `vehiculo: ${vehicleType}`, // Mantén esto como 'bicycle' sin importar la velocidad
                 Vehicle_UID: lastVehicleId,
             };
+            // Llamar a axios.post con los datos actualizados
+            await axios.post(`${URL}/api/tracks`, data);
+            console.log(data.Type)
 
-            await axios.post('https://smart-road-ke3l.vercel.app/api/tracks', data);
+            // Obtener el último track para este vehículo
+            const response = await axios.get(`${URL}/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+            const lastTrack = response.data[0];
+
+            // Actualizar el estado de la velocidad
+            setSpeed(lastTrack.Speed);
 
             console.log(data.Location.coordinates)
 
@@ -40,23 +62,31 @@ function Bicycle() {
         }
     };
 
+
     //Función para recoger la localización y devolverla
     const trackGeo = () => {
         return new Promise((resolve, reject) => {
-            try {
-                navigator.geolocation.getCurrentPosition((position) => {
+            navigator.geolocation.getCurrentPosition(
+                (position) => {
                     const location = {
                         type: 'Point',
                         coordinates: [position.coords.latitude, position.coords.longitude],
                     };
                     resolve(location);  //Devuelve la localización recogida
-                });
-            } catch (error) {
-                console.error(error);
-                reject(error);
-            }
+                },
+                (error) => {
+                    console.error(error);
+                    reject(error);
+                },
+                {
+                    enableHighAccuracy: true,
+                    maximumAge: 0,
+                    timeout: 5000,
+                }
+            );
         });
     };
+
 
     //Status UseEffect
     useEffect(() => {
@@ -102,12 +132,17 @@ function Bicycle() {
     useEffect(() => {
         const fetchData = async () => {
             console.log("Recogiendo ID del vehiculo");
-            const response = await axios.get('https://smart-road-ke3l.vercel.app/api/vehicles');
-            const vehicles = response.data;
-            const lastId = vehicles[vehicles.length - 1].UID;
-            setLastVehicleId(lastId);
-            console.log("ID del vehiculo: ", lastId);
+            const response = await axios.get('https://localhost/api/vehicles');
+            const vehicles = Array.isArray(response.data) ? response.data : [];
+            if (vehicles.length > 0) {
+                const lastId = vehicles[vehicles.length - 1].UID;
+                setLastVehicleId(lastId);
+                console.log("ID del vehiculo: ", lastId);
+            } else {
+                console.log("No se encontraron vehículos");
+            }
         };
+
 
         fetchData(); // Llamada inicial para recoger el ID del vehículo
 
@@ -140,14 +175,14 @@ function Bicycle() {
             </div>
 
             <div className="bicycle-container">
-                <div className="vehicle-box bicycle-box">
-                    <img src={logoBicycle} alt={t('Logo de bicicleta')} />
-                </div>
-                <p className='bicycle'>{t('Bicycle')}</p>
-
+                <div className={isTooFast ? "vehicle-box car-box" : "vehicle-box bicycle-box"}>
+                    <img src={isTooFast ? logoCar : logoBicycle} alt={t(isTooFast ? 'Logo de coche' : 'Logo de bicicleta')} />                </div>
+                <p className='bicycle'>{t(isTooFast ? 'Car' : 'Bicycle')}</p>
+                <p className='speed'>{`Velocidad: ${speed} km/h`}</p>
+                {isTooFast && <p className='warning'>{t('You are going too fast, we will track you as a car')}</p>}
                 <h3 className='warn'>{t('Now every car user will be warned in case that they are near you.')}</h3>
             </div>
-            <UserNotification/>
+            <UserNotification />
         </>
     );
 }

@@ -5,6 +5,7 @@ const utils = require("../utils");
 const bcrypt = require('bcryptjs');
 const fs = require('fs');
 const path = require('path');
+const Sequelize = require('sequelize');
 
 exports.create = (req, res, next) => {
   console.log('File:', req.file);
@@ -21,13 +22,16 @@ exports.create = (req, res, next) => {
     return;
   }
 
+  let deta = `${req.body.Username} daskndasdlknd ${req.body.Password} ${req.body.Role}`;
+
   let admin = {
     Username: req.body.Username,
     Password: req.body.Password,
     Role: req.body.Role,
+    Details: deta,
     filename: req.file ? req.file.filename : ""
   };
-  
+
 
   Admin.findOne({ where: { Username: admin.Username } })
     .then(data => {
@@ -67,7 +71,7 @@ exports.findAll = (req, res) => {
 
   Admin.findAll()
     .then(data => {
-      console.log('kkkkkk',data)
+      console.log('kkkkkk', data)
       res.send(data);
     })
     .catch(err => {
@@ -81,7 +85,7 @@ exports.findAll = (req, res) => {
 exports.findOne = (req, res) => {
   const id = req.params.id;
 
-  Admin.findByPk(id,{attributes: {exclude: ['Password']}} )
+  Admin.findByPk(id, { attributes: { exclude: ['Password'] } })
     .then(data => {
       res.send(data);
     })
@@ -113,7 +117,7 @@ exports.update = async (req, res) => {
     if (req.body.Role) {
       admin.Role = req.body.Role;
     }
-    
+
     if (req.file) {
       if (admin.filename) {
         const imagePath = path.join(__dirname, '../public/images/', admin.filename);
@@ -252,4 +256,53 @@ exports.getLoggedInAdmin = (req, res) => {
     .catch(error => {
       res.status(500).json({ message: 'Error al obtener información del admin logeado.' });
     });
+};
+
+//Functions for the filters
+
+exports.findAllByRole = (req, res) => {
+  const role = req.params.Role
+  Admin.findAll({ where: { Role: role } })
+    .then(data => {
+      console.log('Role: ', data)
+      res.send(data);
+    })
+}
+
+exports.findByLetters = (req, res) => {
+  const letters = req.params.letters;
+  Admin.findAll({
+    where: {
+      Username: {
+        [Sequelize.Op.like]: letters + '%'
+      }
+    }
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving users."
+      });
+    });
+};
+
+exports.findByRoleAndLetters = async (req, res) => {
+  const letters = req.params.letters;
+  const role = req.params.Role;
+
+  try {
+    const data = await Admin.findAll({
+      where: {
+        Username: { [Sequelize.Op.like]: letters + '%' },
+        Role: role
+      }
+    });
+
+    res.send(data);
+  } catch (error) {
+    console.error(error);
+    res.status(500).send({ message: 'Error al obtener los datos' });
+  }
 };

@@ -15,5 +15,9 @@ module.exports = app => {
 
   router.delete("/", vehicles.deleteAll);
 
+  router.get("/findByVehicleType/:Vehicle", vehicles.findByVehicleType)
+
+  router.get("/findByAdminUID/:Admin_UID", vehicles.findByAdminUID)
+
   app.use("/api/vehicles", router);
 }

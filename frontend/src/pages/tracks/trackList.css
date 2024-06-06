@@ -1,5 +1,3 @@
-@import '~leaflet/dist/leaflet.css';
-
 .container {
   padding: 20px;
   max-width: 100%;
@@ -7,10 +5,6 @@
 
 .button-primary {
   margin-top: 20px;
-}
-
-.leaflet-routing-container {
-  display: none !important;
 }
 
 .arrow {
@@ -23,7 +17,6 @@
   overflow-x: auto;
   border-collapse: collapse;
 }
-
 
 .table th,
 .table td {
@@ -75,7 +68,10 @@
 
 .add {
   background-color: #f8ab2f;
-  margin-left: 10px;
+}
+
+.track-add-container {
+  margin-left: 12px;
 }
 
 .add:hover {
@@ -98,6 +94,22 @@
 
 .delete:hover {
   background-color: #7b0e02;
+}
+
+.language-add-bottons-container-track {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.div-select-tracks-time {
+  margin-left: 12px;
+  margin-top: 8px;
+}
+
+.div-select-tracks-method {
+  margin-left: 12px;
+  margin-top: 8px;
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1023px) {
@@ -127,6 +139,7 @@
 }
 
 @media only screen and (max-width: 767px) {
+
   .table th.speed,
   .table td.speed {
     width: auto;

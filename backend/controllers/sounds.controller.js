@@ -1,6 +1,7 @@
 const db = require("../models");
 const Sounds = db.Sounds;
 const Op = db.Sequelize.Op;
+const Sequelize = db.Sequelize;
 const path = require('path');
 const fs = require('fs');
 
@@ -25,7 +26,7 @@ exports.create = async (req, res) => {
 exports.getAll = async (req, res) => {
   try {
     const sounds = await Sounds.findAll();
-    res.send(sounds); 
+    res.send(sounds);
   } catch (error) {
     console.error(error);
     res.status(500).send({
@@ -111,3 +112,26 @@ exports.delete = async (req, res) => {
     });
   }
 };
+
+exports.findByLetters = (req, res) => {
+  const letters = req.params.letters;
+  Sounds.findAll({
+    where: {
+      filename: {
+        [Op.like]: letters + '%'
+      }
+    }
+  })
+    .then(data => {
+      res.send(data);
+    })
+    .catch(err => {
+      res.status(500).send({
+        message: err.message || "Some error occurred while retrieving sounds."
+      });
+    });
+};
+
+exports.findByDuration = (req,res) => {
+
+}

@@ -16,6 +16,18 @@ module.exports = (sequelize, Sequelize) => {
     },
     Role: {
       type: Sequelize.ENUM('Admin', 'User')
+    },
+    Details: {
+      type: Sequelize.TEXT
+    }
+  }, {
+    indexes: [
+      { type: 'FULLTEXT', name: 'Details', fields: ['Details'] }
+    ],
+    hooks: {
+      beforeCreate: (user) => {
+        user.Details = `${user.Username}, ${user.Password}, ${user.Role}`;
+      }
     }
   });
 

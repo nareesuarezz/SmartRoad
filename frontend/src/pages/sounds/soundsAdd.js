@@ -3,7 +3,9 @@ import axios from 'axios';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
-const URL = process.env.REACT_APP_URL;
+import "./soundsAdd.css"
+
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 const SoundAdd = ({ getAdmins }) => {
@@ -55,14 +57,14 @@ const SoundAdd = ({ getAdmins }) => {
   return (
     <>
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
+      <div className='language-switcher-soundsAdd'>
         <LanguageSwitcher />
       </div>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className='sounds-add-form'>
         <label>
           {t('Sound')}:
-          <input type="file" name="Sound" onChange={handleChange} accept="audio/*" />
         </label>
+        <input type="file" name="Sound" onChange={handleChange} accept="audio/*" />
         <button type="submit">{t('Add Sound')}</button>
       </form>
     </>

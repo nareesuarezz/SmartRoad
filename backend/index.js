@@ -7,7 +7,8 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const http = require('http');
-const socketIo = require('socket.io');
+const https = require('https');
+const socket = require('./socket');
 const dbConfig = require("./config/db.config");
 
 const PORT = process.env.PORT || 3000;
@@ -61,7 +62,7 @@ db.sequelize.sync().then(async () => {
       Username: 'carmelo',
       Password: hashedPasswordUs,
       filename: 'user.png',
-      Role: 'User'
+      Role: 'User',
     })
 
     const createdSound1 = await db.Sounds.create({
@@ -125,12 +126,8 @@ app.use(function (req, res, next) {
 
 const SERVER = http.createServer(app);
 
-const io = socketIo(SERVER, {
-  cors: {
-    origin: "https://smart-road.vercel.app", 
-    methods: ["GET", "POST"]
-  }
-});
+const io = socket.init(SERVER);
+
 
 // Socket.IO setup for global notifications
 io.on('connection', (socket) => {
@@ -173,6 +170,8 @@ require("./routes/tracks.routes")(app);
 require("./routes/vehicles.routes")(app);
 require("./routes/admins.routes")(app);
 require("./routes/subscription.routes")(app);
+require("./routes/routes.routes")(app);
+
 
 SERVER.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

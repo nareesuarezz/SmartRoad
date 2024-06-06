@@ -1,14 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import './App.css';
 import { Route, Routes, BrowserRouter } from 'react-router-dom';
 import { initReactI18next } from 'react-i18next'; // Import initReactI18next
-import i18n from 'i18next'; // Import i18n
-
+import { PersistGate } from 'redux-persist/integration/react';
+import createStore from './services/store';
+import { Provider } from 'react-redux'; import i18n from 'i18next'; // Import i18n
 import Loading from './pages/loading/Loading';
 import Home from './pages/home/Home';
 import Car from './pages/car/Car';
 import Bicycle from './pages/bicycle/Bicycle';
-import Login from './pages/login/Login';
 import TrackList from './pages/tracks/trackList';
 import TrackAdd from './pages/tracks/trackAdd';
 import TrackEdit from './pages/tracks/trackEdit';
@@ -27,6 +27,7 @@ import SoundEdit from './pages/sounds/soundsEdit';
 import LoginUser from './pages/loginUser/LoginUser';
 import UserProfile from './pages/userProfile/userProfile'
 import SignUpUser from './pages/singupUser/SignUpUser';
+const { store, persistor } = createStore();
 
 // Initialize i18n
 i18n
@@ -143,6 +144,7 @@ i18n
   });
 
 function App() {
+
   useEffect(() => {
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('./sw.js')
@@ -157,38 +159,39 @@ function App() {
   }, []);
 
   return (
-    <>
-      <div id='demo'></div>
-      <BrowserRouter>
-        <Routes>
-          {/* Pass i18n instance to Home component */}
-          <Route path="/home" element={<Home />} />
-          <Route path="/" element={<Loading />} />
-          <Route path="/home" element={<Home />} />
-          <Route path="/car" element={<Car />} />
-          <Route path="/bicycle" element={<Bicycle />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/track-list" element={<TrackList />} />
-          <Route path="/track-add" element={<TrackAdd />} />
-          <Route path="/track-edit/:id" element={<TrackEdit />} />
-          <Route path="/vehicle-list" element={<VehicleList />} />
-          <Route path="/vehicle-add" element={<VehicleAdd />} />
-          <Route path="/vehicle-edit/:id" element={<VehicleEdit />} />
-          <Route path="/admin-list" element={<AdminList />} />
-          <Route path="/admin-add" element={<AdminAdd />} />
-          <Route path="/admin-edit/:id" element={<AdminEdit />} />
-          <Route path="/log-list" element={<LogList />} />
-          <Route path="/admin-notification" element={<AdminNotification />} />
-          <Route path="/user-notification" element={<UserNotification />} />
-          <Route path="/sound-list" element={<SoundList />} />
-          <Route path="/sound-add" element={<SoundAdd />} />
-          <Route path="/sound-edit/:id" element={<SoundEdit />} />
-          <Route path="/login-user" element={<LoginUser />} />
-          <Route path="/user-profile/:id" element={<UserProfile />} />
-          <Route path="/sign-up" element={<SignUpUser />} />
-        </Routes>
-      </BrowserRouter>
-    </>
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <div id='demo'></div>
+        <BrowserRouter>
+          <Routes>
+            {/* Pass i18n instance to Home component */}
+            <Route path="/home" element={<Home />} />
+            <Route path="/" element={<Loading />} />
+            <Route path="/home" element={<Home />} />
+            <Route path="/car" element={<Car />} />
+            <Route path="/bicycle" element={<Bicycle />} />
+            <Route path="/track-list" element={<TrackList />} />
+            <Route path="/track-add" element={<TrackAdd />} />
+            <Route path="/track-edit/:id" element={<TrackEdit />} />
+            <Route path="/vehicle-list" element={<VehicleList />} />
+            <Route path="/vehicle-add" element={<VehicleAdd />} />
+            <Route path="/vehicle-edit/:id" element={<VehicleEdit />} />
+            <Route path="/admin-list" element={<AdminList />} />
+            <Route path="/admin-add" element={<AdminAdd />} />
+            <Route path="/admin-edit/:id" element={<AdminEdit />} />
+            <Route path="/log-list" element={<LogList />} />
+            <Route path="/admin-notification" element={<AdminNotification />} />
+            <Route path="/user-notification" element={<UserNotification />} />
+            <Route path="/sound-list" element={<SoundList />} />
+            <Route path="/sound-add" element={<SoundAdd />} />
+            <Route path="/sound-edit/:id" element={<SoundEdit />} />
+            <Route path="/login-user" element={<LoginUser />} />
+            <Route path="/user-profile/:id" element={<UserProfile />} />
+            <Route path="/sign-up" element={<SignUpUser />} />
+          </Routes>
+        </BrowserRouter>
+      </PersistGate>
+    </Provider>
   );
 }
 

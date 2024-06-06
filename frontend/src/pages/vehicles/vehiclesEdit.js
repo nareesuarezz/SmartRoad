@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./vehiclesEdit.css"
 
 const URL = process.env.REACT_APP_URL;
 
@@ -62,18 +63,18 @@ const VehicleEdit = ({ getVehicles }) => {
     return (
         <>
             <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-            <div>
+            <div className='language-switcher-vhEdit'>
                 <LanguageSwitcher />
             </div>
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className='vehicles-edit-form'>
                 <label>
                     {t('Vehicle')}:
-                    <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
-                        <option value="">{t('Select')}</option>
-                        <option value="bicycle">{t('Bike')}</option>
-                        <option value="car">{t('Car')}</option>
-                    </select>
                 </label>
+                <select name="Vehicle" value={formData.Vehicle} onChange={handleChange}>
+                    <option value="">{t('Select')}</option>
+                    <option value="bicycle">{t('Bicycle')}</option>
+                    <option value="car">{t('Car')}</option>
+                </select>
                 <button type="submit">{t('Edit Vehicle')}</button>
             </form>
         </>

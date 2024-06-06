@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import './trackList.css';
+import './soundList.css';
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import { useTranslation } from 'react-i18next';
@@ -14,15 +14,37 @@ const SoundList = () => {
 
   const [sounds, setSounds] = useState([]);
 
+  const [soundName, setSoundName] = useState('');
+
+  const [durationFilter, setDurationFilter] = useState('');
+
   useEffect(() => {
-    getSounds();
-  }, []);
+    getSounds(soundName);
+  }, [soundName, durationFilter]);
 
   const getSounds = async () => {
     try {
-      const response = await axios.get(`${URL}/api/sounds/`, {});
-      console.log(response.data);
-      setSounds(response.data);
+      let response;
+      if (soundName) {
+        response = await axios.get(`${URL}/api/sounds/findBySound/${soundName}`);
+      } else {
+        response = await axios.get(`${URL}/api/sounds/`);
+      }
+      let soundsWithDuration = await Promise.all(response.data.map(async sound => {
+        return new Promise((resolve, reject) => {
+          let audio = new Audio(`${URL}/api/sounds/${sound.id}`);
+          audio.onloadedmetadata = function () {
+            resolve({ ...sound, duration: audio.duration });
+          };
+          audio.onerror = function () {
+            reject('Error loading audio');
+          };
+        });
+      }));
+      if (durationFilter) {
+        soundsWithDuration = soundsWithDuration.filter(sound => Math.floor(sound.duration) === durationFilter);
+      }
+      setSounds(soundsWithDuration);
     } catch (error) {
       console.error('Error fetching sounds:', error);
     }
@@ -37,22 +59,42 @@ const SoundList = () => {
     }
   };
 
-  const goBack = () => {
-    window.location.href = "/login";
-  };
+  const handleSoundNameGetter = (e) => {
+    setSoundName(e.target.value)
+  }
+
+  const handleDurationFilterChange = (e) => {
+    setDurationFilter(Number(e.target.value));
+  }
 
   return (
     <div>
       <Header />
-      <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
-        <LanguageSwitcher />
+      <div className='language-add-bottons-container-sounds'>
+        <div className='sounds-add-container'>
+          <Link to="/sound-add" className="add">
+            {t('Add New Sound')}
+          </Link>
+        </div>
+        <div>
+          <LanguageSwitcher />
+        </div>
       </div>
-      <Link to="/sound-add" className="add">
-        {t('Add New Sound')}
-      </Link>
+      <div className='sounds-filter'>
+        <div className='sounds-filter-duration'>
+          <select onChange={handleDurationFilterChange}>
+            <option value="">{t('-- Select Duration --')}</option>
+            <option value="1">{t('1 Second')}</option>
+            <option value="2">{t('2 Second')}</option>
+            <option value="3">{t('3 Second')}</option>
+          </select>
+        </div>
+        <div className='sounds-filter-name'>
+          <input type='text' placeholder={t('Sound Name')} onChange={handleSoundNameGetter}></input>
+        </div>
+      </div>
 
-      <table className="table is-striped is-fullwidth">
+      <table className="table-sounds">
         <thead>
           <tr>
             <th>ID</th>
@@ -68,7 +110,7 @@ const SoundList = () => {
               <td>{sound.filename}</td>
               <td>
                 {sound.id && (
-                  <audio controls>
+                  <audio controls className='audio-interface-sounds-list'>
                     <source src={`${URL}/api/sounds/${sound.id}`} type="audio/mp3" />
                     {t('Your browser does not support the audio tag.')}
                   </audio>

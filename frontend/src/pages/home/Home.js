@@ -124,6 +124,7 @@ function Home() {
         Location: location,
         Status: 'Moving',
         Speed: 0,
+        Type: 'Real',
         Extra: null,
         Vehicle_UID: vehicleId,
       });
@@ -134,10 +135,6 @@ function Home() {
       console.error('Error creating track:', error);
       throw error;
     }
-  };
-
-  const goLogin = () => {
-    window.location.href = "/login";
   };
 
   const goBack = () => {
@@ -152,13 +149,15 @@ function Home() {
 
   return (
     <>
-      <div className="title">
-        <h1>SmartRoad</h1>
-      </div>
       <div className='arrow' onClick={() => goBack()}>
         <UserDeleteOutlined />
       </div>
-      <div><ProfilePictureUser /></div>
+      <div className='home-view-profile-picture'>
+        <ProfilePictureUser />
+      </div>
+      <div className="title">
+        <h1>SmartRoad</h1>
+      </div>
       <div>
         <LanguageSwitcher />
       </div>
@@ -191,10 +190,6 @@ function Home() {
             </option>
           ))}
         </select>
-      </div>
-      <div className='admin'>
-        <p>{t('Are you an admin?')}</p>
-        <p className='log' onClick={goLogin}>{t('Log in here')}</p>
       </div>
       <a className='help' href='/html/Introduction.html'>{t('Need help?')}</a>
       <UserNotification />

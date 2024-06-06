@@ -1,0 +1,18 @@
+.language-switcher-soundsEdit {
+    margin-top: 12px;
+    margin-left: 20em;
+}
+
+.sounds-edit-form {
+    width: auto;
+    margin: 12px;
+    align-items: center;
+}
+
+.sounds-edit-form input {
+    width: 80%;
+}
+
+.sounds-edit-form button {
+    width: 90%;
+}

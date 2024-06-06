@@ -1,0 +1,19 @@
+.language-switcher-adAdd {
+    margin-top: 12px;
+    margin-left: 20em;
+}
+
+.admins-add-form {
+    width: auto;
+    margin: 12px;
+    align-items: center;
+}
+
+.admins-add-form input {
+    width: 80%;
+    margin-bottom: 10px;
+}
+
+.admins-add-form button {
+    width: 90%;
+}

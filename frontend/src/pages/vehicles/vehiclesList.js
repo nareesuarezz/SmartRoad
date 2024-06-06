@@ -5,6 +5,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./vehiclesList.css"
 
 const URL = process.env.REACT_APP_URL;
 
@@ -13,42 +14,83 @@ const VehicleList = () => {
 
   const [vehicles, setVehicles] = useState([]);
 
-  useEffect(() => {
-    getVehicles();
-  }, []);
+  const [vehicleT, setVehicleT] = useState('');
 
-  const getVehicles = async () => {
+  const [adminUID, setAdminUID] = useState('');
+
+  useEffect(() => {
+    getVehicles(vehicleT, adminUID);
+  }, [vehicleT, adminUID]);
+
+  const getVehicles = async (vehicleType = '', adminUID = '') => {
     try {
-      const response = await axios.get(`${URL}/api/vehicles`);
-      setVehicles(response.data);
+      let response
+
+      if (vehicleType) {
+        response = await axios.get(`${URL}/api/vehicles/findByVehicleType/${vehicleType}`);
+      }
+      else if (adminUID) {
+        response = await axios.get(`${URL}/api/vehicles/findByAdminUID/${adminUID}`);
+      }
+      else {
+        response = await axios.get(`${URL}/api/vehicles`)
+      }
+      setVehicles(response.data)
+
     } catch (error) {
       console.error('Error fetching vehicles:', error);
     }
-  };
+  }
 
   const deleteVehicle = async (id) => {
     try {
       await axios.delete(`${URL}/api/vehicles/${id}`);
-      getVehicles();
+      getVehicles(vehicleT, adminUID);
     } catch (error) {
       console.error(`Error deleting vehicle with id=${id}:`, error);
     }
   };
 
-  const goBack = () => {
-    window.location.href = "/login";
+  const handleVehicleGetter = (e) => {
+    setVehicleT(e.target.value)
   }
+
+  const handleAdminUIDGetter = (e) => {
+    setAdminUID(e.target.value)
+  }
+
+  const goBack = () => {
+    window.location.href = '/login-user';
+  };
 
   return (
     <div>
       <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
-        <LanguageSwitcher />
+      <div className='language-add-bottons-container-vehicles'>
+        <div className='vehicles-add-container'>
+          <Link to="/vehicle-add" className="add">
+            {t('Add New Vehicle')}
+          </Link>
+        </div>
+        <div>
+          <LanguageSwitcher />
+        </div>
       </div>
-      <Link to="/vehicle-add" className="add">
-        {t('Add New Vehicle')}
-      </Link>
+      <div className='vehicles-filter'>
+        <div className='vehicles-filter-type'>
+          <label>{t('Vehicle')}:</label>
+          <span> </span>
+          <select name="Vehicle" value={vehicleT} onChange={handleVehicleGetter}>
+            <option value="">{t('Select')}</option>
+            <option value="Car">{t('Car')}</option>
+            <option value="Bicycle">{t('Bicycle')}</option>
+          </select>
+        </div>
+        <div className='vehicles-filter-adminUID'>
+          <input type='text' placeholder={t('Admin_UID')} onChange={handleAdminUIDGetter}></input>
+        </div>
+      </div>
 
       <table className="table is-striped is-fullwidth">
         <thead>

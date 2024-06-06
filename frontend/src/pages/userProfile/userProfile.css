@@ -1,0 +1,29 @@
+header {
+    display: flex;
+    align-items: center;
+    position: relative;
+    height: 7em;
+    justify-content: center;
+}
+
+.arrow {
+    position: absolute;
+    left: 10px;
+    top: 15px;
+}
+
+.leaflet-routing-container {
+    display: none;
+  }
+  
+
+.username {
+    position: absolute;
+    bottom: 20px;
+}
+
+.userProfileData{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}

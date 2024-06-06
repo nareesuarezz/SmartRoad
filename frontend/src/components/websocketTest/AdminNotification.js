@@ -3,9 +3,15 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import './NotificationTest.css'
 import Header from '../header/header';
+import "./AdminNotification.css"
+import LanguageSwitcher from '../languageSwitcher/LanguageSwitcher';
+import { useTranslation } from 'react-i18next';
 
 const SOCKET_SERVER_URL = process.env.REACT_APP_URL;
 const AdminNotification = () => {
+  const { t } = useTranslation();
+
+
   const [showModal, setShowModal] = useState(false);
   const [currentNotification, setCurrentNotification] = useState('');
   const [formData, setFormData] = useState({ message: 'CAREFULL, CRASH AHEAD!!!' });
@@ -50,15 +56,18 @@ const AdminNotification = () => {
   return (
     <div>
       <Header />
-      <h2>Notifications</h2>
+      <div>
+        <LanguageSwitcher />
+      </div>
+      <h2>{t('Notifications')}</h2>
       <input
         type="text"
         name="message"
         value={formData.message}
         onChange={handleChange}
-        placeholder="Escribe tu mensaje de notificación"
+        placeholder=""
       />
-      <button onClick={sendNotification}>Enviar Notificación</button>
+      <button onClick={sendNotification}>{t('Send Notification')}</button>
       {showModal && (
         <div className="modal-overlay">
           <div className="modal">

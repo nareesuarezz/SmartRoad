@@ -1,0 +1,18 @@
+.language-switcher-soundsAdd {
+    margin-top: 12px;
+    margin-left: 20em;
+}
+
+.sounds-add-form {
+    width: auto;
+    margin: 12px;
+    align-items: center;
+}
+
+.sounds-add-form input {
+    width: 80%;
+}
+
+.sounds-add-form button {
+    width: 90%;
+}

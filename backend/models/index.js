@@ -24,6 +24,7 @@ db.Track = require("./tracks.model.js")(sequelize, Sequelize);
 db.Admin = require("./admins.model.js")(sequelize, Sequelize);
 db.Log = require("./logs.model.js")(sequelize, Sequelize);
 db.Subscription = require("./subscription.model.js")(sequelize, Sequelize);
+db.Routes = require("./routes.model.js")(sequelize, Sequelize);
 
 db.Log.belongsTo(db.Admin, { foreignKey: 'Admin_UID' });
 db.Log.belongsTo(db.Track, { foreignKey: 'Track_ID' });

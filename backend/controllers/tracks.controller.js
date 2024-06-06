@@ -4,10 +4,73 @@ const Vehicles = db.Vehicle;
 const Logs = db.Log;
 const Op = db.Sequelize.Op;
 const Sequelize = db.Sequelize;
+const socket = require('../socket');
+const _ = require('lodash'); // Importa la biblioteca lodash
+const axios = require('axios');
+
 
 // Variables para ajustes de desarrollo
 const MINUTES_AGO = 10; // Encuentra tracks subidos en los últimos 10 minutos
-const RADIUS_IN_METERS = 500; // Encuentra tracks dentro de un radio de 500 metros
+const RADIUS_IN_METERS = 500; // Encuentra tracks dentro de un radio de 500 metro
+
+function calculateDistance(lat1, lon1, lat2, lon2) {
+    var R = 6371; // Radio de la tierra en km
+    var dLat = (lat2 - lat1) * Math.PI / 180;
+    var dLon = (lon2 - lon1) * Math.PI / 180;
+    var a =
+        0.5 - Math.cos(dLat) / 2 +
+        Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+        (1 - Math.cos(dLon)) / 2;
+
+    return R * 2 * Math.asin(Math.sqrt(a));
+}
+
+exports.processTracks = (req, res) => {
+    const allTracks = req.body.allTracks;
+
+    // Agrupa los tracks por tipo de vehículo
+    const groupedTracks = groupTracksByVehicleAndMethod(allTracks);
+
+    const carTracksGPSGeoJSON = groupedTracks.car ? tracksToGeoJSON(groupedTracks.car.GPS || []) : [];
+    const bicycleTracksGPSGeoJSON = groupedTracks.bicycle ? tracksToGeoJSON(groupedTracks.bicycle.GPS || []) : [];
+    const carTracksGeoapifyGeoJSON = groupedTracks.car ? tracksToGeoJSON(groupedTracks.car.Geoapify || []) : [];
+    const bicycleTracksGeoapifyGeoJSON = groupedTracks.bicycle ? tracksToGeoJSON(groupedTracks.bicycle.Geoapify || []) : [];
+
+    // Devuelve las capas GeoJSON en la respuesta
+    res.json({ carTracksGPSGeoJSON, carTracksGeoapifyGeoJSON, bicycleTracksGPSGeoJSON, bicycleTracksGeoapifyGeoJSON });
+};
+
+// Función para agrupar los tracks por tipo de vehículo
+function groupTracksByVehicleAndMethod(tracks) {
+    return tracks.reduce((grouped, track) => {
+        const vehicleGroup = (grouped[track.Vehicles.Vehicle] = grouped[track.Vehicles.Vehicle] || {});
+        (vehicleGroup[track.Method] = vehicleGroup[track.Method] || []).push(track);
+        return grouped;
+    }, {});
+}
+
+// Función para transformar los tracks a GeoJSON
+function tracksToGeoJSON(tracks) {
+    return {
+        type: 'FeatureCollection',
+        features: tracks.map(track => ({
+            type: 'Feature',
+            geometry: {
+                type: 'Point',
+                coordinates: track.Location.coordinates
+            },
+            properties: {
+                trackId: track.ID,
+                vehicleId: track.Vehicle_UID,
+                status: track.Status,
+                speed: track.Speed,
+                type: track.Type,
+                vehicleType: track.Vehicles.Vehicle
+            }
+        }))
+    };
+}
+
 
 exports.findRecentTracksWithinRadius = async (req, res) => {
     // Calcula el tiempo mínimo (hace X minutos desde ahora)
@@ -76,28 +139,117 @@ const createLogEntry = async (action, trackId, adminId) => {
     }
 };
 
+async function correctTrack(track) {
+    if (!track || !Array.isArray(track.Location.coordinates) || track.Location.coordinates.length < 2) {
+        console.error('Invalid track data:', track);
+        return track;
+    }
+
+    const lat = track.Location.coordinates[0];
+    const lon = track.Location.coordinates[1];
+
+    try {
+        const response = await axios.get(`https://api.geoapify.com/v1/geocode/reverse?lat=${lat}&lon=${lon}&apiKey=90862c7baea8498aae344555b76ab034`);
+
+        if (response.data.features[0].properties.category !== 'road') {
+            const roadAddress = response.data.features[0].properties.street;
+            const roadResponse = await axios.get(`https://api.geoapify.com/v1/geocode/search?apiKey=90862c7baea8498aae344555b76ab034&text=${roadAddress}`);
+
+            let closestRoad;
+            let minDistance = Infinity;
+
+            for (let i = 0; i < roadResponse.data.features.length; i++) {
+                const road = roadResponse.data.features[i];
+                const roadLat = road.geometry.coordinates[1];
+                const roadLon = road.geometry.coordinates[0];
+                const distance = getDistance(lat, lon, roadLat, roadLon);
+
+                if (distance < minDistance) {
+                    minDistance = distance;
+                    closestRoad = road;
+                }
+            }
+
+            if (closestRoad) {
+                console.log('Original track location:', lat, lon);
+                track.Location.coordinates[0] = closestRoad.geometry.coordinates[1];
+                track.Location.coordinates[1] = closestRoad.geometry.coordinates[0];
+                console.log('New track location:', track.Location.coordinates[0], track.Location.coordinates[1]);
+            }
+        }
+
+        return track;
+    } catch (error) {
+        console.error('Error in reverse geocoding API:', error);
+    }
+}
+
+function getDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radio de la tierra en km
+    const dLat = deg2rad(lat2 - lat1);
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const distance = R * c; // Distancia en km
+    return distance;
+}
+
+function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+}
+
 exports.create = async (req, res) => {
     try {
-
         const track = {
             Location: req.body.Location,
             Status: req.body.Status,
             Speed: req.body.Speed,
+            Type: req.body.Type,
             Extra: req.body.Extra,
             Vehicle_UID: req.body.Vehicle_UID,
             Date: req.body.Date,
         };
 
-        const createdTrack = await Tracks.create(track);
+        // Buscar el último track para este vehículo
+        const lastTrack = await Tracks.findOne({ where: { Vehicle_UID: track.Vehicle_UID }, order: [['createdAt', 'DESC']] });
 
-        res.status(201).send({ message: "Track created successfully." });
+        if (lastTrack) {
+            // Calcular la distancia y el tiempo
+            const distance = calculateDistance(lastTrack.Location.coordinates[0], lastTrack.Location.coordinates[1], track.Location.coordinates[0], track.Location.coordinates[1]);
+            const time = (new Date(track.Date) - new Date(lastTrack.Date)) / 1000 / 60 / 60; // en horas
+
+            // // Calcular la velocidad
+            // const speed = distance / time;
+
+            // // Guardar la velocidad en el track
+            // track.Speed = speed;
+        }
+
+        const originalTrack = await Tracks.create({ ...track, Method: 'GPS' });
+
+
+        // Emitir el evento 'trackCreated' con el track creado como dato
+        const io = socket.getIo();
+        io.emit('trackCreated', originalTrack);
+
+        // Corrige el track
+        const correctedTrackData = await correctTrack(track);
+
+        // Crea el track corregido con el método 'Geoapify'
+        const correctedTrack = await Tracks.create({ ...correctedTrackData, Method: 'Geoapify' });
+
+        res.status(201).send({ message: "Tracks created successfully.", originalTrack, correctedTrack });
     } catch (error) {
         console.error(error);
         res.status(500).send({
-            message: error.message || "Some error occurred while creating the track.",
+            message: error.message || "Some error occurred while creating the tracks.",
         });
     }
 };
+
 
 exports.findAll = (req, res) => {
     Tracks.findAll()
@@ -140,6 +292,7 @@ exports.update = async (req, res) => {
             Location: req.body.Location,
             Status: req.body.Status,
             Speed: req.body.Speed,
+            Type: req.body.Type,
             Extra: req.body.Extra,
             Vehicle_UID: req.body.Vehicle_UID,
         };
@@ -170,6 +323,87 @@ exports.update = async (req, res) => {
         console.error(`Error updating Track with id=${id}: ${err.message}`);
         res.status(500).send({
             message: `Error updating Track with id=${id}: ${err.message}`
+        });
+    }
+};
+
+exports.findTracksWithinBounds = async (req, res) => {
+    const swLat = parseFloat(req.query.swLat);
+    const swLng = parseFloat(req.query.swLng);
+    const neLat = parseFloat(req.query.neLat);
+    const neLng = parseFloat(req.query.neLng);
+    const userId = req.query.userId;
+
+    const boundsPolygon = Sequelize.fn('ST_GeomFromText', `POLYGON((${swLat} ${swLng}, ${neLat} ${swLng}, ${neLat} ${neLng}, ${swLat} ${neLng}, ${swLat} ${swLng}))`);
+
+    try {
+        let whereClause = {
+            [Sequelize.Op.or]: [
+                { Vehicle: 'bicycle' },
+                { Vehicle: 'car' }
+            ]
+        };
+
+        if (userId) {
+            whereClause.Admin_UID = userId;
+        }
+
+        let tracksWithinBounds = await db.Track.findAll({
+            where: Sequelize.where(
+                Sequelize.fn('ST_Contains', boundsPolygon, Sequelize.col('Location')),
+                true
+            ),
+            include: [{
+                model: db.Vehicle,
+                as: 'Vehicles',
+                where: whereClause,
+                required: true
+            }],
+            logging: console.log
+        });
+
+        console.log("LKFHBJDFHNKSJDHn", tracksWithinBounds)
+        res.status(200).send({
+            tracksWithinBounds: tracksWithinBounds
+        })
+    } catch (error) {
+        console.error('Error al buscar tracks recientes dentro del radio:', error);
+        res.status(500).send({
+            message: "Error al recuperar tracks recientes dentro del radio especificado."
+        });
+    }
+};
+
+
+
+exports.findTracksInTimeInterval = async (req, res) => {
+    // Assume you receive the start and end times as query params in ISO 8601 format
+    const startTime = new Date(req.query.startTime);
+    const endTime = new Date(req.query.endTime);
+
+    try {
+        let tracksInTimeInterval = await db.Track.findAll({
+            where: {
+                Date: {
+                    [Op.gte]: startTime, // Greater than or equal to the start time
+                    [Op.lte]: endTime    // Less than or equal to the end time
+                }
+            },
+            include: [{
+                model: db.Vehicle, // Use the Vehicles model
+                as: 'Vehicles', // Change this to match the name of the model
+                attributes: ['Vehicle'] // Include the 'Vehicle' field which contains the type of vehicle
+            }],
+            logging: console.log
+        });
+
+        res.status(200).send({
+            tracksInTimeInterval: tracksInTimeInterval
+        });
+    } catch (error) {
+        console.error('Error fetching tracks in time interval:', error);
+        res.status(500).send({
+            message: "Error retrieving tracks in the specified time interval."
         });
     }
 };
@@ -354,15 +588,15 @@ exports.calculateBicycleTime = async (req, res) => {
 
 function calculateDistance(location1, location2) {
     const R = 6371e3; // radio medio de la Tierra en metros
-    const lat1 = location1[0] * Math.PI/180; // convertir a radianes
-    const lat2 = location2[0] * Math.PI/180;
-    const deltaLat = (location2[0]-location1[0]) * Math.PI/180;
-    const deltaLng = (location2[1]-location1[1]) * Math.PI/180;
+    const lat1 = location1[0] * Math.PI / 180; // convertir a radianes
+    const lat2 = location2[0] * Math.PI / 180;
+    const deltaLat = (location2[0] - location1[0]) * Math.PI / 180;
+    const deltaLng = (location2[1] - location1[1]) * Math.PI / 180;
 
-    const a = Math.sin(deltaLat/2) * Math.sin(deltaLat/2) +
-              Math.cos(lat1) * Math.cos(lat2) *
-              Math.sin(deltaLng/2) * Math.sin(deltaLng/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    const a = Math.sin(deltaLat / 2) * Math.sin(deltaLat / 2) +
+        Math.cos(lat1) * Math.cos(lat2) *
+        Math.sin(deltaLng / 2) * Math.sin(deltaLng / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 
     const distance = R * c; // en metros
     return distance;
@@ -421,62 +655,61 @@ exports.calculateTotalDistance = async (req, res) => {
 exports.getLastJourney = async (req, res) => {
     try {
         const adminId = req.params.Admin_UID; // Asume que recibes el ID del administrador como parámetro
-  
-      // Busca todos los vehículos del administrador
-      const vehicles = await Vehicles.findAll({
-        where: { Admin_UID: adminId }
-      });
-  
-      if (!vehicles || vehicles.length === 0) {
-        return res.status(404).json({ message: 'No se encontró ningún vehículo para este administrador' });
-      }
-  
-      let allTracks = [];
-  
-      // Itera sobre los vehículos del administrador y busca los tracks para cada uno
-      for (let vehicle of vehicles) {
-        const tracks = await Tracks.findAll({
-          where: { Vehicle_UID: vehicle.UID },
-          order: [['Date', 'ASC']]
+
+        // Busca todos los vehículos del administrador
+        const vehicles = await Vehicles.findAll({
+            where: { Admin_UID: adminId }
         });
-  
-        allTracks = allTracks.concat(tracks);
-      }
-  
-      let journeys = [];
-      let currentJourney = [allTracks[0]];
-  
-      // Itera sobre los tracks del usuario
-      for (let i = 1; i < allTracks.length; i++) {
-        const currentTrack = allTracks[i];
-        const previousTrack = allTracks[i - 1];
-  
-        // Calcula la diferencia de tiempo entre el track actual y el anterior
-        const timeDifference = (new Date(currentTrack.Date) - new Date(previousTrack.Date)) / 1000;
-  
-        // Si la diferencia de tiempo es mayor a 5 segundos, considera que es un nuevo viaje
-        if (timeDifference > 5) {
-          journeys.push(currentJourney);
-          currentJourney = [currentTrack];
-        } else {
-          currentJourney.push(currentTrack);
+
+        if (!vehicles || vehicles.length === 0) {
+            return res.status(404).json({ message: 'No se encontró ningún vehículo para este administrador' });
         }
-      }
-  
-      // Asegúrate de agregar el último viaje
-      journeys.push(currentJourney);
-  
-      // Obtiene el último viaje
-      const lastJourney = journeys[journeys.length - 1];
-  
-      // Obtiene el primer y último track del último viaje
-      const firstTrack = lastJourney[0];
-      const lastTrack = lastJourney[lastJourney.length - 1];
-  
-      return res.json({ firstTrack, lastTrack });
+
+        let allTracks = [];
+
+        // Itera sobre los vehículos del administrador y busca los tracks para cada uno
+        for (let vehicle of vehicles) {
+            const tracks = await Tracks.findAll({
+                where: { Vehicle_UID: vehicle.UID },
+                order: [['Date', 'ASC']]
+            });
+
+            allTracks = allTracks.concat(tracks);
+        }
+
+        let journeys = [];
+        let currentJourney = [allTracks[0]];
+
+        // Itera sobre los tracks del usuario
+        for (let i = 1; i < allTracks.length; i++) {
+            const currentTrack = allTracks[i];
+            const previousTrack = allTracks[i - 1];
+
+            // Calcula la diferencia de tiempo entre el track actual y el anterior
+            const timeDifference = (new Date(currentTrack.Date) - new Date(previousTrack.Date)) / 1000;
+
+            // Si la diferencia de tiempo es mayor a 5 segundos, considera que es un nuevo viaje
+            if (timeDifference > 5) {
+                journeys.push(currentJourney);
+                currentJourney = [currentTrack];
+            } else {
+                currentJourney.push(currentTrack);
+            }
+        }
+
+        // Asegúrate de agregar el último viaje
+        journeys.push(currentJourney);
+
+        // Obtiene el último viaje
+        const lastJourney = journeys[journeys.length - 1];
+
+        // Obtiene el primer y último track del último viaje
+        const firstTrack = lastJourney[0];
+        const lastTrack = lastJourney[lastJourney.length - 1];
+
+        return res.json({ firstTrack, lastTrack });
     } catch (error) {
-      console.error(`Error al buscar el último viaje: ${error}`);
-      return res.status(500).json({ message: 'Hubo un error al buscar el último viaje' });
+        console.error(`Error al buscar el último viaje: ${error}`);
+        return res.status(500).json({ message: 'Hubo un error al buscar el último viaje' });
     }
-  };
-  
+};

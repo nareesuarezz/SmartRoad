@@ -1,38 +1,18 @@
-form {
-    max-width: 400px; 
-    margin: 0 auto; 
-  }
-  
-  label {
-    display: block;
-    margin-bottom: 10px;
-  }
-  
-  input,
-  select {
-    width: 100%;
-    padding: 8px;
-    margin-bottom: 10px;
-    box-sizing: border-box;
-  }
-  
-  button {
-    width: 100%;
-    padding: 10px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    cursor: pointer;
-  }
+.language-switcher-trAdd {
+    margin-top: 12px;
+    margin-left: 20em;
+}
 
-  .image-preview {
-    text-align: center; 
-    margin-top: 10px; 
-  }
-  
-  .image-preview img {
-    max-width: 100%; 
-    max-height: 200px; 
-    margin: 0 auto; 
-    display: block; 
-  }
+.tracks-add-form {
+    width: auto;
+    margin: 12px;
+    align-items: center;
+}
+
+.tracks-add-form input {
+    width: 80%;
+}
+
+.tracks-add-form button {
+    width: 90%;
+}
