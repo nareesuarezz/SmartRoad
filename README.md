@@ -147,27 +147,26 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
    _Example:_ When selecting the car driver button, the interface continues to maintain the same general layout and offers a consistent experience with the home page.
    
     ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/dacd7828-80a0-4a0b-bfe4-d80c6c483a34)
+   
     ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2533c594-2215-432b-9088-b48a9be5a4e6)
 
     
-3. Readability:
+4. Readability:
 
     _Justification:_ Legible fonts, appropriate font sizes, and a well-chosen color scheme enhance readability, catering to users with visual impairments or reading difficulties.
    
    _Example:_ The car or bike page is a perfect example for this aspect, we have a really clear text telling you what is it function and what is going to make the app
    
-   ![290362307-931ec42f-f85d-4903-8cb6-01339b27a259](https://github.com/nareesuarezz/SmartRoad/assets/131177598/a4dd3d9e-fdad-454f-8d69-1bbbce11332b)
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2533c594-2215-432b-9088-b48a9be5a4e6)
 
-
-4. Match Between the System and the Real World
+5. Match Between the System and the Real World
 
     _Justification:_ The desing uses words, phrases and concepts familiar for the user.
 
     _Example:_ We use a common and simply use of the jargon for tell about what happening, and whats
 gonna happen
 
-![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/fa7a6565-2f18-4cd6-9cdc-2a05cf56f34c)
-
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2533c594-2215-432b-9088-b48a9be5a4e6)
 
 5. User Control and Freedom
 
@@ -175,7 +174,7 @@ gonna happen
 
    _Example:_ A left arrow on the top left of the screen that allow the user going back on the instruction
 
-   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/173c8699-ad64-4da3-a6fb-c7160315c47a)
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/7f653db5-4926-440c-96b2-beeee972c4ff)
 
 
 6. Aesthetic and Minimalist Desing
@@ -184,7 +183,7 @@ gonna happen
 
    _Example_: The principal view of the API use a limited color palette, and efficient use of space. It presents only the necessary elements 
 
-![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/02971a55-8eff-4b74-b002-d5b2fafa5970)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/101cf3d3-985d-419a-b6f2-fc7c362881e6)
 
 
 7. Help and Documentation:
@@ -193,7 +192,7 @@ gonna happen
 
    _Example:_ The API is very intuitive and if you need a user manual it is easy to find. It is on the main page of the API and is an option that says "Need help?"
 
-   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2d71aa8c-34f0-4f30-97d7-5162f29fd300)
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/7d2fa693-3125-4042-89d7-ee103004f667)
 
 
 8. Instant Feedback:
@@ -212,10 +211,12 @@ gonna happen
    _Example:_ An API for a global e-commerce platform could accept requests and return responses in multiple languages, making it more accessible and user-friendly.
 
    English option allowed
-    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/fbec981b-8be1-480b-904a-ef08a7d1a682)
+   
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/91db14c3-24d1-41e0-b66f-8c67ad4cdd14)
 
    Spanish option allowed
-    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/37bb9814-fed6-4feb-9070-2f36aee8d261)
+   
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2aba1774-e05f-408e-a0ca-7af497c167b8)
 
 
 
