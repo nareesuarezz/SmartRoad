@@ -82,10 +82,12 @@ And if you log as a bike it appears this interface:
 
 We also added a sound selector, where you can select a notification sound in case that you are a
 car driver:
+
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/d5015c81-4701-459f-8608-78f4413528fc)
 
 Another new feature is that we added a multilanguage support (we just added english and spanish for now), which allows you to change the language between spanish and english in every page of the API:
-![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/65f5a197-3db6-4a84-8f12-6e7600b189f6)
+
+![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/a805dd13-c78f-4a04-af69-cf308113dc9c)
 
 That's how it looks like if you change it to spanish:
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/e3e5278e-656e-471f-95a9-d21fbf3bf037)
