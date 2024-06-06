@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 import "./vehiclesEdit.css"
 
-const URL = process.env.REACT_APP_URL;
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const VehicleEdit = ({ getVehicles }) => {
     const { t } = useTranslation();

@@ -114,5 +114,3 @@ exports.update = (req, res) => {
         });
       });
   };
-
-

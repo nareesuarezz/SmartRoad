@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
 
-const URL = process.env.REACT_APP_URL;
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 const TrackEdit = ({ getTracks }) => {
     const { t } = useTranslation();

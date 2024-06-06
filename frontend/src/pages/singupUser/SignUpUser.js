@@ -1,29 +1,29 @@
-    import React, { useState } from 'react';
-    import './SignUpUser.css';
-    import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-    import AuthService from '../../services/authService';
-    import { useTranslation } from 'react-i18next';
-    import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import React, { useState } from 'react';
+import './SignUpUser.css';
+import { EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
+import AuthService from '../../services/authService';
+import { useTranslation } from 'react-i18next';
+import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
 
-    function SignUpUser() {
-        const [username, setUsername] = useState('');
-        const [password, setPassword] = useState('');
-        const [showPassword, setShowPassword] = useState(false);
-        const [error, setError] = useState('');
-        const URL = process.env.REACT_APP_URL;
-        const { t } = useTranslation();
+function SignUpUser() {
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [error, setError] = useState('');
+    const URL = process.env.REACT_APP_LOCALHOST_URL;
+    const { t } = useTranslation();
 
     const createUser = async () => {
         try {
             const pfp = `${URL}/images/user.png`
             const response = await AuthService.signUp(username, password, 'User', pfp);
 
-                console.log('Respuesta del backend:', response);
+            console.log('Respuesta del backend:', response);
 
-                if (response.error) {
-                    setError(response.error);
-                    return;
-                }
+            if (response.error) {
+                setError(response.error);
+                return;
+            }
 
             window.location.href = "/login-user";
         } catch (error) {
@@ -87,4 +87,4 @@
     );
 };
 
-    export default SignUpUser;
+export default SignUpUser;

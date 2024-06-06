@@ -3,7 +3,7 @@ import io from 'socket.io-client';
 import axios from 'axios';
 import './NotificationTest.css'
 
-const SOCKET_SERVER_URL = process.env.REACT_APP_URL;
+const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
 const UserNotification = () => {
   const [showNotificationModal, setshowNotificationModal] = useState(false);
   const [currentNotification, setCurrentNotification] = useState('');

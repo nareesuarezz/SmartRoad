@@ -7,7 +7,7 @@ import "./AdminNotification.css"
 import LanguageSwitcher from '../languageSwitcher/LanguageSwitcher';
 import { useTranslation } from 'react-i18next';
 
-const SOCKET_SERVER_URL = process.env.REACT_APP_URL;
+const SOCKET_SERVER_URL = process.env.REACT_APP_LOCALHOST_URL;
 const AdminNotification = () => {
   const { t } = useTranslation();
 
