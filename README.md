@@ -137,7 +137,7 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
    
    _Example:_ The home page is the best example of this aspect, we have 2 buttons that indicates clearly where are them redirecting to
 
-   ![290362180-b0ed9750-0d60-4cc6-a954-07e72c7acf04](https://github.com/nareesuarezz/SmartRoad/assets/131177598/54ad482b-8f4d-4ea7-9650-64ebad5b3075)
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/4f7d55f4-3090-4286-8d0b-d39c7535ba9f)
 
 
 2. Consistency:
@@ -146,8 +146,8 @@ https://www.figma.com/file/rFNs70rKThQkLl0Nqc9rYP/Untitled?type=design&node-id=0
    
    _Example:_ When selecting the car driver button, the interface continues to maintain the same general layout and offers a consistent experience with the home page.
    
-   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/810921d3-2ec5-45e3-b7fd-28c7bc4ee4fa)
-   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/7ec111b7-d9c4-444a-b0a9-38c628bdaeff)
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/dacd7828-80a0-4a0b-bfe4-d80c6c483a34)
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2533c594-2215-432b-9088-b48a9be5a4e6)
 
     
 3. Readability:
