@@ -11,7 +11,7 @@ import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher
 import UserNotification from '../../components/websocketTest/UserNotification';
 import ProfilePictureUser from '../../components/profilePictureUser/profilePictureUser';
 import { UserDeleteOutlined } from '@ant-design/icons';
-const URL = process.env.REACT_APP_URL;
+const URL = process.env.REACT_APP_LOCALHOST_URL;
 
 
 function Home() {
