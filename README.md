@@ -229,7 +229,7 @@ gonna happen
    
    _Example:_ An example of this aspect is in the forms of the admin view, you can navigate through the fields with the keyboard
    
-   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/ddab5941-3439-4344-af38-77a83d41f5fa)
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/922c4bd4-9ba4-4bd0-a08f-97718e243175)
 
 
 2. Color Contrast:
@@ -238,7 +238,7 @@ gonna happen
    
    _Example:_ The admin view is a good example of this aspect, since it has a contrast between all the features
    
-   ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/131177598/2a584642-f412-4f9c-9850-2d96b05ec1cd)
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/9185a9d2-bd1a-42e4-8f9e-3abb1aafc76a)
 
 
 3. Alternative Text on images:
@@ -270,11 +270,12 @@ gonna happen
    _Example:_ An API for a global e-commerce platform could accept requests and return responses in multiple languages, making it more accessible and user-friendly.
 
    English option allowed
-    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/fbec981b-8be1-480b-904a-ef08a7d1a682)
-
+   
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/91db14c3-24d1-41e0-b66f-8c67ad4cdd14)
+   
    Spanish option allowed
-    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/37bb9814-fed6-4feb-9070-2f36aee8d261)
-
+   
+    ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/2aba1774-e05f-408e-a0ca-7af497c167b8)
 
 
 ## Manuals of installation
