@@ -120,6 +120,7 @@ looks like in the admin and user interface:
 
 ![imagen](https://github.com/nareesuarezz/SmartRoad/assets/118464117/4b0c00eb-6dab-438d-9586-c7dfac49ef77)
 
+In addition, we have added a profile page for the user side, where he can see his statistics such as time and distance he has travelled with the different types of vehicles and also has his own map to create routes that are saved there in case the user wants to see them, also the map shows a record of all the movements the user has made, like the normal map but only of the movements of the user that enters the page.
 
 
 ## Initial Design
