@@ -68,6 +68,7 @@ First, once you enter into the app, you will have a login page, where you can lo
 ![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/dd3c0b06-dacc-44d5-bf62-4721d9e89ed6)
 
 This is the home page:
+
 ![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/b0ed9750-0d60-4cc6-a954-07e72c7acf04)
 
 If you log as a car it appears this interface:
