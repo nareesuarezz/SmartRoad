@@ -67,15 +67,11 @@ const SoundList = () => {
     setDurationFilter(Number(e.target.value));
   }
 
-  const goBack = () => {
-    window.location.href = '/login-user';
-  };
-
   return (
     <div>
       <Header />
-      <div className='language-add-bottons-container-sound'>
-        <div className='sound-add-container'>
+      <div className='language-add-bottons-container-sounds'>
+        <div className='sounds-add-container'>
           <Link to="/sound-add" className="add">
             {t('Add New Sound')}
           </Link>
@@ -84,17 +80,21 @@ const SoundList = () => {
           <LanguageSwitcher />
         </div>
       </div>
-      <div className='soundsFilters'>
-        <input type='text' placeholder='Sound Name' onChange={handleSoundNameGetter}></input>
-        <select onChange={handleDurationFilterChange}>
-          <option value="">-- Select Duration --</option>
-          <option value="1">1 Second</option>
-          <option value="2">2 Seconds</option>
-          <option value="3">3 Seconds</option>
-        </select>
+      <div className='sounds-filter'>
+        <div className='sounds-filter-duration'>
+          <select onChange={handleDurationFilterChange}>
+            <option value="">{t('-- Select Duration --')}</option>
+            <option value="1">{t('1 Second')}</option>
+            <option value="2">{t('2 Second')}</option>
+            <option value="3">{t('3 Second')}</option>
+          </select>
+        </div>
+        <div className='sounds-filter-name'>
+          <input type='text' placeholder={t('Sound Name')} onChange={handleSoundNameGetter}></input>
+        </div>
       </div>
 
-      <table className="table is-striped is-fullwidth">
+      <table className="table-sounds">
         <thead>
           <tr>
             <th>ID</th>
@@ -110,7 +110,7 @@ const SoundList = () => {
               <td>{sound.filename}</td>
               <td>
                 {sound.id && (
-                  <audio controls>
+                  <audio controls className='audio-interface-sounds-list'>
                     <source src={`${URL}/api/sounds/${sound.id}`} type="audio/mp3" />
                     {t('Your browser does not support the audio tag.')}
                   </audio>

@@ -1,18 +1,18 @@
-.language-switcher-trAdd {
+.language-switcher-vhEdit {
     margin-top: 12px;
     margin-left: 20em;
 }
 
-.tracks-add-form {
+.vehicles-edit-form {
     width: auto;
     margin: 12px;
     align-items: center;
 }
 
-.tracks-add-form input {
+.vehicles-edit-form input {
     width: 80%;
 }
 
-.tracks-add-form button {
+.vehicles-edit-form button {
     width: 90%;
 }

@@ -1,18 +1,19 @@
-.language-switcher-trAdd {
+.language-switcher-adAdd {
     margin-top: 12px;
     margin-left: 20em;
 }
 
-.tracks-add-form {
+.admins-add-form {
     width: auto;
     margin: 12px;
     align-items: center;
 }
 
-.tracks-add-form input {
+.admins-add-form input {
     width: 80%;
+    margin-bottom: 10px;
 }
 
-.tracks-add-form button {
+.admins-add-form button {
     width: 90%;
 }

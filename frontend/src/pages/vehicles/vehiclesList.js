@@ -5,6 +5,7 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import Header from '../../components/header/header';
 import { useTranslation } from 'react-i18next';
 import LanguageSwitcher from '../../components/languageSwitcher/LanguageSwitcher';
+import "./vehiclesList.css"
 
 const URL = process.env.REACT_APP_LOCALHOST_URL;
 
@@ -66,21 +67,29 @@ const VehicleList = () => {
     <div>
       <Header />
       <div className='arrow' onClick={() => goBack()}><ArrowLeftOutlined /></div>
-      <div>
-        <LanguageSwitcher />
+      <div className='language-add-bottons-container-vehicles'>
+        <div className='vehicles-add-container'>
+          <Link to="/vehicle-add" className="add">
+            {t('Add New Vehicle')}
+          </Link>
+        </div>
+        <div>
+          <LanguageSwitcher />
+        </div>
       </div>
-      <Link to="/vehicle-add" className="add">
-        {t('Add New Vehicle')}
-      </Link>
-      <div className='vehiclesFilters'>
-        <label>Vehicle:</label>
-        <span> </span>
-        <select name="Vehicle" value={vehicleT} onChange={handleVehicleGetter}>
-          <option value="">Select</option>
-          <option value="Car">Car</option>
-          <option value="Bicycle">Bicycle</option>
-        </select>
-        <input type='text' placeholder='Admin_UID' onChange={handleAdminUIDGetter}></input>
+      <div className='vehicles-filter'>
+        <div className='vehicles-filter-type'>
+          <label>{t('Vehicle')}:</label>
+          <span> </span>
+          <select name="Vehicle" value={vehicleT} onChange={handleVehicleGetter}>
+            <option value="">{t('Select')}</option>
+            <option value="Car">{t('Car')}</option>
+            <option value="Bicycle">{t('Bicycle')}</option>
+          </select>
+        </div>
+        <div className='vehicles-filter-adminUID'>
+          <input type='text' placeholder={t('Admin_UID')} onChange={handleAdminUIDGetter}></input>
+        </div>
       </div>
 
       <table className="table is-striped is-fullwidth">

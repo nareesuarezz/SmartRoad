@@ -1,18 +1,18 @@
-.language-switcher-trAdd {
+.language-switcher-soundsEdit {
     margin-top: 12px;
     margin-left: 20em;
 }
 
-.tracks-add-form {
+.sounds-edit-form {
     width: auto;
     margin: 12px;
     align-items: center;
 }
 
-.tracks-add-form input {
+.sounds-edit-form input {
     width: 80%;
 }
 
-.tracks-add-form button {
+.sounds-edit-form button {
     width: 90%;
 }
