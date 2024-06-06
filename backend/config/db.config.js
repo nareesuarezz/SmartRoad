@@ -1,12 +1,9 @@
-const Sequelize = require("sequelize");
-
 module.exports = {
-  HOST: process.env.MYSQL_ADDON_HOST,
-  USER: process.env.MYSQL_ADDON_USER,
-  PASSWORD: process.env.MYSQL_ADDON_PASSWORD,
-  DB: process.env.MYSQL_ADDON_DB,
+  HOST: process.env.DB_HOST,
+  USER: process.env.DB_USER,
+  PASSWORD: process.env.DB_PASSWORD,
+  DB: process.env.DB_NAME,
   dialect: "mysql",
-  dialectModule: require('mysql2'),
   pool: {
     max: 5,
     min: 0,
@@ -14,18 +11,3 @@ module.exports = {
     idle: 10000
   }
 };
-
-const sequelize = new Sequelize(module.exports.DB, module.exports.USER, module.exports.PASSWORD, {
-  host: module.exports.HOST,
-  dialect: module.exports.dialect,
-  dialectModule: module.exports.dialectModule,
-  pool: module.exports.pool
-});
-
-sequelize.authenticate()
-  .then(() => {
-    console.log('Connection has been established successfully.');
-  })
-  .catch(err => {
-    console.error('Unable to connect to the database:', err);
-  });

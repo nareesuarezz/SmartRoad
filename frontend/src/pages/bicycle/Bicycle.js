@@ -94,7 +94,7 @@ function Bicycle() {
 
         const checkStatus = async () => {
             try {
-                const response = await axios.get(`https://smart-road-ke3l.vercel.app/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
+                const response = await axios.get(`https://localhost/api/tracks?Vehicle_UID=${lastVehicleId}&_limit=1&_sort=createdAt:desc`);
                 const lastTrackStatus = response.data[postsT]?.Status;
 
                 if (lastTrackStatus === 'Stopped') {

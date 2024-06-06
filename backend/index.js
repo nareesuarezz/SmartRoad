@@ -11,7 +11,20 @@ const https = require('https');
 const socket = require('./socket');
 const dbConfig = require("./config/db.config");
 
-const PORT = process.env.PORT || 3000;
+const USING_HTTPS = process.env.USING_HTTPS == "true" ? true : false;
+const HOST = process.env.HOST || "localhost";
+const PORT = process.env.PORT || 443;
+
+
+const HTTP = express();
+
+if (USING_HTTPS && PORT != 443) {
+  HTTP.get("*", (req, res) =>
+    res.redirect("https://" + process.env.HOST + ":" + process.env.PORT)
+  );
+
+  HTTP.listen(PORT);
+}
 
 const app = express();
 
@@ -20,16 +33,18 @@ const { Sequelize } = require('sequelize');
 const sequelize = new Sequelize(dbConfig.DB, dbConfig.USER, dbConfig.PASSWORD, {
   host: dbConfig.HOST,
   dialect: dbConfig.dialect,
-  pool: dbConfig.pool
+  pool: dbConfig.pool,
+  operatorsAliases: false
 });
 
 app.use(express.static(path.join(__dirname, 'public')));
 app.use('/uploads', express.static(path.join(__dirname, 'public/images')));
 app.use('/sounds', express.static(path.join(__dirname, 'public/sounds')));
 
+
 var corsOptions = {
-  origin: "https://smart-road.vercel.app", 
-  methods: "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE",
+  origin: "*",
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
   credentials: true,
   optionsSuccessStatus: 204,
   preflightContinue: true,
@@ -42,7 +57,7 @@ app.use(express.urlencoded({ extended: true }));
 const db = require("./models");
 
 // Database sync and setup
-db.sequelize.sync().then(async () => {
+db.sequelize.sync({ force: true }).then(async () => {
   console.log("Database tables dropped and re-synced.");
 
   const existingAdmin = await db.Admin.findOne({ where: { Username: 'prueba' } });
@@ -81,11 +96,14 @@ db.sequelize.sync().then(async () => {
     console.log('Sound1 Details:', createdSound1.toJSON());
     console.log('Sound2 Details:', createdSound2.toJSON());
     console.log('Sound3 Details:', createdSound3.toJSON());
+
+
   }
 });
 
 app.use(function (req, res, next) {
   var token = req.headers['authorization'];
+
 
   if (token && token.indexOf('Basic ') === 0) {
     const base64Credentials = req.headers.authorization.split(' ')[1];
@@ -104,6 +122,7 @@ app.use(function (req, res, next) {
 
     return next();
   }
+
 
   if (token) {
     token = token.replace('Bearer ', '');
@@ -124,7 +143,25 @@ app.use(function (req, res, next) {
   }
 });
 
-const SERVER = http.createServer(app);
+let SERVER = null;
+
+if (USING_HTTPS) {
+  const CERTS = () => {
+    try {
+      return {
+        key: fs.readFileSync(path.join(__dirname, ".cert/cert.key")),
+        cert: fs.readFileSync(path.join(__dirname, ".cert/cert.crt")),
+      };
+    } catch (err) {
+      console.log("No certificates found: " + err);
+    }
+  };
+  SERVER = https.createServer(CERTS(), app);
+} else {
+  SERVER = http.createServer(app);
+}
+
+
 
 const io = socket.init(SERVER);
 
@@ -173,21 +210,9 @@ require("./routes/subscription.routes")(app);
 require("./routes/routes.routes")(app);
 
 
-SERVER.listen(PORT, () => {
+(USING_HTTPS ? SERVER : app).listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
   sendGlobalNotification("Server has started!!!!!!!!!!!!!!"); // Sending a notification when server starts
 });
 
-app.get('/', (req, res) => {
-  res.send('Bienvenido a mi aplicación!');
-});
-
-
-module.exports = (req, res) => {
-  const { method, url } = req;
-  if (url.startsWith('/socket.io/')) {
-    io.attach(req, res);
-  } else {
-    app.handle(req, res);
-  }
-};
+module.exports = { app, io }; 
