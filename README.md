@@ -64,6 +64,9 @@ The SmartRoad system operates by constantly collecting and storing data related 
 The interface of the app it's really simple, for the user, two buttons where you decide who you are, and the it send you notifications in case that you are a car driver user, also you have an admin view with some tables where you can manage the data. Below, you have some screenshots of the interface of the app:
 
 ### User interface:
+First, once you enter into the app, you will have a login page, where you can login and depending of the role of your user you'll be redirected to the user or admin page:
+![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/dd3c0b06-dacc-44d5-bf62-4721d9e89ed6)
+
 This is the home page:
 ![image](https://github.com/nareesuarezz/SmartRoad/assets/131177598/b0ed9750-0d60-4cc6-a954-07e72c7acf04)
 
